@@ -1,0 +1,243 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import NonGoalsList from "../components/NonGoalsList.astro";
+import CliPreview from "../components/CliPreview.astro";
+import ManifestPreview from "../components/ManifestPreview.astro";
+import ArchDiagram from "../components/ArchDiagram.astro";
+import RoadmapGrid from "../components/RoadmapGrid.astro";
+
+import { site } from "../data/site.ts";
+import { problem, whatItIs, safety, architecture } from "../data/homepage.ts";
+
+const title = `${site.name} — ${site.tagline}`;
+
+const community = [
+  { label: "GitHub", detail: "Source, issues, and design records.", href: site.links.github, external: true },
+  { label: "X", detail: "Project updates and release notes.", href: site.links.x, external: true },
+  { label: "Reddit", detail: "Discussion and questions.", href: site.links.reddit, external: true },
+  { label: "Documentation", detail: "Concepts, reference, and design.", href: "/docs/", external: false },
+];
+---
+
+<BaseLayout title={title}>
+  <Hero />
+
+  <!-- Problem -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="The problem" title={problem.heading} />
+      <div class="prose-block">
+        {problem.body.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- What Hostwright is -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="What it does" title={whatItIs.heading} lead={whatItIs.intro} />
+      <ul class="feature-grid">
+        {
+          whatItIs.capabilities.map((c) => (
+            <li class="feature">
+              <h3>{c.title}</h3>
+              <p>{c.detail}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Non-goals -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Scope"
+        title="What it deliberately does not do yet"
+        lead="Stated openly. A narrow, defensible first release matters more than a broad one."
+      />
+      <NonGoalsList />
+    </div>
+  </section>
+
+  <!-- CLI preview -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Command line" title="A small, honest CLI" />
+      <CliPreview />
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Architecture" title={architecture.heading} lead={architecture.intro} />
+      <ArchDiagram />
+    </div>
+  </section>
+
+  <!-- Manifest -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Manifest" title="Declare a stack in one file" />
+      <ManifestPreview />
+    </div>
+  </section>
+
+  <!-- Safety -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Safety" title={safety.heading} lead={safety.intro} />
+      <ul class="safety-grid">
+        {
+          safety.principles.map((s) => (
+            <li class="safety-item">
+              <h3>{s.title}</h3>
+              <p>{s.detail}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section class="section" id="roadmap">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Current state"
+        title="Roadmap"
+        lead="Honest status. The design is locked; the build is just beginning."
+      />
+      <RoadmapGrid />
+    </div>
+  </section>
+
+  <!-- Community -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Community" title="Follow along" />
+      <ul class="community-grid">
+        {
+          community.map((c) => (
+            <li>
+              <a class="community-card" href={c.href} {...(c.external ? { rel: "noopener" } : {})}>
+                <span class="community-label">
+                  {c.label}
+                  {c.external ? " ↗" : ""}
+                </span>
+                <span class="community-detail">{c.detail}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose-block {
+    max-width: var(--width-prose);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+  }
+
+  .feature-grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  .feature {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-5);
+    background: var(--color-bg);
+  }
+  .feature h3 {
+    font-size: var(--text-base);
+  }
+  .feature p {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .safety-grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-1) var(--space-7);
+    grid-template-columns: 1fr;
+  }
+  .safety-item {
+    padding: var(--space-4) 0 var(--space-4) var(--space-4);
+    border-left: 2px solid var(--color-accent);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .safety-item h3 {
+    font-size: var(--text-base);
+  }
+  .safety-item p {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .community-grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: 1fr;
+  }
+  .community-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    background: var(--color-bg);
+    transition:
+      border-color var(--duration) var(--ease),
+      transform var(--duration) var(--ease);
+  }
+  .community-card:hover {
+    border-color: var(--color-text-faint);
+  }
+  .community-label {
+    font-weight: var(--weight-semibold);
+    color: var(--color-text);
+  }
+  .community-detail {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .feature-grid,
+    .safety-grid,
+    .community-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 64rem) {
+    .feature-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .community-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

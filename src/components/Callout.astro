@@ -1,0 +1,50 @@
+---
+// Used in docs MDX for notes, boundaries, and open questions.
+interface Props {
+  type?: "note" | "warning" | "boundary";
+  title?: string;
+}
+const { type = "note", title } = Astro.props;
+const defaultTitle = { note: "Note", warning: "Caution", boundary: "Boundary" }[type];
+---
+
+<aside class={`callout callout-${type}`}>
+  <p class="callout-title">{title ?? defaultTitle}</p>
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    margin-block: var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-left-width: 3px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+  }
+  .callout-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-1);
+  }
+  .callout-body :global(p) {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .callout-body :global(p + p) {
+    margin-top: var(--space-2);
+  }
+  .callout-note {
+    border-left-color: var(--color-accent);
+  }
+  .callout-warning {
+    border-left-color: var(--status-blocked);
+    background: var(--status-blocked-bg);
+  }
+  .callout-boundary {
+    border-left-color: var(--status-planned);
+  }
+</style>

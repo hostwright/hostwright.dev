@@ -1,0 +1,57 @@
+---
+import { nonGoals } from "../data/nonGoals.ts";
+---
+
+<ul class="nongoals">
+  {
+    nonGoals.map((item) => (
+      <li class="nongoal">
+        <svg class="nongoal-mark" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8 12h8" stroke-linecap="round" />
+        </svg>
+        <div>
+          <p class="nongoal-title">{item.title}</p>
+          <p class="nongoal-detail">{item.detail}</p>
+        </div>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .nongoals {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-1);
+    grid-template-columns: 1fr;
+  }
+  .nongoal {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+  .nongoal-mark {
+    flex: none;
+    margin-top: 0.15rem;
+    color: var(--color-text-faint);
+  }
+  .nongoal-title {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-base);
+  }
+  .nongoal-detail {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin-top: 0.15rem;
+  }
+
+  @media (min-width: 40rem) {
+    .nongoals {
+      grid-template-columns: 1fr 1fr;
+      gap: 0 var(--space-7);
+    }
+  }
+</style>

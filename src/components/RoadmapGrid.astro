@@ -1,0 +1,84 @@
+---
+import { roadmap } from "../data/roadmap.ts";
+import StatusChip from "./StatusChip.astro";
+
+const legend = ["planned", "in-progress", "implemented", "blocked"] as const;
+---
+
+<div class="roadmap">
+  <ul class="roadmap-grid">
+    {
+      roadmap.map((item) => (
+        <li class="roadmap-item">
+          <div class="roadmap-head">
+            <span class="roadmap-title">{item.title}</span>
+            <StatusChip status={item.status} />
+          </div>
+          <p class="roadmap-detail">{item.detail}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="roadmap-legend">
+    <span class="legend-label">Legend</span>
+    {legend.map((s) => <StatusChip status={s} />)}
+  </div>
+</div>
+
+<style>
+  .roadmap-grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: 1fr;
+  }
+  .roadmap-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-bg);
+  }
+  .roadmap-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .roadmap-title {
+    font-weight: var(--weight-semibold);
+  }
+  .roadmap-detail {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .roadmap-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+  .legend-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-faint);
+    font-weight: var(--weight-semibold);
+  }
+
+  @media (min-width: 40rem) {
+    .roadmap-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 64rem) {
+    .roadmap-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

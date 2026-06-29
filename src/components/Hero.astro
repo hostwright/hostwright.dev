@@ -1,0 +1,72 @@
+---
+import { hero } from "../data/homepage.ts";
+---
+
+<section class="hero">
+  <div class="container hero-inner">
+    <a class="hero-status" href="#roadmap">
+      <span class="dot" aria-hidden="true"></span>
+      {hero.status}
+    </a>
+    <h1 class="hero-title">{hero.title}</h1>
+    <p class="hero-subtitle">{hero.subtitle}</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href={hero.ctaPrimary.href}>{hero.ctaPrimary.label}</a>
+      <a class="btn btn-secondary" href={hero.ctaSecondary.href} rel="noopener">
+        {hero.ctaSecondary.label} ↗
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-9) var(--space-8);
+  }
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+  }
+  .hero-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.02em;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 999px;
+    background: var(--color-surface);
+  }
+  .hero-status:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-faint);
+  }
+  .hero-status .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+  }
+  .hero-title {
+    max-width: 18ch;
+    font-size: var(--text-4xl);
+  }
+  .hero-subtitle {
+    max-width: 56ch;
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+</style>

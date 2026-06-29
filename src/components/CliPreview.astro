@@ -1,0 +1,85 @@
+---
+import { Code } from "astro:components";
+import StatusChip from "./StatusChip.astro";
+import { cliCore, cliPlanned } from "../data/homepage.ts";
+---
+
+<div class="cli">
+  <div class="term">
+    <div class="term-bar">
+      <span class="term-label">hostwright — core</span>
+      <span class="term-note">in design</span>
+    </div>
+    <Code code={cliCore} lang="bash" theme="github-light" />
+  </div>
+
+  <div class="term">
+    <div class="term-bar">
+      <span class="term-label">hostwright — later</span>
+      <StatusChip status="planned" />
+    </div>
+    <Code code={cliPlanned} lang="bash" theme="github-light" />
+  </div>
+</div>
+
+<p class="cli-caption">
+  The command surface is still in design. These are the intended shapes, not a
+  shipped tool — commands marked <em>Planned</em> are not implemented yet.
+</p>
+
+<style>
+  .cli {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  .term {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fcfbf8;
+  }
+  .term-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .term-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .term-note {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+  }
+  /* Code component renders its own <pre>; strip the doubled border/radius. */
+  .term :global(pre.astro-code) {
+    border: 0 !important;
+    border-radius: 0 !important;
+    margin: 0;
+  }
+  .cli-caption {
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    max-width: var(--width-prose);
+  }
+  .cli-caption em {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  @media (min-width: 46rem) {
+    .cli {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+</style>
