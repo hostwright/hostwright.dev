@@ -1,0 +1,26 @@
+{
+  "name": "hostwright-site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Website and documentation for Hostwright",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "node scripts/render-og.mjs && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "og": "node scripts/render-og.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.5.0",
+    "@astrojs/mdx": "^4.2.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.7.0",
+    "sharp": "^0.33.5",
+    "@fontsource-variable/ibm-plex-sans": "^5.1.0",
+    "@fontsource/ibm-plex-mono": "^5.1.0"
+  }
+}
