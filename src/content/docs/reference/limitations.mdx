@@ -1,0 +1,44 @@
+---
+title: Limitations
+description: A direct, public list of what Hostwright cannot or does not do. Serious projects name their limits.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+Serious infrastructure projects state their limitations plainly. This page is
+intentionally blunt.
+
+<Callout type="warning" title="The largest limitation">
+Hostwright is not implemented yet. The design is locked, but the build is just
+beginning. Nothing on this site should be read as a description of working,
+shipped software. See the [roadmap](/#roadmap).
+</Callout>
+
+## Scope limits
+
+- **Single host only.** Hostwright manages one Mac. There is no cluster, no multi-machine scheduling, and no remote control plane.
+- **Apple silicon only.** Intel Macs are not supported and are not planned.
+- **macOS 26 or later only.** Earlier macOS versions are out of scope for the first release, primarily because of Apple container networking limitations.
+- **Apple container only.** Hostwright targets Apple container as its runtime substrate. It is not a general multi-runtime tool.
+
+## Runtime limits
+
+These follow from the [Apple container boundary](/docs/concepts/apple-container-boundary/):
+
+- **VM-per-container overhead.** Each container runs in its own lightweight VM. Replicas and large stacks carry real per-VM memory cost, and Hostwright will refuse applies that exceed a safe memory budget.
+- **`amd64` under emulation.** Images without a `linux/arm64` variant run under Rosetta and only when explicitly allowed. Hostwright warns rather than silently emulating.
+- **Networking is a capability gate, not a promise.** Service discovery and DNS are validated by `doctor`, not assumed. Hostwright will not claim Compose-style or Kubernetes-style networking semantics it cannot verify.
+- **Runtime feature boundaries.** Interactive `exec`/attach, port-forwarding, and log streaming for short-lived containers depend on what Apple container exposes; their exact boundaries are still being mapped.
+
+## Not in scope
+
+Hostwright deliberately avoids a number of things — a Docker API shim, a tunnel
+manager, a GPU/ANE scheduler, a cloud control plane, a web dashboard, and more.
+These are covered in [Non-goals](/docs/design/non-goals/), with the reasoning for each.
+
+## What this means for you
+
+If you need cluster orchestration, cross-machine scheduling, or a production
+control plane today, Hostwright is not that tool and is not trying to become it.
+If you want disciplined, single-host, desired-state control over Apple container
+workloads on an Apple silicon Mac, that is exactly the problem it is being built for.

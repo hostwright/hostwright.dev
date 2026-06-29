@@ -1,0 +1,65 @@
+---
+title: Safety model
+description: Conservative defaults — plan before mutation, dry-run before deletion, ownership-aware cleanup, and no secrets in logs.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+Infrastructure tooling earns trust by being predictable when things go wrong.
+Hostwright's safety posture is deliberately conservative, and the defaults reflect
+that.
+
+## Principles
+
+- **Plan before mutation.** Runtime changes are computed and reviewable before they run.
+- **Dry-run for cleanup.** Destructive operations preview exactly what they would remove.
+- **Explicit destructive confirmation.** Removing real resources is an intentional, confirmed action.
+- **Conservative validation.** Unsafe or ambiguous manifests are refused, not guessed at.
+- **No hidden runtime mutation.** Nothing changes the runtime outside the planned, recorded path.
+- **Ownership-tracked cleanup.** No broad garbage collection — only resources Hostwright can prove it owns.
+- **No secret leakage in logs.** Secrets and credentials are kept out of events and log output.
+
+## Ownership
+
+Hostwright must distinguish resources it created from resources you created by
+hand. Every Hostwright-created resource carries project and service ownership
+metadata where the runtime supports it; where it does not, Hostwright keeps an
+ownership ledger in its own [state store](/docs/reference/limitations/).
+
+The rule is strict: **Hostwright never deletes a resource it cannot prove it owns.**
+
+| Resource | Cleanup rule |
+| --- | --- |
+| Owned containers | Removable, with dry-run preview. |
+| Named volumes | Never removed automatically; explicit confirmation required. |
+| Anonymous volumes | Removed only when linked to owned containers and stale. |
+| Networks | Removed only with ownership proof and no attached foreign resources. |
+| Images | Not removed by default. |
+
+## Refusing unsafe applies
+
+Hostwright would rather stop than do something dangerous. An apply is refused
+when, for example:
+
+- the stack exceeds the configured safe memory budget;
+- a service requests `amd64` emulation without an explicit policy;
+- a required macOS, network, or container feature is unavailable;
+- a port conflict exists with no declared alternative;
+- an operation would require privileged access you have not approved.
+
+## Secrets
+
+Secrets are not committed into manifests. Local secrets are kept in the macOS
+**Keychain** rather than in Hostwright-managed plaintext, and mounts are
+least-privilege and read-only unless explicitly made writable.
+
+<Callout type="boundary" title="User-space first">
+Hostwright runs in user space and does not install privileged helpers casually.
+Any operation that would require elevated privilege must say what needs privilege
+and why before asking for it.
+</Callout>
+
+## Open questions
+
+- The exact ownership metadata Apple container can carry, versus what must live only in Hostwright's ledger.
+- Whether anonymous-volume cleanup can be made safe enough to enable without confirmation.

@@ -1,0 +1,46 @@
+---
+title: Compatibility
+description: The environment Hostwright targets — and the environments it explicitly does not.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+Hostwright targets one environment deeply. This page states exactly what that is.
+
+## Supported environment
+
+| Requirement | Status |
+| --- | --- |
+| Apple silicon (arm64) | **Required** |
+| macOS 26 or later | **Required** |
+| Apple container installed | **Required** |
+| Images with a `linux/arm64` variant | **Preferred** |
+| `linux/amd64` images (Rosetta) | Allowed only by explicit manifest policy |
+
+## Not supported
+
+| Environment | Status |
+| --- | --- |
+| Intel Macs | **Not supported, not planned** |
+| macOS 15 or earlier | **Not supported** for the first release |
+| Linux or Windows hosts | **Not supported** — this is a Mac-native project |
+| Runtimes other than Apple container | **Not supported** |
+
+<Callout type="boundary" title="Why so narrow">
+A narrow, defensible first release matters more than a broad, shaky one. Apple
+container networking and the VM-per-container model make older macOS and Intel
+support misleading rather than merely incomplete. See [Why
+Hostwright](/docs/design/why-hostwright/) and [Non-goals](/docs/design/non-goals/).
+</Callout>
+
+## Release language
+
+Hostwright avoids version-number hype. Progress is described in tracks rather than
+marketing versions:
+
+- **Foundation** — the first supported, narrow, strict release contract.
+- **Hardening** — behavior proven under failure: drift, sleep/wake, restarts, resource pressure, cleanup safety.
+- **Stable** — a release you could reasonably depend on for local development.
+
+The project is at the very start of the Foundation track. Nothing has been
+released. Track [current status](/#roadmap) for where each capability stands.

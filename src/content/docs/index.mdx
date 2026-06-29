@@ -1,0 +1,41 @@
+---
+title: Overview
+description: Hostwright is a Mac-native desired-state control plane for Apple container workloads. Start here.
+---
+
+import Callout from "../../components/Callout.astro";
+
+Hostwright is a **Mac-native desired-state control plane** for [Apple container](/docs/concepts/apple-container-boundary/) workloads. You describe the local stack you want in a `hostwright.yaml` manifest; Hostwright plans the change, applies it through a single runtime boundary, and keeps watching so that what is running matches what you declared.
+
+It is built for one machine: an Apple silicon Mac running a recent macOS with Apple container installed. It is not a cluster orchestrator, and it does not try to be.
+
+<Callout type="warning" title="Maturity">
+This is an early infrastructure project. The design is written down and locked; the
+implementation is just beginning. Treat everything here as a description of intent,
+not a shipped, production-ready tool. See [Limitations](/docs/reference/limitations/)
+and [Roadmap](/#roadmap).
+</Callout>
+
+## What you get
+
+- A declarative manifest, [`hostwright.yaml`](/docs/reference/hostwright-yaml/), for local stacks.
+- A planning step that shows every runtime change **before** it happens.
+- A [reconciler](/docs/concepts/reconciliation/) that converges actual state to declared state and reports drift.
+- A single [runtime adapter](/docs/concepts/runtime-adapter/) boundary over Apple container.
+- A [safety model](/docs/concepts/safety-model/) where destruction is explicit and cleanup is ownership-aware.
+
+## How these docs are organized
+
+These docs follow the same split that larger infrastructure projects use, so each page has one job:
+
+| Section | Answers |
+| --- | --- |
+| **Concepts** | How Hostwright thinks: desired state, the adapter, reconciliation, the Apple container boundary, safety. |
+| **Reference** | Exact surfaces: the CLI, the manifest, compatibility, and limitations. |
+| **Design** | Why the project exists, what it refuses to do, and where the name comes from. |
+
+## Where to start
+
+- New here? Read [Why Hostwright](/docs/design/why-hostwright/) for the motivation, then [Desired state](/docs/concepts/desired-state/).
+- Want the boundaries first? Read [Non-goals](/docs/design/non-goals/) and [Limitations](/docs/reference/limitations/).
+- Looking for the shape of the tool? See [Getting started](/docs/getting-started/) and the [CLI reference](/docs/reference/cli/).

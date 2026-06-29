@@ -1,0 +1,54 @@
+---
+title: Name and identity
+description: What "Hostwright" means, what the H mark represents, and the single visual motif the project allows itself.
+---
+
+The name and the mark both encode the same idea: shaping and maintaining the
+state of a local host.
+
+## The name
+
+A **wright** is a maker or repairer — a shipwright builds ships, a wheelwright
+builds wheels. A **hostwright**, then, is a craftsperson of the local host: the
+thing that shapes, repairs, supervises, and maintains host-local container
+workload state.
+
+That is precisely the job. Hostwright does not run your containers; it keeps the
+host in the state you declared, repairing drift and supervising health. The name
+is meant to be understood by the same people who respect `systemd`, SQLite, and
+Apple container — serious, specific, and not borrowed from the Kubernetes or
+Docker vocabulary.
+
+## The mark
+
+The H symbol is two **host pillars** joined by a single **control bridge**.
+
+- The two pillars stand for the two states Hostwright always holds in mind: the **declared** state and the **actual** host runtime state.
+- The bridge between them is **reconciliation** — the controlled connection that brings actual state toward declared state.
+
+The mark is geometric and flat on purpose. It reads at favicon size, it works in a
+single ink color, and it carries the project's one idea without ornament.
+
+## One motif, used sparingly
+
+Hostwright allows itself exactly one visual motif: **host pillars, a control
+bridge, a reconciliation line.** It appears in the mark and, quietly, as the thin
+rule between sections. There are no gradients, no particles, and no decorative
+illustration. The restraint is the point — this is infrastructure, and the design
+should feel like infrastructure.
+
+## Canonical names
+
+To keep everything consistent across the CLI, daemon, manifests, and docs:
+
+| Thing | Name |
+| --- | --- |
+| Project | Hostwright |
+| CLI | `hostwright` |
+| Daemon | `hostwrightd` |
+| Manifest | `hostwright.yaml` |
+| Documentation | `hostwright.dev` |
+
+Lowercase `hostwright` is used for the command, packages, and file names;
+PascalCase `Hostwright…` is used for Swift modules and types. The human-facing
+name is always **Hostwright**.

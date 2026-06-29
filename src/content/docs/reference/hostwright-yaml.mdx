@@ -1,0 +1,65 @@
+---
+title: hostwright.yaml
+description: The manifest format — the fields shown in the example, what they mean, and what is still under design.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+A stack is declared in a single `hostwright.yaml` file. This page documents the
+fields used in the example below. Anything not listed here is still under design
+and should not be relied on.
+
+## Example
+
+```yaml
+project: api-local
+
+services:
+  api:
+    image: ghcr.io/example/api:latest
+    ports:
+      - "8080:8080"
+    env:
+      APP_ENV: development
+    health:
+      command: ["curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+    restart:
+      policy: on-failure
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+```
+
+## Fields
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `project` | string | Name of the project. Scopes ownership and the resources in this stack. |
+| `services` | map | One entry per service, keyed by service name. |
+| `services.<name>.image` | string | The container image reference to run. |
+| `services.<name>.ports` | list of strings | Port mappings in `"host:container"` form. |
+| `services.<name>.env` | map | Environment variables passed to the service. |
+| `services.<name>.health.command` | list of strings | Command run to check health (argv form). |
+| `services.<name>.health.interval` | duration | How often the health command runs, e.g. `10s`. |
+| `services.<name>.restart.policy` | string | Restart behavior. `on-failure` is shown above. |
+
+## Notes
+
+- **Images should provide `linux/arm64`.** On Apple silicon, an image that only resolves to `amd64` runs under Rosetta and is allowed only by explicit policy.
+- **Health checks** are honest about the runtime: a check can only report what Apple container can observe.
+
+<Callout type="boundary" title="Under design">
+The full set of `restart.policy` values, image digest pinning, named volumes,
+config and secret references, replicas, and resource limits are part of the design
+but are not finalized here. They will be documented when their behavior is fixed —
+the goal is to never imply a field works before it does.
+</Callout>
+
+## Open questions
+
+- The canonical duration format and which fields accept durations.
+- Whether the manifest gains an explicit schema version field before the first release.
+- How secret and config references are expressed without ever putting secrets in the file. See the [safety model](/docs/concepts/safety-model/).

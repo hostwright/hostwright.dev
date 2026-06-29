@@ -1,0 +1,73 @@
+---
+title: Runtime adapter
+description: Every runtime operation crosses a single typed boundary, so Apple container assumptions never leak across the codebase.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+The **RuntimeAdapter** is the one place in Hostwright that talks to the runtime.
+Nothing else — not the reconciler, not the CLI — calls Apple container directly.
+This single boundary is the most important architectural decision in the project.
+
+## Why a single boundary
+
+Apple container is young and evolving. Its command surface, structured output,
+and native APIs will change. If assumptions about it were scattered across the
+reconciler, the state store, and the CLI, every runtime change would ripple
+through the whole codebase.
+
+By forcing every runtime operation through one typed protocol, Hostwright keeps
+those assumptions contained. The reconciler works against an abstract contract; it
+does not know or care whether the call is served by shelling out to the Apple
+container CLI or by a future Swift-native client.
+
+## The contract
+
+The adapter exposes typed operations to the rest of the system — roughly:
+
+```swift
+protocol RuntimeAdapter {
+    func systemStatus() async throws -> RuntimeSystemStatus
+    func pullImage(_ ref: ImageReference, policy: PullPolicy) async throws -> ImageRecord
+    func list(project: ProjectName) async throws -> [RuntimeContainer]
+    func inspect(_ id: RuntimeContainerID) async throws -> RuntimeContainer
+    func create(_ spec: ContainerCreateSpec) async throws -> RuntimeContainerID
+    func start(_ id: RuntimeContainerID) async throws
+    func stop(_ id: RuntimeContainerID, timeout: Duration) async throws
+    func delete(_ id: RuntimeContainerID) async throws
+    func logs(_ id: RuntimeContainerID, options: LogOptions) async throws -> LogStream
+    func stats(_ id: RuntimeContainerID) async throws -> RuntimeStatsSnapshot
+}
+```
+
+The exact shape will evolve, but the principle is fixed: typed inputs, typed
+outputs, typed errors. The reconciler never parses a human-readable table.
+
+## CLI adapter first, native adapter later
+
+The first concrete implementation drives the **Apple container CLI** and parses
+its structured output. A Swift-native adapter built on Apple's Containerization
+APIs is a later option — adopted only when that surface is stable enough to depend
+on. Both implement the same protocol, so the rest of the system is unaffected by
+the switch.
+
+## Rules for any adapter
+
+- Use **structured output** (JSON) when available; never scrape human tables.
+- Every subprocess call has a **timeout**, captured stderr, and typed error mapping.
+- Every operation is **cancellable**.
+- Operations are recorded as events **without leaking secrets**.
+- Every observed status carries its **source and a timestamp**.
+- Behavior is tested through a **mock adapter** and at least one real integration path.
+
+<Callout type="boundary" title="What the adapter does not do">
+The adapter does not own Apple container's internals — its helpers, its VM
+lifecycle, or its networking stack. It is a translation layer, not a reimplementation.
+See the [Apple container boundary](/docs/concepts/apple-container-boundary/).
+</Callout>
+
+## Open questions
+
+- How much runtime state can be reliably observed through the CLI's structured output today?
+- Which metadata can mark Hostwright-owned containers, volumes, and networks, versus what must live in Hostwright's own [state store](/docs/reference/limitations/)?
+- When does the native Containerization API become stable enough to back a second adapter?

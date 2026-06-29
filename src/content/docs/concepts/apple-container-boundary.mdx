@@ -1,0 +1,66 @@
+---
+title: Apple container boundary
+description: Apple container is the execution substrate. Hostwright sits above it and is careful about what it does and does not own.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+Hostwright does not run containers. **Apple container** runs containers; Hostwright
+decides what *should* run and keeps it honest. Understanding where that line sits
+is essential to understanding the project.
+
+## What Apple container provides
+
+Apple container is a Mac-native runtime built for Apple silicon. The properties
+that matter for Hostwright:
+
+- A **VM-per-container** model — each container runs in its own lightweight Linux VM rather than a single shared VM.
+- An **OCI image** flow, so standard container images work.
+- A command surface and helper services managed under macOS (launchd, XPC), with `vmnet`-based networking.
+
+The VM-per-container model is a defining constraint: replicas and large stacks
+carry real per-VM memory overhead, which shapes Hostwright's [resource
+guardrails](/docs/reference/limitations/).
+
+## The path of a runtime operation
+
+```text
+hostwright CLI
+  → hostwrightd
+    → RuntimeAdapter
+      → Apple container CLI / Containerization
+        → Apple container services
+          → lightweight Linux VM
+            → your container process
+```
+
+Everything above the [RuntimeAdapter](/docs/concepts/runtime-adapter/) is
+Hostwright. Everything below it is Apple's. The adapter is the seam.
+
+## What Hostwright owns
+
+- Declared state, planning, and reconciliation.
+- Drift detection, health, restart policy, and events.
+- An ownership ledger and a conservative cleanup policy.
+
+## What Apple container owns
+
+- The container and VM lifecycle internals.
+- The image store and registry interactions.
+- The networking stack and system helpers.
+
+<Callout type="boundary" title="No reaching past the seam">
+Hostwright does not reimplement, patch, or assume the internals of Apple
+container. When the runtime cannot do something, Hostwright reports it as a
+[limitation](/docs/reference/limitations/) rather than hiding it behind a vague error.
+</Callout>
+
+## Open questions at the boundary
+
+These depend on Apple container behavior and are tracked, not assumed:
+
+- The boundaries of `exec` and interactive attach.
+- Port-forwarding semantics and equivalents.
+- Log streaming for short-lived containers.
+- Stable MAC addresses and project-level network isolation.
+- What ownership metadata the runtime can carry for owned resources.

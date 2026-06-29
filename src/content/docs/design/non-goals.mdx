@@ -1,0 +1,74 @@
+---
+title: Non-goals
+description: What Hostwright refuses to do, and why each refusal makes the project stronger rather than weaker.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+A project is defined as much by what it refuses to do as by what it builds.
+Hostwright's non-goals are deliberate, and each has a reason.
+
+## Copy, adapt, reject
+
+Hostwright studies prior art and decides explicitly what to take:
+
+| Source idea | Decision | What Hostwright does |
+| --- | --- | --- |
+| Kubernetes controllers | **Adapt** | A local observe–diff–plan–apply–observe loop. |
+| Kubernetes API server | **Reject (for now)** | Single-host control needs no distributed API server. |
+| Container Runtime Interface (CRI) | **Study, don't implement** | Inspiration for the adapter boundary, not a shim. |
+| Docker Compose | **Adapt lightly** | A readable local stack format, not full parity. |
+| Docker API compatibility | **Reject as core** | Already covered elsewhere; distracts from controller-first design. |
+| Apple container CLI | **Adopt initially** | Structured output behind the adapter while native APIs settle. |
+| Containerization APIs | **Adopt when stable** | A Swift-native runtime path, later. |
+
+## Why CRI is deferred
+
+CRI is a strong design reference for a runtime boundary, which is exactly how
+Hostwright uses it — as inspiration for the [RuntimeAdapter](/docs/concepts/runtime-adapter/).
+Implementing CRI itself would mean committing to Kubernetes' contract and node-agent
+semantics that single-host Hostwright does not need.
+
+## Why full Compose parity is deferred
+
+Compose is large. Chasing 100% parity would turn Hostwright into a compatibility
+project instead of a control plane. Hostwright takes the readable-local-stack idea
+and stops there, deliberately narrower than Compose.
+
+## Why Docker API emulation is avoided
+
+A Docker API shim is a real thing developers want — and other projects already
+provide it. Re-implementing it as Hostwright's core would dilute the controller-first
+design for little gain.
+
+## Why a cloud control plane is out
+
+Hostwright is single-host by design. A hosted control plane, multi-Mac
+orchestration, and remote state are a different product with different failure
+modes. Adding them would compromise the local model that is the whole point.
+
+## Why GPU and accelerator claims are research-only
+
+Apple silicon acceleration — GPU/ANE scheduling, Metal, Core ML, MLX in
+containers — is genuinely interesting and genuinely hard. It is treated as
+research, not as a feature. Hostwright will not claim accelerator capabilities it
+has not built and tested.
+
+<Callout type="warning" title="Research is not a promise">
+Networking, tunnels, DNS, cloud exposure, and accelerator support all have
+research behind them in the project's design materials. Research informs the
+roadmap; it does not become a claim until there is working, tested code.
+</Callout>
+
+## Why destructive cleanup must be conservative
+
+A tool that deletes the wrong thing once loses trust permanently. So cleanup is
+ownership-aware, dry-run by default, and never touches resources Hostwright cannot
+prove it owns. This is covered in the [safety model](/docs/concepts/safety-model/).
+
+## The full list
+
+For the compact list of non-goals as they appear on the homepage — no CRI shim,
+no Kubernetes replacement, no Docker API shim, no cloud control plane, no tunnel
+manager, no GPU scheduler, no web dashboard, not production-ready — see the
+[home page](/) and [Limitations](/docs/reference/limitations/).
