@@ -1,0 +1,72 @@
+---
+import { navGroups } from "../data/nav.ts";
+
+interface Props {
+  currentSlug: string;
+}
+const { currentSlug } = Astro.props;
+---
+
+<nav class="docs-sidebar" aria-label="Documentation">
+  {
+    navGroups.map((group) => (
+      <div class="nav-group">
+        <p class="nav-group-label">{group.label}</p>
+        <ul>
+          {group.items.map((item) => {
+            const current = item.slug === currentSlug;
+            return (
+              <li>
+                <a href={item.href} aria-current={current ? "page" : undefined} class={current ? "current" : ""}>
+                  {item.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))
+  }
+</nav>
+
+<style>
+  .docs-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .nav-group-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-faint);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-2);
+  }
+  .nav-group ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+  .nav-group a {
+    display: block;
+    padding: 0.35rem var(--space-3);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    border-left: 2px solid transparent;
+  }
+  .nav-group a:hover {
+    color: var(--color-text);
+    background: var(--color-surface);
+  }
+  .nav-group a.current {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    border-left-color: var(--color-accent);
+    font-weight: var(--weight-medium);
+  }
+</style>

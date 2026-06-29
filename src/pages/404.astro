@@ -1,0 +1,32 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found · Hostwright" description="That page does not exist.">
+  <section class="section">
+    <div class="container notfound">
+      <p class="eyebrow">404</p>
+      <h1>This page drifted out of state.</h1>
+      <p class="lead">The page you asked for does not exist or has moved.</p>
+      <div class="notfound-actions">
+        <a class="btn btn-primary" href="/">Home</a>
+        <a class="btn btn-secondary" href="/docs/">Read the docs</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: flex-start;
+    padding-block: var(--space-8);
+  }
+  .notfound-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+</style>
