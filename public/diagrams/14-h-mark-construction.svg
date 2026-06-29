@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">H-mark construction</title>
+  <desc id="desc">The Hostwright H mark explained: two host pillars joined by a control bridge representing reconciliation.</desc>
+  
+    <style><![CDATA[
+      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
+      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
+      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
+      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
+      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
+      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
+      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
+      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
+      .hair { stroke: #e4e1da; stroke-width: 1.5; }
+    ]]></style>
+    
+  <defs>
+    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
+    </marker>
+    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="600" height="600" fill="#faf9f6"/>
+<path d="M 150 80 L 150 500" class="hair"/>
+<path d="M 220 80 L 220 500" class="hair"/>
+<path d="M 300 80 L 300 500" class="hair"/>
+<path d="M 380 80 L 380 500" class="hair"/>
+<path d="M 450 80 L 450 500" class="hair"/>
+<path d="M 90 120 L 510 120" class="hair"/>
+<path d="M 90 210 L 510 210" class="hair"/>
+<path d="M 90 300 L 510 300" class="hair"/>
+<path d="M 90 390 L 510 390" class="hair"/>
+<path d="M 90 480 L 510 480" class="hair"/>
+<rect x="190" y="145" width="58" height="310" rx="8" fill="#202327"/>
+<rect x="352" y="145" width="58" height="310" rx="8" fill="#202327"/>
+<rect x="248" y="276" width="104" height="48" rx="2" fill="#1f3a5f"/>
+<text x="219" y="120" class="small" text-anchor="middle">declared host state</text>
+<text x="381" y="120" class="small" text-anchor="middle">actual host state</text>
+<text x="300" y="352" class="small" text-anchor="middle">reconciliation bridge</text>
+<path d="M 219 135 L 219 145" class="arrow"/>
+<path d="M 381 135 L 381 145" class="arrow"/>
+<path d="M 300 342 L 300 324" class="arrowAccent"/>
+<text x="300" y="540" class="small" text-anchor="middle">Hostwright H: two host pillars joined by a control bridge.</text>
+</svg>

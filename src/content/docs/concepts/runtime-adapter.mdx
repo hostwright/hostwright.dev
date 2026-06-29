@@ -4,10 +4,17 @@ description: Every runtime operation crosses a single typed boundary, so Apple c
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 The **RuntimeAdapter** is the one place in Hostwright that talks to the runtime.
 Nothing else — not the reconciler, not the CLI — calls Apple container directly.
 This single boundary is the most important architectural decision in the project.
+
+<Figure
+  src="/diagrams/06-runtime-adapter-boundary.svg"
+  alt="Hostwright core talks only through the RuntimeAdapter interface to a CLI adapter today and a planned native adapter later."
+  caption="Every runtime call crosses one boundary — no ad-hoc shell commands leak into the codebase."
+/>
 
 ## Why a single boundary
 

@@ -4,10 +4,17 @@ description: Conservative defaults — plan before mutation, dry-run before dele
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 Infrastructure tooling earns trust by being predictable when things go wrong.
 Hostwright's safety posture is deliberately conservative, and the defaults reflect
 that.
+
+<Figure
+  src="/diagrams/08-safety-plan-before-mutation.svg"
+  alt="Safety flow: validate the manifest, compute a plan, confirm destructive actions, then apply; dry-run exits before any mutation."
+  caption="Nothing mutates before the plan is shown."
+/>
 
 ## Principles
 

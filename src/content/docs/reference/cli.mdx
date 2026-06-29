@@ -4,6 +4,7 @@ description: The hostwright command surface — what each command is intended to
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 The `hostwright` command line is the primary way you interact with the control
 plane. This page documents the intended command surface.
@@ -12,6 +13,12 @@ plane. This page documents the intended command surface.
 These commands describe intended behavior. The CLI is not yet implemented. Shapes
 and flags may change before the first release.
 </Callout>
+
+<Figure
+  src="/diagrams/09-cli-lifecycle-map.svg"
+  alt="CLI lifecycle from init, validate, plan, doctor to the planned apply, status, and down commands."
+  caption="Solid commands are designed for the first release; dashed commands are planned."
+/>
 
 ## Commands
 

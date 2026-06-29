@@ -3,19 +3,30 @@ import { hero } from "../data/homepage.ts";
 ---
 
 <section class="hero">
-  <div class="container hero-inner">
-    <a class="hero-status" href="#roadmap">
-      <span class="dot" aria-hidden="true"></span>
-      {hero.status}
-    </a>
-    <h1 class="hero-title">{hero.title}</h1>
-    <p class="hero-subtitle">{hero.subtitle}</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href={hero.ctaPrimary.href}>{hero.ctaPrimary.label}</a>
-      <a class="btn btn-secondary" href={hero.ctaSecondary.href} rel="noopener">
-        {hero.ctaSecondary.label} ↗
+  <div class="container hero-grid">
+    <div class="hero-inner">
+      <a class="hero-status" href="#roadmap">
+        <span class="dot" aria-hidden="true"></span>
+        {hero.status}
       </a>
+      <h1 class="hero-title">{hero.title}</h1>
+      <p class="hero-subtitle">{hero.subtitle}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href={hero.ctaPrimary.href}>{hero.ctaPrimary.label}</a>
+        <a class="btn btn-secondary" href={hero.ctaSecondary.href} rel="noopener">
+          {hero.ctaSecondary.label} ↗
+        </a>
+      </div>
     </div>
+    <img
+      class="hero-motif"
+      src="/diagrams/02-hero-reconciliation-motif.svg"
+      alt="Two columns, declared and actual state, joined by a reconciliation line."
+      width="560"
+      height="460"
+      loading="eager"
+      decoding="async"
+    />
   </div>
 </section>
 
@@ -23,11 +34,31 @@ import { hero } from "../data/homepage.ts";
   .hero {
     padding-block: var(--space-9) var(--space-8);
   }
+  .hero-grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
   .hero-inner {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-5);
+  }
+  .hero-motif {
+    display: none;
+    width: 100%;
+    max-width: 30rem;
+    height: auto;
+    justify-self: end;
+  }
+  @media (min-width: 64rem) {
+    .hero-grid {
+      grid-template-columns: 1.3fr 1fr;
+    }
+    .hero-motif {
+      display: block;
+    }
   }
   .hero-status {
     display: inline-flex;

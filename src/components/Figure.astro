@@ -1,0 +1,40 @@
+---
+// A diagram with caption. SVGs live in public/diagrams and carry their own
+// off-white background, so they sit flush on the page with a hairline frame.
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  max?: string;
+}
+const { src, alt, caption, max } = Astro.props;
+---
+
+<figure class="figure" style={max ? `--figure-max: ${max}` : undefined}>
+  <img src={src} alt={alt} loading="lazy" decoding="async" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin-block: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .figure img {
+    width: 100%;
+    max-width: var(--figure-max, 100%);
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+  }
+  .figure figcaption {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-align: center;
+    max-width: var(--width-prose);
+  }
+</style>

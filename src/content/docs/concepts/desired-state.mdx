@@ -4,11 +4,18 @@ description: Hostwright separates the state you declare from the state that is a
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 Hostwright is a **desired-state** system. You do not start and stop containers by
 hand. You declare the state you want the machine to be in, and Hostwright is
 responsible for making the running system match it — and for telling you when it
 does not.
+
+<Figure
+  src="/diagrams/05-desired-observed-drift.svg"
+  alt="Desired state and observed runtime state compared by a comparator to produce a drift report."
+  caption="Drift is the difference between what you declared and what is actually running."
+/>
 
 ## Two kinds of state
 

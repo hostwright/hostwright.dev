@@ -4,11 +4,18 @@ description: The reconciliation loop observes, diffs, plans, applies, and observ
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 Reconciliation is the heart of Hostwright. It should be boring: deterministic,
 observable, and hard to corrupt. Every cycle treats desired state and observed
 state as separate inputs, computes a plan, applies actions idempotently, and
 records what happened.
+
+<Figure
+  src="/diagrams/04-reconcile-loop.svg"
+  alt="Reconciliation cycle: observe actual state, diff against desired, plan actions, then the planned apply step, looping back to observe; dry-run stops after plan."
+  caption="Re-running converges on desired state; it never duplicates work."
+/>
 
 ## The loop
 

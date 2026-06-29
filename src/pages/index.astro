@@ -5,7 +5,7 @@ import SectionHeading from "../components/SectionHeading.astro";
 import NonGoalsList from "../components/NonGoalsList.astro";
 import CliPreview from "../components/CliPreview.astro";
 import ManifestPreview from "../components/ManifestPreview.astro";
-import ArchDiagram from "../components/ArchDiagram.astro";
+import Figure from "../components/Figure.astro";
 import RoadmapGrid from "../components/RoadmapGrid.astro";
 
 import { site } from "../data/site.ts";
@@ -75,7 +75,11 @@ const community = [
   <section class="section">
     <div class="container">
       <SectionHeading eyebrow="Architecture" title={architecture.heading} lead={architecture.intro} />
-      <ArchDiagram />
+      <Figure
+        src="/diagrams/01-system-layer-stack.svg"
+        alt="Layered architecture: the hostwright CLI and planned daemon sit above the RuntimeAdapter boundary, which drives Apple's container runtime and Linux VMs."
+        caption="Apple container is the execution substrate. Hostwright owns declared state, planning, reconciliation, health, drift, and cleanup — not Apple's runtime internals."
+      />
     </div>
   </section>
 

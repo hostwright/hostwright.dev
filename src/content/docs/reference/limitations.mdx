@@ -4,6 +4,7 @@ description: A direct, public list of what Hostwright cannot or does not do. Ser
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 Serious infrastructure projects state their limitations plainly. This page is
 intentionally blunt.
@@ -13,6 +14,12 @@ Hostwright is not implemented yet. The design is locked, but the build is just
 beginning. Nothing on this site should be read as a description of working,
 shipped software. See the [roadmap](/#roadmap).
 </Callout>
+
+<Figure
+  src="/diagrams/11-scope-boundary.svg"
+  alt="A scope boundary: single-host control inside; cluster, cloud, and Docker-API features outside."
+  caption="Inside the boundary is in scope. Everything dashed and outside is not."
+/>
 
 ## Scope limits
 

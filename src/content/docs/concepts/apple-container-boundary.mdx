@@ -4,10 +4,17 @@ description: Apple container is the execution substrate. Hostwright sits above i
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 Hostwright does not run containers. **Apple container** runs containers; Hostwright
 decides what *should* run and keeps it honest. Understanding where that line sits
 is essential to understanding the project.
+
+<Figure
+  src="/diagrams/07-apple-container-boundary.svg"
+  alt="Responsibility split between what Hostwright owns and what Apple's container runtime owns."
+  caption="Hostwright orchestrates Apple container; it does not reimplement it."
+/>
 
 ## What Apple container provides
 

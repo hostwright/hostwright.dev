@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
+  <title id="title">CLI lifecycle map</title>
+  <desc id="desc">CLI lifecycle from init, validate, plan, doctor to the planned apply, status, and down commands.</desc>
+  
+    <style><![CDATA[
+      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
+      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
+      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
+      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
+      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
+      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
+      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
+      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
+      .hair { stroke: #e4e1da; stroke-width: 1.5; }
+    ]]></style>
+    
+  <defs>
+    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
+    </marker>
+    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="720" height="440" fill="#faf9f6"/>
+<rect x="40" y="150" width="82" height="52" rx="8" class="box-ink" />
+<text x="81.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">init</text>
+<text x="81.0" y="245" class="tiny" text-anchor="middle">
+  <tspan x="81.0" dy="0">create local</tspan>
+  <tspan x="81.0" dy="14">scaffold</tspan>
+</text>
+<path d="M 124 176 L 134 176" class="arrow"/>
+<rect x="138" y="150" width="82" height="52" rx="8" class="box-ink" />
+<text x="179.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">validate</text>
+<text x="179.0" y="245" class="tiny" text-anchor="middle">
+  <tspan x="179.0" dy="0">check manifest</tspan>
+</text>
+<path d="M 222 176 L 232 176" class="arrow"/>
+<rect x="236" y="150" width="82" height="52" rx="8" class="box-ink" />
+<text x="277.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">plan</text>
+<text x="277.0" y="245" class="tiny" text-anchor="middle">
+  <tspan x="277.0" dy="0">show proposed</tspan>
+  <tspan x="277.0" dy="14">actions</tspan>
+</text>
+<path d="M 320 176 L 330 176" class="arrow"/>
+<rect x="334" y="150" width="82" height="52" rx="8" class="box-ink" />
+<text x="375.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">doctor</text>
+<text x="375.0" y="245" class="tiny" text-anchor="middle">
+  <tspan x="375.0" dy="0">check</tspan>
+  <tspan x="375.0" dy="14">host/runtime</tspan>
+</text>
+<path d="M 418 176 L 428 176" class="arrow" stroke-dasharray="8 6"/>
+<rect x="432" y="150" width="82" height="52" rx="8" class="box-ink planned" />
+<text x="473.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">apply</text>
+<text x="473.0" y="218" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
+<text x="473.0" y="245" class="tiny" text-anchor="middle">
+  <tspan x="473.0" dy="0">mutate runtime</tspan>
+</text>
+<path d="M 516 176 L 526 176" class="arrow" stroke-dasharray="8 6"/>
+<rect x="530" y="150" width="82" height="52" rx="8" class="box-ink planned" />
+<text x="571.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">status</text>
+<text x="571.0" y="218" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
+<text x="571.0" y="245" class="tiny" text-anchor="middle">
+  <tspan x="571.0" dy="0">show live</tspan>
+  <tspan x="571.0" dy="14">state</tspan>
+</text>
+<path d="M 614 176 L 624 176" class="arrow" stroke-dasharray="8 6"/>
+<rect x="628" y="150" width="82" height="52" rx="8" class="box-ink planned" />
+<text x="669.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">down --dry-run</text>
+<text x="669.0" y="218" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
+<text x="669.0" y="245" class="tiny" text-anchor="middle">
+  <tspan x="669.0" dy="0">safe cleanup</tspan>
+  <tspan x="669.0" dy="14">plan</tspan>
+</text>
+<path d="M 422 100 L 422 300" class="hair"/>
+<text x="203" y="90" class="small" text-anchor="middle">solid: designed first-release commands</text>
+<text x="540" y="90" class="small" text-anchor="middle">dashed: planned runtime commands</text>
+</svg>

@@ -4,10 +4,17 @@ description: The manifest format — the fields shown in the example, what they 
 ---
 
 import Callout from "../../../components/Callout.astro";
+import Figure from "../../../components/Figure.astro";
 
 A stack is declared in a single `hostwright.yaml` file. This page documents the
 fields used in the example below. Anything not listed here is still under design
 and should not be relied on.
+
+<Figure
+  src="/diagrams/10-annotated-manifest-anatomy.svg"
+  alt="Annotated hostwright.yaml showing project, services, image, ports, env, health, and restart fields."
+  caption="The fields documented on this page, called out on a sample manifest."
+/>
 
 ## Example
 
