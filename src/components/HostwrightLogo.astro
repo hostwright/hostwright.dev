@@ -1,0 +1,25 @@
+---
+// The Hostwright wordmark (the project's own artwork). The H mark itself is used
+// as the favicon and on the social card; the header/footer show the wordmark.
+const WORDMARK_RATIO = 1402 / 240;
+interface Props {
+  size?: number; // rendered height in px
+}
+const { size = 24 } = Astro.props;
+const width = Math.round(size * WORDMARK_RATIO);
+---
+
+<img
+  class="logo"
+  src="/hostwright-wordmark.png"
+  alt="Hostwright"
+  height={size}
+  width={width}
+  decoding="async"
+/>
+
+<style>
+  .logo {
+    display: block;
+  }
+</style>

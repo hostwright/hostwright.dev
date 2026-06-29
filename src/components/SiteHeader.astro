@@ -1,0 +1,124 @@
+---
+import HostwrightLogo from "./HostwrightLogo.astro";
+import { site } from "../data/site.ts";
+
+const navLinks = [
+  { label: "Docs", href: "/docs/" },
+  { label: "Concepts", href: "/docs/concepts/desired-state/" },
+  { label: "Reference", href: "/docs/reference/cli/" },
+];
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="header-logo" aria-label="Hostwright home">
+      <HostwrightLogo size={26} />
+    </a>
+
+    <details class="nav">
+      <summary class="nav-toggle" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </summary>
+      <nav class="nav-menu" aria-label="Primary">
+        {navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+        <a class="nav-github" href={site.links.github} rel="noopener">GitHub ↗</a>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+  }
+  .header-logo {
+    text-decoration: none;
+    color: var(--color-text);
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    cursor: pointer;
+    color: var(--color-text);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    list-style: none;
+  }
+  .nav-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .nav-menu {
+    /* Appearance of the mobile dropdown. Visibility is gated below so the
+       closed <details> stays hidden without JS. */
+    flex-direction: column;
+    gap: var(--space-1);
+    position: absolute;
+    right: var(--space-5);
+    top: calc(var(--header-height) - 0.4rem);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    min-width: 12rem;
+    box-shadow: 0 12px 32px -16px rgba(32, 35, 39, 0.3);
+  }
+  .nav-menu a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+  }
+  .nav-menu a:hover {
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .nav-github {
+    color: var(--color-accent) !important;
+  }
+
+  /* Mobile: reveal only when the disclosure is open. */
+  .nav[open] .nav-menu {
+    display: flex;
+  }
+
+  @media (min-width: 48rem) {
+    .nav-toggle {
+      display: none;
+    }
+    .nav-menu {
+      /* Author-origin display beats the UA's closed-<details> hide,
+         so the inline menu always shows on desktop. */
+      display: flex;
+      position: static;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+      background: none;
+      min-width: 0;
+    }
+  }
+</style>

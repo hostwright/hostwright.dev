@@ -1,0 +1,132 @@
+---
+import HostwrightLogo from "./HostwrightLogo.astro";
+import { site } from "../data/site.ts";
+
+const columns = [
+  {
+    label: "Project",
+    links: [
+      { label: "GitHub", href: site.links.github, external: true },
+      { label: "X", href: site.links.x, external: true },
+      { label: "Reddit", href: site.links.reddit, external: true },
+    ],
+  },
+  {
+    label: "Docs",
+    links: [
+      { label: "Overview", href: "/docs/", external: false },
+      { label: "Getting started", href: "/docs/getting-started/", external: false },
+      { label: "Concepts", href: "/docs/concepts/desired-state/", external: false },
+      { label: "Reference", href: "/docs/reference/cli/", external: false },
+    ],
+  },
+];
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <HostwrightLogo size={24} />
+      <p class="footer-tagline">{site.tagline}</p>
+      <p class="footer-maturity">{site.maturity}</p>
+    </div>
+
+    <nav class="footer-cols" aria-label="Footer">
+      {
+        columns.map((col) => (
+          <div class="footer-col">
+            <h2 class="footer-col-title">{col.label}</h2>
+            <ul>
+              {col.links.map((l) => (
+                <li>
+                  <a href={l.href} {...(l.external ? { rel: "noopener" } : {})}>
+                    {l.label}
+                    {l.external ? " ↗" : ""}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+  </div>
+
+  <div class="container footer-meta">
+    <span>License: {site.license}</span>
+    <span aria-hidden="true">·</span>
+    <span>{site.domain}</span>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-9);
+    padding-block: var(--space-7) var(--space-6);
+    background: var(--color-surface);
+  }
+  .footer-inner {
+    display: grid;
+    gap: var(--space-7);
+    grid-template-columns: 1fr;
+  }
+  .footer-tagline {
+    margin-top: var(--space-3);
+    max-width: 22rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .footer-maturity {
+    margin-top: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+  }
+  .footer-cols {
+    display: flex;
+    gap: var(--space-7);
+    flex-wrap: wrap;
+  }
+  .footer-col-title {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-faint);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-3);
+  }
+  .footer-col ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .footer-col a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+  .footer-col a:hover {
+    color: var(--color-text);
+  }
+  .footer-meta {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    font-family: var(--font-mono);
+  }
+
+  @media (min-width: 52rem) {
+    .footer-inner {
+      grid-template-columns: 1.4fr 1fr;
+      align-items: start;
+    }
+  }
+</style>
