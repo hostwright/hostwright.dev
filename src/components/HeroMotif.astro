@@ -21,9 +21,12 @@
     <!-- declared column (the source of truth — never moves) -->
     <rect x="150" y="80" width="26" height="248" rx="7" fill="var(--color-text)"></rect>
 
-    <!-- actual column: a stack of segments; the top one drifts then reconciles -->
+    <!-- actual column: a stack of segments; the top one drifts then reconciles.
+         The drift segment overlaps the static one by more than the corner
+         radius so, when settled, the two read as a single unbroken bar — a
+         proper H, matching declared, instead of a permanently split column. -->
     <rect x="304" y="174" width="26" height="154" rx="7" fill="var(--color-text)"></rect>
-    <rect class="m-drift" x="304" y="80" width="26" height="84" rx="7"></rect>
+    <rect class="m-drift" x="304" y="80" width="26" height="104" rx="7"></rect>
 
     <!-- reconciliation line + center node -->
     <line x1="176" y1="204" x2="304" y2="204" stroke="var(--color-accent)" stroke-width="3"></line>
