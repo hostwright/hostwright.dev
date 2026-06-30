@@ -1,56 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
-  <title id="title">Safety plan before mutation</title>
-  <desc id="desc">Safety flow: validate, plan, confirm destructive actions, then apply; dry-run exits before any mutation.</desc>
-  
-    <style><![CDATA[
-      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
-      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
-      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
-      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
-      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
-      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
-      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
-      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
-      .hair { stroke: #e4e1da; stroke-width: 1.5; }
-    ]]></style>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="460" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+  <title id="title">Safety: plan before mutation</title>
+  <desc id="desc">Command flow: validate manifest, compute plan, confirm destructive changes, planned apply, and dry-run exit before mutation.</desc>
   <defs>
-    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+    <style>
+      .bg { fill: #faf9f6; }
+      .card { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box { fill: #f3f1ec; stroke: #202327; stroke-width: 1.8; }
+      .box-light { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box-planned { fill: #faf9f6; stroke: #5a5f67; stroke-width: 1.8; stroke-dasharray: 8 7; }
+      .accent { fill: #1f3a5f; stroke: #1f3a5f; }
+      .text { fill: #202327; font-family: Arial, Helvetica, sans-serif; }
+      .muted { fill: #646973; font-family: Arial, Helvetica, sans-serif; }
+      .white { fill: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+      .mono { fill: #202327; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+      .line { stroke: #202327; stroke-width: 1.8; fill: none; }
+      .line-muted { stroke: #e4e1da; stroke-width: 1.2; fill: none; }
+      .line-planned { stroke: #5a5f67; stroke-width: 1.8; fill: none; stroke-dasharray: 8 7; }
+      .arrow { stroke: #202327; stroke-width: 1.8; fill: none; marker-end: url(#arrow); }
+      .arrow-accent { stroke: #1f3a5f; stroke-width: 2.2; fill: none; marker-end: url(#arrowAccent); }
+      .arrow-planned { stroke: #5a5f67; stroke-width: 1.8; fill: none; stroke-dasharray: 8 7; marker-end: url(#arrowPlanned); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
     </marker>
-    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+    <marker id="arrowAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
     </marker>
+    <marker id="arrowPlanned" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a5f67"/>
+    </marker>
   </defs>
-  <rect x="0" y="0" width="720" height="460" fill="#faf9f6"/>
-<rect x="55" y="90" width="110" height="60" rx="8" class="box-ink" />
-<text x="110.0" y="120.0" class="label" text-anchor="middle" dominant-baseline="middle">Command</text>
-<rect x="200" y="90" width="130" height="60" rx="8" class="box-ink" />
-<text x="265.0" y="114" class="label" text-anchor="middle">
-  <tspan x="265.0" dy="0">Validate</tspan>
-  <tspan x="265.0" dy="20">manifest</tspan>
-</text>
-<rect x="370" y="90" width="120" height="60" rx="8" class="box-ink" />
-<text x="430.0" y="114" class="label" text-anchor="middle">
-  <tspan x="430.0" dy="0">Compute</tspan>
-  <tspan x="430.0" dy="20">plan</tspan>
-</text>
-<path d="M 165 120 L 200 120" class="arrow"/>
-<path d="M 330 120 L 370 120" class="arrow"/>
-<path d="M 575 85 L 640 120 L 575 155 L 510 120 Z" fill="#f3f1ec" stroke="#202327" stroke-width="1.5"/>
-<text x="575" y="114" class="small" text-anchor="middle" dominant-baseline="middle">Destructive?</text>
-<path d="M 490 120 L 510 120" class="arrow"/>
-<rect x="450" y="240" width="180" height="62" rx="8" class="box-ink" />
-<text x="540" y="270" class="small" text-anchor="middle" dominant-baseline="middle">Explicit confirmation</text>
-<rect x="270" y="240" width="130" height="62" rx="8" class="box-ink planned" />
-<text x="335" y="265" class="label" text-anchor="middle" dominant-baseline="middle">Apply</text>
-<text x="335" y="288" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
-<path d="M 575 155 L 540 240" class="arrow"/>
-<path d="M 450 270 L 400 270" class="arrow" stroke-dasharray="8 6"/>
-<path d="M 430 150 L 430 185 L 170 185 L 170 270" class="arrow" stroke-dasharray="8 6"/>
-<rect x="80" y="240" width="180" height="62" rx="8" class="box planned" />
-<text x="170" y="263" class="label" text-anchor="middle" dominant-baseline="middle">--dry-run</text>
-<text x="170" y="286" class="small" text-anchor="middle" dominant-baseline="middle">print plan, exit</text>
-<text x="360" y="405" class="small" text-anchor="middle">Nothing mutates before the plan is shown.</text>
+  <rect class="bg" x="0" y="0" width="720" height="460"/>
+
+  <rect class="card" x="24" y="28" width="672" height="404" rx="14"/>
+  <rect class="box-light" x="64" y="105" width="120" height="56" rx="8"/>
+  <text class="text" x="124" y="129" text-anchor="middle" font-size="18" font-weight="700">Command</text>
+  <rect class="box-light" x="224" y="105" width="142" height="56" rx="8"/>
+  <text class="text" x="295" y="124" text-anchor="middle" font-size="18" font-weight="700">Validate</text>
+<text class="text" x="295" y="144" text-anchor="middle" font-size="18" font-weight="700">manifest</text>
+  <rect class="box-light" x="406" y="105" width="128" height="56" rx="8"/>
+  <text class="text" x="470" y="124" text-anchor="middle" font-size="18" font-weight="700">Compute</text>
+<text class="text" x="470" y="144" text-anchor="middle" font-size="18" font-weight="700">plan</text>
+
+  <path class="arrow" d="M184 133 H218"/>
+  <path class="arrow" d="M366 133 H400"/>
+
+  <polygon points="608,86 672,133 608,180 544,133" fill="#faf9f6" stroke="#202327" stroke-width="1.8"/>
+  <text class="muted" x="608" y="138" text-anchor="middle" font-size="14" font-weight="500">Destructive?</text>
+  <path class="arrow" d="M534 133 H543"/>
+
+  <path class="arrow" d="M608 180 L574 268"/>
+
+  <rect class="box-light" x="488" y="268" width="176" height="58" rx="8"/>
+  <text class="muted" x="576" y="298" text-anchor="middle" font-size="14" font-weight="500">Explicit confirmation</text>
+
+  <rect class="box-planned" x="298" y="268" width="132" height="58" rx="8"/>
+  <text class="text" x="364" y="292" text-anchor="middle" font-size="18" font-weight="700">Apply</text>
+  <text class="muted" x="364" y="315" text-anchor="middle" font-size="13" font-weight="500">Planned</text>
+  <path class="arrow-planned" d="M488 297 H438"/>
+
+  <rect class="box-planned" x="92" y="268" width="172" height="58" rx="8"/>
+  <text class="text" x="178" y="292" text-anchor="middle" font-size="18" font-weight="700">--dry-run</text>
+  <text class="muted" x="178" y="315" text-anchor="middle" font-size="13" font-weight="500">print plan, exit</text>
+
+  <path class="line-planned" d="M470 161 V218 H178 V268"/>
+  <text class="muted" x="360" y="384" text-anchor="middle" font-size="15" font-weight="500">Nothing mutates before the plan is shown.</text>
+
 </svg>

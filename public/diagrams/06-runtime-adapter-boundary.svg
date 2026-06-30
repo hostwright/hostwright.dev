@@ -1,44 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
   <title id="title">RuntimeAdapter boundary</title>
   <desc id="desc">Hostwright core talks only through the RuntimeAdapter interface to a CLI adapter today and a planned native adapter later.</desc>
-  
-    <style><![CDATA[
-      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
-      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
-      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
-      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
-      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
-      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
-      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
-      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
-      .hair { stroke: #e4e1da; stroke-width: 1.5; }
-    ]]></style>
-    
   <defs>
-    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+    <style>
+      .bg { fill: #faf9f6; }
+      .card { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box { fill: #f3f1ec; stroke: #202327; stroke-width: 1.8; }
+      .box-light { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box-planned { fill: #faf9f6; stroke: #5a5f67; stroke-width: 1.8; stroke-dasharray: 8 7; }
+      .accent { fill: #1f3a5f; stroke: #1f3a5f; }
+      .text { fill: #202327; font-family: Arial, Helvetica, sans-serif; }
+      .muted { fill: #646973; font-family: Arial, Helvetica, sans-serif; }
+      .white { fill: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+      .mono { fill: #202327; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+      .line { stroke: #202327; stroke-width: 1.8; fill: none; }
+      .line-muted { stroke: #e4e1da; stroke-width: 1.2; fill: none; }
+      .line-planned { stroke: #5a5f67; stroke-width: 1.8; fill: none; stroke-dasharray: 8 7; }
+      .arrow { stroke: #202327; stroke-width: 1.8; fill: none; marker-end: url(#arrow); }
+      .arrow-accent { stroke: #1f3a5f; stroke-width: 2.2; fill: none; marker-end: url(#arrowAccent); }
+      .arrow-planned { stroke: #5a5f67; stroke-width: 1.8; fill: none; stroke-dasharray: 8 7; marker-end: url(#arrowPlanned); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
     </marker>
-    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+    <marker id="arrowAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
     </marker>
+    <marker id="arrowPlanned" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a5f67"/>
+    </marker>
   </defs>
-  <rect x="0" y="0" width="720" height="480" fill="#faf9f6"/>
-<rect x="140" y="55" width="440" height="90" rx="8" class="box-ink" />
-<text x="360" y="95" class="label" text-anchor="middle" dominant-baseline="middle">Hostwright core</text>
-<text x="360" y="120" class="small" text-anchor="middle" dominant-baseline="middle">planner today · reconciler, state, health planned</text>
-<path d="M 360 145 L 360 185" class="arrowAccent"/>
-<rect x="75" y="185" width="570" height="58" rx="8" fill="#1f3a5f" stroke="#1f3a5f" stroke-width="1.5"/>
-<text x="360" y="214" class="label" text-anchor="middle" dominant-baseline="middle" style="fill:#faf9f6">RuntimeAdapter (typed interface)</text>
-<path d="M 260 243 L 260 300" class="arrow" stroke-dasharray="8 6"/>
-<path d="M 460 243 L 460 300" class="arrow" stroke-dasharray="8 6"/>
-<rect x="95" y="300" width="250" height="86" rx="8" class="box-ink planned" />
-<text x="220" y="330" class="label" text-anchor="middle" dominant-baseline="middle">CLI adapter</text>
-<text x="220" y="358" class="small" text-anchor="middle" dominant-baseline="middle">shells out to container</text>
-<text x="220" y="382" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
-<rect x="375" y="300" width="250" height="86" rx="8" class="box-ink planned" />
-<text x="500" y="330" class="label" text-anchor="middle" dominant-baseline="middle">Containerization adapter</text>
-<text x="500" y="358" class="small" text-anchor="middle" dominant-baseline="middle">native</text>
-<text x="500" y="382" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
-<text x="360" y="430" class="small" text-anchor="middle">Every runtime call crosses one boundary — no ad-hoc shell commands leak into the codebase.</text>
+  <rect class="bg" x="0" y="0" width="720" height="480"/>
+
+  <rect class="card" x="24" y="28" width="672" height="424" rx="14"/>
+  <rect class="box-light" x="116" y="68" width="488" height="72" rx="8"/>
+  <text class="text" x="360" y="101" text-anchor="middle" font-size="20" font-weight="700">Hostwright core</text>
+  <text class="muted" x="360" y="123" text-anchor="middle" font-size="13" font-weight="500">planner / reconciler / state</text>
+  <path class="arrow-accent" d="M360 140 V174"/>
+  <rect x="86" y="178" width="548" height="62" rx="8" fill="#1f3a5f" stroke="#1f3a5f" stroke-width="1.8"/>
+  <text class="white" x="360" y="216" text-anchor="middle" font-size="20" font-weight="700">RuntimeAdapter (typed interface)</text>
+  <path class="arrow" d="M360 240 V276"/>
+  <rect class="box-light" x="98" y="282" width="240" height="82" rx="8"/>
+  <text class="text" x="218" y="314" text-anchor="middle" font-size="16" font-weight="700">CLI adapter</text>
+<text class="text" x="218" y="336" text-anchor="middle" font-size="16" font-weight="700">shells out to container</text>
+  <rect class="box-planned" x="382" y="282" width="240" height="82" rx="8"/>
+  <text class="text" x="502" y="308" text-anchor="middle" font-size="16" font-weight="700">Containerization adapter</text>
+<text class="text" x="502" y="330" text-anchor="middle" font-size="16" font-weight="700">native</text>
+  <text class="muted" x="502" y="351" text-anchor="middle" font-size="13" font-weight="500">Planned</text>
+  <text class="muted" x="360" y="414" text-anchor="middle" font-size="13" font-weight="500">Every runtime call crosses one boundary — no ad-hoc shell commands leak into the codebase.</text>
+
 </svg>

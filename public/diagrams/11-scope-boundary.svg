@@ -1,58 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
-  <title id="title">In-scope out-of-scope boundary</title>
-  <desc id="desc">A scope boundary: single-host control inside, cluster/cloud/Docker-API features outside.</desc>
-  
-    <style><![CDATA[
-      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
-      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
-      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
-      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
-      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
-      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
-      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
-      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
-      .hair { stroke: #e4e1da; stroke-width: 1.5; }
-    ]]></style>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="460" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+  <title id="title">Hostwright scope boundary</title>
+  <desc id="desc">A balanced scope diagram with four out-of-scope items above, four below, and the in-scope Hostwright boundary centered.</desc>
+
   <defs>
-    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
-    </marker>
-    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
-    </marker>
+    <style>
+      .bg { fill: #faf9f6; }
+      .card { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .boundary { fill: #faf9f6; stroke: #202327; stroke-width: 1.9; }
+      .box { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .planned { fill: #faf9f6; stroke: #5a5f67; stroke-width: 1.8; stroke-dasharray: 7 7; }
+      .text { fill: #202327; font-family: Arial, Helvetica, sans-serif; }
+      .muted { fill: #646973; font-family: Arial, Helvetica, sans-serif; }
+      .plannedText { fill: #5a5f67; font-family: Arial, Helvetica, sans-serif; }
+    </style>
   </defs>
-  <rect x="0" y="0" width="720" height="440" fill="#faf9f6"/>
-<rect x="90" y="95" width="540" height="210" rx="20" class="box-ink" />
-<text x="360" y="125" class="label" text-anchor="middle" dominant-baseline="middle">In scope</text>
-<rect x="135" y="165" width="130" height="42" rx="8" class="box" />
-<text x="200" y="186" class="small" text-anchor="middle" dominant-baseline="middle">single-host</text>
-<rect x="300" y="165" width="130" height="42" rx="8" class="box" />
-<text x="365" y="186" class="small" text-anchor="middle" dominant-baseline="middle">declared state</text>
-<rect x="465" y="165" width="130" height="42" rx="8" class="box" />
-<text x="530" y="186" class="small" text-anchor="middle" dominant-baseline="middle">planning</text>
-<rect x="135" y="235" width="130" height="42" rx="8" class="box" />
-<text x="200" y="256" class="small" text-anchor="middle" dominant-baseline="middle">drift</text>
-<rect x="300" y="235" width="130" height="42" rx="8" class="box" />
-<text x="365" y="256" class="small" text-anchor="middle" dominant-baseline="middle">doctor</text>
-<rect x="465" y="235" width="130" height="42" rx="8" class="box" />
-<text x="530" y="256" class="small" text-anchor="middle" dominant-baseline="middle">safe cleanup</text>
-<rect x="70" y="55" width="150" height="34" rx="8" class="box planned" />
-<text x="145" y="72" class="tiny" text-anchor="middle" dominant-baseline="middle">multi-host/cluster</text>
-<rect x="500" y="55" width="150" height="34" rx="8" class="box planned" />
-<text x="575" y="72" class="tiny" text-anchor="middle" dominant-baseline="middle">Kubernetes/CRI</text>
-<rect x="40" y="340" width="150" height="34" rx="8" class="box planned" />
-<text x="115" y="357" class="tiny" text-anchor="middle" dominant-baseline="middle">full Compose parity</text>
-<rect x="505" y="340" width="150" height="34" rx="8" class="box planned" />
-<text x="580" y="357" class="tiny" text-anchor="middle" dominant-baseline="middle">Docker API shim</text>
-<rect x="255" y="350" width="150" height="34" rx="8" class="box planned" />
-<text x="330" y="367" class="tiny" text-anchor="middle" dominant-baseline="middle">cloud control plane</text>
-<rect x="70" y="285" width="150" height="34" rx="8" class="box planned" />
-<text x="145" y="302" class="tiny" text-anchor="middle" dominant-baseline="middle">tunnels</text>
-<rect x="560" y="285" width="150" height="34" rx="8" class="box planned" />
-<text x="635" y="302" class="tiny" text-anchor="middle" dominant-baseline="middle">GPU scheduling</text>
-<rect x="250" y="55" width="150" height="34" rx="8" class="box planned" />
-<text x="325" y="72" class="tiny" text-anchor="middle" dominant-baseline="middle">production-readiness</text>
-<text x="360" y="325" class="small" text-anchor="middle">Out of scope labels are dashed and outside the boundary.</text>
+
+  <rect class="bg" x="0" y="0" width="720" height="460"/>
+  <rect class="card" x="24" y="24" width="672" height="412" rx="16"/>
+
+  <!-- Top out-of-scope row: 4 items -->
+  <rect class="planned" x="58" y="54" width="142" height="36" rx="7"/>
+  <rect class="planned" x="216" y="54" width="154" height="36" rx="7"/>
+  <rect class="planned" x="386" y="54" width="142" height="36" rx="7"/>
+  <rect class="planned" x="544" y="54" width="118" height="36" rx="7"/>
+
+  <text class="plannedText" x="129" y="76" text-anchor="middle" font-size="12.5" font-weight="500">multi-host / cluster</text>
+  <text class="plannedText" x="293" y="76" text-anchor="middle" font-size="12.5" font-weight="500">production readiness</text>
+  <text class="plannedText" x="457" y="76" text-anchor="middle" font-size="12.5" font-weight="500">Kubernetes / CRI</text>
+  <text class="plannedText" x="603" y="76" text-anchor="middle" font-size="12.5" font-weight="500">GPU scheduling</text>
+
+  <!-- Main in-scope boundary -->
+  <rect class="boundary" x="118" y="112" width="484" height="204" rx="18"/>
+  <text class="text" x="360" y="150" text-anchor="middle" font-size="20" font-weight="700">In scope</text>
+
+  <!-- In-scope row 1 -->
+  <rect class="box" x="154" y="176" width="120" height="42" rx="8"/>
+  <rect class="box" x="300" y="176" width="120" height="42" rx="8"/>
+  <rect class="box" x="446" y="176" width="120" height="42" rx="8"/>
+
+  <text class="muted" x="214" y="202" text-anchor="middle" font-size="13" font-weight="500">single-host</text>
+  <text class="muted" x="360" y="202" text-anchor="middle" font-size="13" font-weight="500">declared state</text>
+  <text class="muted" x="506" y="202" text-anchor="middle" font-size="13" font-weight="500">planning</text>
+
+  <!-- In-scope row 2 -->
+  <rect class="box" x="154" y="244" width="120" height="42" rx="8"/>
+  <rect class="box" x="300" y="244" width="120" height="42" rx="8"/>
+  <rect class="box" x="446" y="244" width="120" height="42" rx="8"/>
+
+  <text class="muted" x="214" y="270" text-anchor="middle" font-size="13" font-weight="500">drift</text>
+  <text class="muted" x="360" y="270" text-anchor="middle" font-size="13" font-weight="500">doctor</text>
+  <text class="muted" x="506" y="270" text-anchor="middle" font-size="13" font-weight="500">safe cleanup</text>
+
+  <!-- Bottom out-of-scope row: 4 items -->
+  <rect class="planned" x="46" y="340" width="144" height="36" rx="7"/>
+  <rect class="planned" x="206" y="340" width="144" height="36" rx="7"/>
+  <rect class="planned" x="366" y="340" width="144" height="36" rx="7"/>
+  <rect class="planned" x="530" y="340" width="132" height="36" rx="7"/>
+
+  <text class="plannedText" x="118" y="362" text-anchor="middle" font-size="12.5" font-weight="500">full Compose parity</text>
+  <text class="plannedText" x="278" y="362" text-anchor="middle" font-size="12.5" font-weight="500">cloud control plane</text>
+  <text class="plannedText" x="438" y="362" text-anchor="middle" font-size="12.5" font-weight="500">Docker API shim</text>
+  <text class="plannedText" x="596" y="362" text-anchor="middle" font-size="12.5" font-weight="500">tunnels</text>
+
+  <!-- Caption -->
+  <text class="muted" x="360" y="410" text-anchor="middle" font-size="14" font-weight="500">
+    Inside the boundary is in scope. Dashed labels above and below the boundary are not.
+  </text>
 </svg>
