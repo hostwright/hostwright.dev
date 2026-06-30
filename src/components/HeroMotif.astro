@@ -1,0 +1,114 @@
+---
+// Animated reconciliation motif. The "H" of declared vs. actual state, joined
+// by a reconciliation line. The loop plays out the product's core idea: actual
+// state drifts, drift is observed, a reconcile pass converges it back to
+// declared. Pure SVG + CSS — no JS, no gradients. Honors reduced-motion by
+// freezing in the settled state.
+---
+
+<div class="motif" role="img" aria-label="The reconciliation loop: actual state drifts from declared state, drift is detected, then converges back.">
+  <svg viewBox="0 0 480 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- backdrop dot grid for depth -->
+    <pattern id="hw-dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="var(--color-border-strong)" opacity="0.5"></circle>
+    </pattern>
+    <rect x="40" y="44" width="400" height="320" fill="url(#hw-dots)" opacity="0.5"></rect>
+
+    <!-- labels -->
+    <text class="m-label" x="163" y="64" text-anchor="middle">DECLARED</text>
+    <text class="m-label" x="317" y="64" text-anchor="middle">ACTUAL</text>
+
+    <!-- declared column (the source of truth — never moves) -->
+    <rect x="150" y="80" width="26" height="248" rx="7" fill="var(--color-text)"></rect>
+
+    <!-- actual column: a stack of segments; the top one drifts then reconciles -->
+    <rect x="304" y="174" width="26" height="154" rx="7" fill="var(--color-text)"></rect>
+    <rect class="m-drift" x="304" y="80" width="26" height="84" rx="7"></rect>
+
+    <!-- reconciliation line + center node -->
+    <line x1="176" y1="204" x2="304" y2="204" stroke="var(--color-accent)" stroke-width="3"></line>
+    <circle cx="240" cy="204" r="6" fill="var(--color-accent)"></circle>
+
+    <!-- traveling reconcile pulse -->
+    <circle class="m-pulse" cx="184" cy="204" r="5" fill="var(--color-accent)"></circle>
+
+    <!-- drift tick: appears on the actual side while drifted -->
+    <g class="m-tick">
+      <circle cx="356" cy="122" r="11" fill="var(--status-blocked-bg)" stroke="var(--status-blocked)" stroke-width="1.5"></circle>
+      <path d="M356 117v6M356 127v0.5" stroke="var(--status-blocked)" stroke-width="2" stroke-linecap="round"></path>
+    </g>
+
+    <!-- caption -->
+    <text class="m-caption" x="240" y="384" text-anchor="middle">observe → diff → reconcile</text>
+  </svg>
+</div>
+
+<style>
+  .motif {
+    width: 100%;
+    max-width: 30rem;
+    justify-self: end;
+  }
+  .motif svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .m-label,
+  .m-caption {
+    font-family: var(--font-mono);
+    fill: var(--color-text-faint);
+  }
+  .m-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+  .m-caption {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  /* The drifting segment: matches declared, then slides out + flags, then
+     snaps back. transform-box keeps the translate relative to the element. */
+  .m-drift {
+    fill: var(--color-text);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: drift 7s var(--ease) infinite;
+  }
+  .m-tick {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: tick 7s var(--ease) infinite;
+  }
+  .m-pulse {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pulse 7s var(--ease) infinite;
+  }
+
+  @keyframes drift {
+    0%, 22% { transform: translateX(0); fill: var(--color-text); }
+    34%, 52% { transform: translateX(30px); fill: var(--status-blocked); }
+    70%, 100% { transform: translateX(0); fill: var(--color-text); }
+  }
+  @keyframes tick {
+    0%, 26% { opacity: 0; transform: scale(0.6); }
+    36%, 54% { opacity: 1; transform: scale(1); }
+    66%, 100% { opacity: 0; transform: scale(0.6); }
+  }
+  @keyframes pulse {
+    0%, 54% { opacity: 0; transform: translateX(0); }
+    58% { opacity: 1; transform: translateX(0); }
+    68% { opacity: 1; transform: translateX(112px); }
+    72%, 100% { opacity: 0; transform: translateX(112px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m-drift { animation: none; transform: translateX(0); fill: var(--color-text); }
+    .m-tick { animation: none; opacity: 0; }
+    .m-pulse { animation: none; opacity: 0; }
+  }
+</style>

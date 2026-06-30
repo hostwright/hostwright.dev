@@ -4,6 +4,7 @@ import Hero from "../components/Hero.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import NonGoalsList from "../components/NonGoalsList.astro";
 import CliPreview from "../components/CliPreview.astro";
+import CliTerminal from "../components/CliTerminal.astro";
 import ManifestPreview from "../components/ManifestPreview.astro";
 import Figure from "../components/Figure.astro";
 import RoadmapGrid from "../components/RoadmapGrid.astro";
@@ -23,6 +24,22 @@ const community = [
 
 <BaseLayout title={title}>
   <Hero />
+
+  <!-- Plan demo -->
+  <section class="section section-demo">
+    <div class="container demo-grid">
+      <div class="demo-copy">
+        <span class="eyebrow">Plan, then apply</span>
+        <h2 class="demo-title">See the change before it happens.</h2>
+        <p class="demo-lead">
+          Every run computes a reviewable plan from your manifest. Today
+          <code>plan</code> is non-mutating — it shows the diff and applies
+          nothing. Mutation, when it lands, must cross the same recorded path.
+        </p>
+      </div>
+      <CliTerminal />
+    </div>
+  </section>
 
   <!-- Problem -->
   <section class="section">
@@ -145,6 +162,39 @@ const community = [
 </BaseLayout>
 
 <style>
+  .section-demo {
+    background: var(--color-surface);
+  }
+  .demo-grid {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+  .demo-copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .demo-title {
+    font-size: var(--text-2xl);
+    max-width: 16ch;
+  }
+  .demo-lead {
+    max-width: 46ch;
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+  }
+  .demo-lead code {
+    font-size: 0.85em;
+  }
+  @media (min-width: 56rem) {
+    .demo-grid {
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: var(--space-7);
+    }
+  }
+
   .prose-block {
     max-width: var(--width-prose);
     display: flex;

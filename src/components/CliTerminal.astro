@@ -1,0 +1,176 @@
+---
+// Animated terminal: a non-mutating `hostwright plan` run. Output reveals line
+// by line when the terminal scrolls into view. Progressive enhancement — with
+// no JS the full transcript is shown; reduced-motion freezes it fully visible.
+// The transcript is honest: plan computes a diff but applies nothing.
+---
+
+<div class="term-live" aria-label="Example output of hostwright plan">
+  <div class="tl-bar">
+    <span class="tl-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="tl-title">hostwright plan</span>
+    <span class="tl-tag">non-mutating</span>
+  </div>
+
+  <pre class="tl-body"><code>{
+    [
+      { c: "cmd",   t: "$ hostwright plan" },
+      { c: "muted", t: "∙ reading hostwright.yaml" },
+      { c: "muted", t: "∙ validating manifest … ok" },
+      { c: "muted", t: "∙ computing plan (non-mutating)" },
+      { c: "blank", t: " " },
+      { c: "head",  t: "  project: api-local" },
+      { c: "blank", t: " " },
+      { c: "add",   t: "  + create   service/api      ghcr.io/example/api:latest" },
+      { c: "add",   t: "  + create   service/redis    redis:7" },
+      { c: "chg",   t: "  ~ map      ports            8080→8080, 6379→6379" },
+      { c: "blank", t: " " },
+      { c: "muted", t: "  plan: 2 to create, 1 to configure, 0 to destroy" },
+      { c: "blank", t: " " },
+      { c: "ok",    t: "✓ no changes applied — review, then apply" },
+    ].map((l, i) => (
+      <span class:list={["ln", l.c]} style={`--i:${i}`}>{l.t}<span class="cur" aria-hidden="true"></span></span>
+    ))
+  }</code></pre>
+</div>
+
+<style>
+  .term-live {
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: #fcfbf8;
+    box-shadow: 0 18px 40px -28px rgba(32, 35, 39, 0.45);
+    max-width: 46rem;
+  }
+  .tl-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .tl-dots {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .tl-dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-border-strong);
+  }
+  .tl-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .tl-tag {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    color: var(--color-text-faint);
+  }
+
+  .tl-body {
+    margin: 0;
+    padding: var(--space-4) var(--space-5);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.85;
+    overflow-x: auto;
+  }
+  .tl-body code {
+    display: block;
+    background: none;
+    border: 0;
+    padding: 0;
+    white-space: pre;
+  }
+
+  .ln {
+    display: block;
+    position: relative;
+  }
+  .ln.cmd { color: var(--color-accent); font-weight: var(--weight-medium); }
+  .ln.muted { color: var(--color-text-faint); }
+  .ln.head { color: var(--color-text); font-weight: var(--weight-semibold); }
+  .ln.add { color: var(--status-implemented); }
+  .ln.chg { color: var(--color-accent); }
+  .ln.ok { color: var(--status-implemented); font-weight: var(--weight-medium); }
+  .ln.blank { color: transparent; }
+
+  /* Per-line cursor — hidden by default; only the active line shows a block
+     caret while the transcript types out. */
+  .cur {
+    display: none;
+    width: 0.55em;
+    height: 1.05em;
+    margin-left: 2px;
+    vertical-align: -0.2em;
+    background: var(--color-accent);
+  }
+
+  /* JS-enhanced state: hide lines, reveal on .play. */
+  .term-live.anim .ln {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  .term-live.anim.play .ln {
+    animation: ln-in 0.32s var(--ease) forwards;
+    animation-delay: calc(var(--i) * 150ms);
+  }
+  /* A single resting caret blinks on the final line once the transcript has
+     fully revealed. */
+  .term-live.anim.play .ln.ok .cur {
+    display: inline-block;
+    opacity: 0;
+    animation: blink 1.1s steps(1) calc(var(--i) * 150ms) infinite;
+  }
+
+  @keyframes ln-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .term-live.anim .ln {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .term-live.anim .ln .cur { display: none; }
+    .term-live.anim .ln.ok .cur { display: inline-block; animation: blink 1.1s steps(1) infinite; }
+  }
+</style>
+
+<script>
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll<HTMLElement>(".term-live").forEach((el) => {
+    el.classList.add("anim");
+    if (reduce) {
+      el.classList.add("play");
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            el.classList.add("play");
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+  });
+</script>
