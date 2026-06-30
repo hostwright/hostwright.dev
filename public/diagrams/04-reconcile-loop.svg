@@ -1,53 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-labelledby="title desc">
-  <title id="title">The reconcile loop</title>
-  <desc id="desc">Reconciliation cycle: observe, diff, plan, then the planned apply step, looping back to observe; dry-run stops after plan.</desc>
-  
-    <style><![CDATA[
-      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
-      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
-      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
-      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
-      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
-      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
-      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
-      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
-      .hair { stroke: #e4e1da; stroke-width: 1.5; }
-    ]]></style>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="540" viewBox="0 0 720 540" role="img" aria-labelledby="title desc">
+  <title id="title">Hostwright reconciliation loop</title>
+  <desc id="desc">A clean reconciliation loop showing observe actual state, diff against desired, plan actions, and planned apply with dry-run stopping after plan.</desc>
+
   <defs>
-    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
+    <style>
+      .bg { fill: #faf9f6; }
+      .card { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box { fill: #faf9f6; stroke: #202327; stroke-width: 1.9; }
+      .boxPlanned { fill: #faf9f6; stroke: #5a5f67; stroke-width: 1.9; stroke-dasharray: 7 7; }
+      .note { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.3; }
+      .arrow { stroke: #202327; stroke-width: 1.9; fill: none; marker-end: url(#arrowHead); }
+      .arrowPlanned { stroke: #5a5f67; stroke-width: 1.9; fill: none; stroke-dasharray: 7 7; marker-end: url(#arrowHeadPlanned); }
+      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowHeadAccent); }
+      .text { fill: #202327; font-family: Arial, Helvetica, sans-serif; }
+      .muted { fill: #646973; font-family: Arial, Helvetica, sans-serif; }
+      .plannedText { fill: #5a5f67; font-family: Arial, Helvetica, sans-serif; }
+      .accentText { fill: #1f3a5f; font-family: Arial, Helvetica, sans-serif; }
+    </style>
+
+    <marker id="arrowHead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#202327"/>
     </marker>
-    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
+
+    <marker id="arrowHeadPlanned" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#5a5f67"/>
+    </marker>
+
+    <marker id="arrowHeadAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#1f3a5f"/>
     </marker>
   </defs>
-  <rect x="0" y="0" width="720" height="520" fill="#faf9f6"/>
-<rect x="275" y="43" width="170" height="84" rx="8" class="box-ink planned" />
-<text x="360" y="79" class="label" text-anchor="middle">
-  <tspan x="360" dy="0">Observe</tspan>
-  <tspan x="360" dy="22">actual state</tspan>
-</text>
-<rect x="500" y="208" width="170" height="84" rx="8" class="box-ink planned" />
-<text x="585" y="244" class="label" text-anchor="middle">
-  <tspan x="585" dy="0">Diff against</tspan>
-  <tspan x="585" dy="22">desired</tspan>
-</text>
-<rect x="275" y="373" width="170" height="84" rx="8" class="box-ink planned" />
-<text x="360" y="409" class="label" text-anchor="middle">
-  <tspan x="360" dy="0">Plan</tspan>
-  <tspan x="360" dy="22">actions</tspan>
-</text>
-<rect x="50" y="208" width="170" height="84" rx="8" class="box-ink planned" />
-<text x="135" y="250" class="label" text-anchor="middle" dominant-baseline="middle">Apply</text>
-<text x="135" y="278" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
-<path d="M 430 110 C 520 130 595 175 600 220" class="arrow" stroke-dasharray="8 6"/>
-<path d="M 580 295 C 535 365 455 410 405 415" class="arrow" stroke-dasharray="8 6"/>
-<path d="M 315 415 C 230 405 150 345 140 295" class="arrow" stroke-dasharray="8 6"/>
-<path d="M 140 205 C 150 145 230 95 315 85" class="arrow" stroke-dasharray="8 6"/>
-<path d="M 360 370 L 360 315 L 525 315" class="arrow" stroke-dasharray="8 6"/>
-<text x="500" y="304" class="small" text-anchor="middle">--dry-run: stop here, show plan</text>
-<text x="360" y="255" class="small" text-anchor="middle">Idempotent: re-running converges, never duplicates.</text>
-<text x="360" y="180" class="small" text-anchor="middle" fill="#5a5f67">Planned — this loop is not implemented yet.</text>
+
+  <rect class="bg" x="0" y="0" width="720" height="540"/>
+  <rect class="card" x="28" y="28" width="664" height="484" rx="16"/>
+
+  <!-- Header note, separated from diagram -->
+  <rect class="note" x="174" y="58" width="372" height="42" rx="8"/>
+  <text class="muted" x="360" y="84" text-anchor="middle" font-size="13" font-weight="500">Planned apply completes the loop after review.</text>
+
+  <!-- Node boxes -->
+  <rect class="box" x="252" y="128" width="216" height="68" rx="10"/>
+  <text class="text" x="360" y="155" text-anchor="middle" font-size="18" font-weight="700">Observe</text>
+  <text class="text" x="360" y="178" text-anchor="middle" font-size="18" font-weight="700">actual state</text>
+
+  <rect class="box" x="504" y="238" width="156" height="68" rx="10"/>
+  <text class="text" x="582" y="264" text-anchor="middle" font-size="17" font-weight="700">Diff against</text>
+  <text class="text" x="582" y="286" text-anchor="middle" font-size="17" font-weight="700">desired</text>
+
+  <rect class="box" x="252" y="348" width="216" height="68" rx="10"/>
+  <text class="text" x="360" y="375" text-anchor="middle" font-size="18" font-weight="700">Plan</text>
+  <text class="text" x="360" y="398" text-anchor="middle" font-size="18" font-weight="700">actions</text>
+
+  <rect class="boxPlanned" x="60" y="238" width="156" height="68" rx="10"/>
+  <text class="plannedText" x="138" y="267" text-anchor="middle" font-size="18" font-weight="700">Apply</text>
+  <text class="plannedText" x="138" y="289" text-anchor="middle" font-size="12" font-weight="500">Planned</text>
+
+  <!-- Loop arrows outside boxes, no center text -->
+  <path class="arrow" d="M468 162 C542 166 596 192 582 238"/>
+  <path class="arrow" d="M582 306 C574 350 522 382 468 382"/>
+  <path class="arrowPlanned" d="M252 382 C196 378 146 346 138 306"/>
+  <path class="arrowPlanned" d="M138 238 C126 192 178 166 252 162"/>
+
+  <!-- Dry-run branch: separate lane below Plan, no collision with loop -->
+  <path class="arrowAccent" d="M468 400 H548"/>
+  <rect class="box" x="548" y="376" width="116" height="48" rx="8"/>
+  <text class="accentText" x="606" y="395" text-anchor="middle" font-size="12.5" font-weight="700">--dry-run</text>
+  <text class="muted" x="606" y="412" text-anchor="middle" font-size="11.5" font-weight="500">show plan, stop</text>
+
+  <!-- Bottom note, separated from loop -->
+  <rect class="note" x="134" y="452" width="452" height="38" rx="8"/>
+  <text class="muted" x="360" y="476" text-anchor="middle" font-size="13" font-weight="500">Idempotent: re-running should converge, not duplicate.</text>
 </svg>
