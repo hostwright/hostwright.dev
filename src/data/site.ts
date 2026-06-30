@@ -8,7 +8,7 @@ export const site = {
   url: "https://hostwright.dev",
   tagline: "Desired-state container control for Apple silicon Macs.",
   description:
-    "Hostwright is a Mac-native desired-state control plane for Apple container workloads — a Swift CLI, a local daemon, and declarative manifests that keep local runtime state honest.",
+    "Hostwright is a Mac-native, desired-state control plane for Apple's container runtime — declare a local stack in one manifest and plan changes safely. Open-source; runtime convergence in active development.",
   cli: "hostwright",
   daemon: "hostwrightd",
   manifest: "hostwright.yaml",

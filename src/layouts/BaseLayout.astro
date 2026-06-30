@@ -19,6 +19,30 @@ interface Props {
 const { title, description = site.description, image = "/og.png" } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const ogImage = new URL(image, site.url).href;
+
+// Entity graph: tells search engines that "Hostwright" is a distinct brand and
+// links it to its GitHub/X/Reddit profiles (sameAs) for entity disambiguation.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      name: site.name,
+      url: site.url,
+      description: site.description,
+      publisher: { "@id": `${site.url}/#org` },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${site.url}/#org`,
+      name: site.name,
+      url: site.url,
+      logo: new URL("/hostwright-mark.png", site.url).href,
+      sameAs: [site.links.github, site.links.x, site.links.reddit],
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -45,9 +69,13 @@ const ogImage = new URL(image, site.url).href;
     <meta property="og:image:height" content="630" />
 
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@hostwrightdev" />
+    <meta name="twitter:creator" content="@hostwrightdev" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
     <slot name="head" />
   </head>
