@@ -24,17 +24,17 @@
     </marker>
   </defs>
   <rect x="0" y="0" width="720" height="520" fill="#faf9f6"/>
-<rect x="275" y="43" width="170" height="84" rx="8" class="box-ink" />
+<rect x="275" y="43" width="170" height="84" rx="8" class="box-ink planned" />
 <text x="360" y="79" class="label" text-anchor="middle">
   <tspan x="360" dy="0">Observe</tspan>
   <tspan x="360" dy="22">actual state</tspan>
 </text>
-<rect x="500" y="208" width="170" height="84" rx="8" class="box-ink" />
+<rect x="500" y="208" width="170" height="84" rx="8" class="box-ink planned" />
 <text x="585" y="244" class="label" text-anchor="middle">
   <tspan x="585" dy="0">Diff against</tspan>
   <tspan x="585" dy="22">desired</tspan>
 </text>
-<rect x="275" y="373" width="170" height="84" rx="8" class="box-ink" />
+<rect x="275" y="373" width="170" height="84" rx="8" class="box-ink planned" />
 <text x="360" y="409" class="label" text-anchor="middle">
   <tspan x="360" dy="0">Plan</tspan>
   <tspan x="360" dy="22">actions</tspan>
@@ -42,11 +42,12 @@
 <rect x="50" y="208" width="170" height="84" rx="8" class="box-ink planned" />
 <text x="135" y="250" class="label" text-anchor="middle" dominant-baseline="middle">Apply</text>
 <text x="135" y="278" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
-<path d="M 430 110 C 520 130 595 175 600 220" class="arrow"/>
-<path d="M 580 295 C 535 365 455 410 405 415" class="arrow"/>
+<path d="M 430 110 C 520 130 595 175 600 220" class="arrow" stroke-dasharray="8 6"/>
+<path d="M 580 295 C 535 365 455 410 405 415" class="arrow" stroke-dasharray="8 6"/>
 <path d="M 315 415 C 230 405 150 345 140 295" class="arrow" stroke-dasharray="8 6"/>
-<path d="M 140 205 C 150 145 230 95 315 85" class="arrow"/>
+<path d="M 140 205 C 150 145 230 95 315 85" class="arrow" stroke-dasharray="8 6"/>
 <path d="M 360 370 L 360 315 L 525 315" class="arrow" stroke-dasharray="8 6"/>
 <text x="500" y="304" class="small" text-anchor="middle">--dry-run: stop here, show plan</text>
 <text x="360" y="255" class="small" text-anchor="middle">Idempotent: re-running converges, never duplicates.</text>
+<text x="360" y="180" class="small" text-anchor="middle" fill="#5a5f67">Planned — this loop is not implemented yet.</text>
 </svg>

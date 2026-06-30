@@ -26,15 +26,16 @@
   <rect x="0" y="0" width="720" height="480" fill="#faf9f6"/>
 <rect x="140" y="55" width="440" height="90" rx="8" class="box-ink" />
 <text x="360" y="95" class="label" text-anchor="middle" dominant-baseline="middle">Hostwright core</text>
-<text x="360" y="120" class="small" text-anchor="middle" dominant-baseline="middle">planner · reconciler · state · health</text>
+<text x="360" y="120" class="small" text-anchor="middle" dominant-baseline="middle">planner today · reconciler, state, health planned</text>
 <path d="M 360 145 L 360 185" class="arrowAccent"/>
 <rect x="75" y="185" width="570" height="58" rx="8" fill="#1f3a5f" stroke="#1f3a5f" stroke-width="1.5"/>
 <text x="360" y="214" class="label" text-anchor="middle" dominant-baseline="middle" style="fill:#faf9f6">RuntimeAdapter (typed interface)</text>
-<path d="M 260 243 L 260 300" class="arrow"/>
+<path d="M 260 243 L 260 300" class="arrow" stroke-dasharray="8 6"/>
 <path d="M 460 243 L 460 300" class="arrow" stroke-dasharray="8 6"/>
-<rect x="95" y="300" width="250" height="86" rx="8" class="box-ink" />
+<rect x="95" y="300" width="250" height="86" rx="8" class="box-ink planned" />
 <text x="220" y="330" class="label" text-anchor="middle" dominant-baseline="middle">CLI adapter</text>
 <text x="220" y="358" class="small" text-anchor="middle" dominant-baseline="middle">shells out to container</text>
+<text x="220" y="382" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
 <rect x="375" y="300" width="250" height="86" rx="8" class="box-ink planned" />
 <text x="500" y="330" class="label" text-anchor="middle" dominant-baseline="middle">Containerization adapter</text>
 <text x="500" y="358" class="small" text-anchor="middle" dominant-baseline="middle">native</text>

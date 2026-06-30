@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
   <title id="title">CLI lifecycle map</title>
-  <desc id="desc">CLI lifecycle from init, validate, plan, doctor to the planned apply, status, and down commands.</desc>
+  <desc id="desc">CLI lifecycle: init, validate, plan, doctor, and status are implemented today; apply and down are planned.</desc>
   
     <style><![CDATA[
       .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
@@ -40,30 +40,29 @@
 <rect x="236" y="150" width="82" height="52" rx="8" class="box-ink" />
 <text x="277.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">plan</text>
 <text x="277.0" y="245" class="tiny" text-anchor="middle">
-  <tspan x="277.0" dy="0">show proposed</tspan>
-  <tspan x="277.0" dy="14">actions</tspan>
+  <tspan x="277.0" dy="0">manifest</tspan>
+  <tspan x="277.0" dy="14">plan</tspan>
 </text>
 <path d="M 320 176 L 330 176" class="arrow"/>
 <rect x="334" y="150" width="82" height="52" rx="8" class="box-ink" />
 <text x="375.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">doctor</text>
 <text x="375.0" y="245" class="tiny" text-anchor="middle">
-  <tspan x="375.0" dy="0">check</tspan>
-  <tspan x="375.0" dy="14">host/runtime</tspan>
+  <tspan x="375.0" dy="0">safe local</tspan>
+  <tspan x="375.0" dy="14">checks</tspan>
 </text>
-<path d="M 418 176 L 428 176" class="arrow" stroke-dasharray="8 6"/>
-<rect x="432" y="150" width="82" height="52" rx="8" class="box-ink planned" />
-<text x="473.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">apply</text>
-<text x="473.0" y="218" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
+<path d="M 418 176 L 428 176" class="arrow"/>
+<rect x="432" y="150" width="82" height="52" rx="8" class="box-ink" />
+<text x="473.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">status</text>
 <text x="473.0" y="245" class="tiny" text-anchor="middle">
-  <tspan x="473.0" dy="0">mutate runtime</tspan>
+  <tspan x="473.0" dy="0">manifest</tspan>
+  <tspan x="473.0" dy="14">status</tspan>
 </text>
 <path d="M 516 176 L 526 176" class="arrow" stroke-dasharray="8 6"/>
 <rect x="530" y="150" width="82" height="52" rx="8" class="box-ink planned" />
-<text x="571.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">status</text>
+<text x="571.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">apply</text>
 <text x="571.0" y="218" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
 <text x="571.0" y="245" class="tiny" text-anchor="middle">
-  <tspan x="571.0" dy="0">show live</tspan>
-  <tspan x="571.0" dy="14">state</tspan>
+  <tspan x="571.0" dy="0">mutate runtime</tspan>
 </text>
 <path d="M 614 176 L 624 176" class="arrow" stroke-dasharray="8 6"/>
 <rect x="628" y="150" width="82" height="52" rx="8" class="box-ink planned" />
@@ -73,7 +72,7 @@
   <tspan x="669.0" dy="0">safe cleanup</tspan>
   <tspan x="669.0" dy="14">plan</tspan>
 </text>
-<path d="M 422 100 L 422 300" class="hair"/>
-<text x="203" y="90" class="small" text-anchor="middle">solid: designed first-release commands</text>
-<text x="540" y="90" class="small" text-anchor="middle">dashed: planned runtime commands</text>
+<path d="M 522 100 L 522 300" class="hair"/>
+<text x="277" y="90" class="small" text-anchor="middle">solid: implemented today</text>
+<text x="620" y="90" class="small" text-anchor="middle">dashed: planned</text>
 </svg>

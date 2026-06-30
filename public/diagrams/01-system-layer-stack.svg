@@ -35,8 +35,9 @@
 <rect x="428" y="228" width="205" height="48" rx="6" class="box-ink planned" />
 <text x="530.5" y="250" class="label" text-anchor="middle" dominant-baseline="middle">Reconciler</text>
 <text x="530.5" y="270" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
-<rect x="658" y="228" width="205" height="48" rx="6" class="box-ink" />
+<rect x="658" y="228" width="205" height="48" rx="6" class="box-ink planned" />
 <text x="760.5" y="250" class="label" text-anchor="middle" dominant-baseline="middle">State Store</text>
+<text x="760.5" y="270" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
 <rect x="150" y="330" width="740" height="64" rx="8" fill="#1f3a5f" stroke="#1f3a5f" stroke-width="1.5"/>
 <text x="520.0" y="362.0" class="label" text-anchor="middle" dominant-baseline="middle" style="fill:#faf9f6">RuntimeAdapter boundary</text>
 <rect x="150" y="425" width="740" height="62" rx="8" class="box" />
