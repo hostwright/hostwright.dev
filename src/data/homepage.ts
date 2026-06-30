@@ -3,7 +3,7 @@
 export const hero = {
   title: "Desired-state container control for Apple silicon Macs.",
   subtitle:
-    "Hostwright is a Mac-native control plane for Apple container workloads. Define a local stack once, inspect the plan, and let a local reconciler keep runtime state honest.",
+    "Hostwright is a Mac-native control plane for Apple container workloads. Today it can initialize, validate, plan without mutation, show manifest-level status, and run safe doctor checks while the runtime control loop is built.",
   ctaPrimary: { label: "Read the docs", href: "/docs/" },
   ctaSecondary: { label: "View on GitHub", href: "https://github.com/hostwright/hostwright" },
   status: "Early design and implementation",
@@ -26,7 +26,7 @@ export interface Capability {
 export const whatItIs = {
   heading: "What Hostwright does",
   intro:
-    "A narrow, well-defined contract: declare a stack, see the plan, converge to it, and observe the result.",
+    "A narrow, well-defined release direction: declare a stack, see the plan, then later converge to it through a single runtime boundary.",
   capabilities: [
     {
       title: "Declares services in hostwright.yaml",
@@ -34,27 +34,27 @@ export const whatItIs = {
     },
     {
       title: "Plans changes before mutation",
-      detail: "Every runtime change is computed and shown before anything is applied.",
+      detail: "The current plan command is non-mutating and manifest-level. Runtime action planning comes after observation exists.",
     },
     {
       title: "Routes operations through a RuntimeAdapter",
-      detail: "All runtime calls cross one typed boundary, never ad-hoc shell commands.",
+      detail: "The boundary exists now. Real runtime calls are planned and must cross this typed boundary.",
     },
     {
       title: "Tracks local state",
-      detail: "Desired state, events, and resource ownership are recorded durably.",
+      detail: "Durable desired state, events, and ownership are planned for the SQLite phase.",
     },
     {
       title: "Detects drift",
-      detail: "Compares declared state against observed runtime state and reports the difference.",
+      detail: "Drift detection is planned after read-only runtime observation exists.",
     },
     {
       title: "Runs doctor checks",
-      detail: "Validates Apple container, macOS, architecture, and runtime assumptions up front.",
+      detail: "Runs safe local checks for OS, architecture, Swift, manifest presence, and `container` executable lookup.",
     },
     {
       title: "Treats destruction as explicit",
-      detail: "Cleanup and teardown are deliberate operations, never silent side effects.",
+      detail: "Cleanup and teardown are not implemented yet; the release design requires dry-run and ownership checks first.",
     },
   ] satisfies Capability[],
 };
@@ -64,10 +64,10 @@ export const whatItIs = {
 export const cliCore = `hostwright init
 hostwright validate
 hostwright plan
+hostwright status
 hostwright doctor`;
 
 export const cliPlanned = `hostwright apply
-hostwright status
 hostwright down --dry-run`;
 
 // Manifest example — kept verbatim. Document only the fields shown here.
@@ -97,11 +97,11 @@ export const safety = {
     "Infrastructure tooling earns trust by being predictable under failure. Hostwright's defaults are conservative.",
   principles: [
     { title: "Plan before mutation", detail: "Runtime changes are computed and reviewable before they run." },
-    { title: "Dry-run for cleanup", detail: "Destructive operations preview exactly what they would remove first." },
+    { title: "Dry-run for cleanup", detail: "Cleanup is planned to preview exactly what it would remove before it can remove anything." },
     { title: "Explicit destructive confirmation", detail: "Removing real resources requires an intentional, confirmed action." },
     { title: "Conservative validation", detail: "Unsafe or ambiguous manifests are refused, not guessed at." },
-    { title: "No hidden runtime mutation", detail: "Nothing changes the runtime outside the planned, recorded path." },
-    { title: "Ownership-tracked cleanup", detail: "No broad garbage collection — only resources Hostwright can prove it owns." },
+    { title: "No hidden runtime mutation", detail: "Current commands do not mutate runtime state. Future mutation must use the planned, recorded path." },
+    { title: "Ownership-tracked cleanup", detail: "Cleanup is planned to touch only resources Hostwright can prove it owns." },
     { title: "No secret leakage in logs", detail: "Secrets and credentials are kept out of events and log output." },
   ] satisfies Capability[],
 };
@@ -109,5 +109,5 @@ export const safety = {
 export const architecture = {
   heading: "Architecture",
   intro:
-    "Hostwright owns declared state, planning, reconciliation, health, drift, events, and cleanup policy. Apple container owns the runtime. The RuntimeAdapter is the boundary between them.",
+    "Hostwright currently owns manifest parsing, validation, non-mutating planning, and architecture boundaries. Apple container owns the runtime. The RuntimeAdapter is the boundary future runtime behavior must cross.",
 };

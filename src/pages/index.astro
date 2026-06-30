@@ -78,7 +78,7 @@ const community = [
       <Figure
         src="/diagrams/01-system-layer-stack.svg"
         alt="Layered architecture: the hostwright CLI and planned daemon sit above the RuntimeAdapter boundary, which drives Apple's container runtime and Linux VMs."
-        caption="Apple container is the execution substrate. Hostwright owns declared state, planning, reconciliation, health, drift, and cleanup — not Apple's runtime internals."
+        caption="Apple container is the execution substrate. Hostwright currently owns manifest validation and non-mutating planning; runtime reconciliation, health, drift, and cleanup are planned behind the RuntimeAdapter boundary."
         dense
       />
     </div>

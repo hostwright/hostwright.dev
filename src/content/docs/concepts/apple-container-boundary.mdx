@@ -7,8 +7,9 @@ import Callout from "../../../components/Callout.astro";
 import Figure from "../../../components/Figure.astro";
 
 Hostwright does not run containers. **Apple container** runs containers; Hostwright
-decides what *should* run and keeps it honest. Understanding where that line sits
-is essential to understanding the project.
+currently validates what *should* run and produces non-mutating plans. Future
+observation and mutation must cross the RuntimeAdapter boundary. Understanding
+where that line sits is essential to understanding the project.
 
 <Figure
   src="/diagrams/07-apple-container-boundary.svg"
@@ -30,7 +31,7 @@ The VM-per-container model is a defining constraint: replicas and large stacks
 carry real per-VM memory overhead, which shapes Hostwright's [resource
 guardrails](/docs/reference/limitations/).
 
-## The path of a runtime operation
+## The intended path of a runtime operation
 
 ```text
 hostwright CLI
@@ -43,13 +44,14 @@ hostwright CLI
 ```
 
 Everything above the [RuntimeAdapter](/docs/concepts/runtime-adapter/) is
-Hostwright. Everything below it is Apple's. The adapter is the seam.
+Hostwright. Everything below it is Apple's. The adapter is the boundary future
+runtime behavior must use.
 
 ## What Hostwright owns
 
-- Declared state, planning, and reconciliation.
-- Drift detection, health, restart policy, and events.
-- An ownership ledger and a conservative cleanup policy.
+- Current declared manifest parsing, validation, and non-mutating planning.
+- Planned reconciliation, drift detection, health, restart policy, and events.
+- Planned ownership ledger and conservative cleanup policy.
 
 ## What Apple container owns
 

@@ -32,7 +32,7 @@ shipped software. See the [roadmap](/#roadmap).
 
 These follow from the [Apple container boundary](/docs/concepts/apple-container-boundary/):
 
-- **VM-per-container overhead.** Each container runs in its own lightweight VM. Replicas and large stacks carry real per-VM memory cost, and Hostwright will refuse applies that exceed a safe memory budget.
+- **VM-per-container overhead.** Each container runs in its own lightweight VM. Replicas and large stacks carry real per-VM memory cost, and future `apply` behavior must refuse or warn on unsafe memory budgets.
 - **`amd64` under emulation.** Images without a `linux/arm64` variant run under Rosetta and only when explicitly allowed. Hostwright warns rather than silently emulating.
 - **Networking is a capability gate, not a promise.** Service discovery and DNS are validated by `doctor`, not assumed. Hostwright will not claim Compose-style or Kubernetes-style networking semantics it cannot verify.
 - **Runtime feature boundaries.** Interactive `exec`/attach, port-forwarding, and log streaming for short-lived containers depend on what Apple container exposes; their exact boundaries are still being mapped.

@@ -1,15 +1,15 @@
 ---
 title: Reconciliation
-description: The reconciliation loop observes, diffs, plans, applies, and observes again — boringly, deterministically, and with every step recorded.
+description: The intended reconciliation loop observes, diffs, plans, applies, and observes again; Phase 2 only has non-mutating manifest-level planning.
 ---
 
 import Callout from "../../../components/Callout.astro";
 import Figure from "../../../components/Figure.astro";
 
-Reconciliation is the heart of Hostwright. It should be boring: deterministic,
-observable, and hard to corrupt. Every cycle treats desired state and observed
-state as separate inputs, computes a plan, applies actions idempotently, and
-records what happened.
+Reconciliation is the heart of the intended Hostwright release. It should be
+boring: deterministic, observable, and hard to corrupt. Phase 2 does not run this
+loop yet; it only validates a manifest and renders a non-mutating manifest-level
+plan.
 
 <Figure
   src="/diagrams/04-reconcile-loop.svg"
@@ -18,7 +18,7 @@ records what happened.
   dense
 />
 
-## The loop
+## The intended loop
 
 ```text
 load desired state from the state store
@@ -34,20 +34,22 @@ record events and status transitions
 observe again
 ```
 
-The diff and the plan are first-class artifacts. `hostwright plan` shows you the
-ordered actions **before** `hostwright apply` runs them.
+The diff and the plan must become first-class artifacts. Today, `hostwright plan`
+does not observe Apple container and does not compute real runtime actions.
 
 ## Dry-run and apply
 
-- **`plan`** computes the diff and the action plan and prints it. Nothing in the runtime changes.
-- **`apply`** runs the plan, persisting intent before each mutation and the result immediately after.
+- **`plan` today** validates the manifest and prints a non-mutating manifest-level plan. Nothing in the runtime changes.
+- **`plan` later** must compute real desired-vs-observed drift after read-only runtime observation exists.
+- **`apply` later** must run the plan, persisting intent before each mutation and the result immediately after.
 
-Because intent is persisted before mutation, a daemon restart in the middle of an
-apply does not lose track of what was being attempted.
+Because intent must be persisted before mutation, the future `apply` design needs
+SQLite operation records before runtime mutation begins.
 
 ## Idempotency
 
-Applying a converged state is a no-op. The rules that make this safe:
+Applying a converged state should be a no-op once `apply` exists. The rules that
+make this safe:
 
 - Creating an already-correct container is a no-op or a clear "already converged" result.
 - Starting an already-running container is not an error.
@@ -57,15 +59,15 @@ Applying a converged state is a no-op. The rules that make this safe:
 
 ## Drift
 
-Drift is the gap between what you declared and what is running. Hostwright
-reports drift for resources that are missing, stopped, unhealthy, or modified
-out from under it. Drift is surfaced in `hostwright status`, not silently repaired
-in ways you cannot see.
+Drift is the gap between what you declared and what is running. Real drift
+detection is planned after read-only runtime observation. Current `hostwright
+status` is manifest-level only and must not be read as service health or runtime
+state.
 
 ## Events
 
-Every meaningful step emits a structured event so failures are explainable after
-the fact:
+Every meaningful runtime step must eventually emit a structured event so failures
+are explainable after the fact:
 
 ```text
 Event {
@@ -78,9 +80,9 @@ Event {
 ```
 
 <Callout type="boundary" title="Failure is reported, not swallowed">
-A failed apply emits a failure event with the source operation, an error
-category, and a recovery hint. Hostwright never silently continues past a safety
-gate. Rollback is conservative — see the [safety model](/docs/concepts/safety-model/).
+A future failed apply must emit a failure event with the source operation, an
+error category, and a recovery hint. Hostwright must never silently continue past
+a safety gate. Rollback is conservative — see the [safety model](/docs/concepts/safety-model/).
 </Callout>
 
 ## Open questions

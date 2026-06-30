@@ -1,15 +1,14 @@
 ---
 title: Desired state
-description: Hostwright separates the state you declare from the state that is actually running, and works to close the gap.
+description: Hostwright separates the state you declare from the state that is actually running; Phase 2 models the declared side only.
 ---
 
 import Callout from "../../../components/Callout.astro";
 import Figure from "../../../components/Figure.astro";
 
-Hostwright is a **desired-state** system. You do not start and stop containers by
-hand. You declare the state you want the machine to be in, and Hostwright is
-responsible for making the running system match it — and for telling you when it
-does not.
+Hostwright is being built as a **desired-state** system. Today it models and
+validates the declared side of that system. Runtime observation, convergence, and
+drift reporting are planned after the RuntimeAdapter and state store are ready.
 
 <Figure
   src="/diagrams/05-desired-observed-drift.svg"
@@ -19,21 +18,21 @@ does not.
 
 ## Two kinds of state
 
-- **Desired state** — what you declared in [`hostwright.yaml`](/docs/reference/hostwright-yaml/). It is persisted durably so it survives daemon restarts and machine reboots.
-- **Observed state** — what is actually running, read back from the runtime through the [RuntimeAdapter](/docs/concepts/runtime-adapter/) at a point in time.
+- **Desired state** — what you declared in [`hostwright.yaml`](/docs/reference/hostwright-yaml/). Durable persistence is planned for the SQLite phase.
+- **Observed state** — what is actually running, read back from the runtime through the [RuntimeAdapter](/docs/concepts/runtime-adapter/) at a point in time. This is not implemented yet.
 
-The job of the [reconciler](/docs/concepts/reconciliation/) is to compare the two,
-compute the difference, and converge observed state toward desired state.
+The planned job of the [reconciler](/docs/concepts/reconciliation/) is to compare
+the two, compute the difference, and converge observed state toward desired state.
 
 ## Why declare instead of command
 
 Imperative commands describe *how*; a manifest describes *what*. A declarative
 model gives you properties that are hard to get from a pile of shell commands:
 
-- **Idempotency** — applying the same manifest twice converges to the same result.
-- **Drift detection** — because the desired state is recorded, Hostwright can notice when reality has diverged from it.
+- **Idempotency** — future `apply` behavior must converge to the same result when run more than once.
+- **Drift detection** — once desired and observed state are both recorded, Hostwright can notice when reality has diverged from it.
 - **Reviewable change** — the difference between current and desired state can be shown as a plan before anything mutates.
-- **Recovery** — desired state is not lost when the daemon restarts.
+- **Recovery** — once SQLite state exists, desired state and operation records should survive daemon restarts.
 
 ## The unit of declaration
 
@@ -59,5 +58,5 @@ a missing feature — see [Why Hostwright](/docs/design/why-hostwright/).
 
 ## Open questions
 
-- **Rollback.** When an apply fails partway, should Hostwright roll back automatically, or stop and hand you an explicit recovery plan? The current stance is conservative: automatic rollback only when every affected resource is owned by Hostwright and the rollback is deterministic. See the [safety model](/docs/concepts/safety-model/).
+- **Rollback.** Future `apply` behavior still needs a final rollback policy. The current stance is conservative: automatic rollback only when every affected resource is owned by Hostwright and the rollback is deterministic. See the [safety model](/docs/concepts/safety-model/).
 - **Replicas.** Running more than one instance of a service interacts with Apple container's VM-per-container model. The scheduling and naming details for replicas are still under design.

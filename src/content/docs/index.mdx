@@ -5,7 +5,7 @@ description: Hostwright is a Mac-native desired-state control plane for Apple co
 
 import Callout from "../../components/Callout.astro";
 
-Hostwright is a **Mac-native desired-state control plane** for [Apple container](/docs/concepts/apple-container-boundary/) workloads. You describe the local stack you want in a `hostwright.yaml` manifest; Hostwright plans the change, applies it through a single runtime boundary, and keeps watching so that what is running matches what you declared.
+Hostwright is a **Mac-native desired-state control plane** for [Apple container](/docs/concepts/apple-container-boundary/) workloads. Today it can initialize and validate a `hostwright.yaml` manifest, render a non-mutating manifest-level plan, show manifest-level status, and run safe doctor checks. Runtime observation and apply are planned behind one runtime boundary.
 
 It is built for one machine: an Apple silicon Mac running a recent macOS with Apple container installed. It is not a cluster orchestrator, and it does not try to be.
 
@@ -19,10 +19,10 @@ and [Roadmap](/#roadmap).
 ## What you get
 
 - A declarative manifest, [`hostwright.yaml`](/docs/reference/hostwright-yaml/), for local stacks.
-- A planning step that shows every runtime change **before** it happens.
-- A [reconciler](/docs/concepts/reconciliation/) that converges actual state to declared state and reports drift.
-- A single [runtime adapter](/docs/concepts/runtime-adapter/) boundary over Apple container.
-- A [safety model](/docs/concepts/safety-model/) where destruction is explicit and cleanup is ownership-aware.
+- A current non-mutating planning step that does not inspect Apple container.
+- A planned [reconciler](/docs/concepts/reconciliation/) that will converge actual state to declared state and report drift after runtime observation exists.
+- A single [runtime adapter](/docs/concepts/runtime-adapter/) boundary that all future Apple container behavior must cross.
+- A planned [safety model](/docs/concepts/safety-model/) where destruction is explicit and cleanup is ownership-aware.
 
 ## How these docs are organized
 

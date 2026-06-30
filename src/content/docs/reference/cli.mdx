@@ -1,17 +1,19 @@
 ---
 title: CLI
-description: The hostwright command surface — what each command is intended to do, and which are read-only versus mutating.
+description: The current hostwright command surface and the planned first-release commands.
 ---
 
 import Callout from "../../../components/Callout.astro";
 import Figure from "../../../components/Figure.astro";
 
 The `hostwright` command line is the primary way you interact with the control
-plane. This page documents the intended command surface.
+plane. This page separates commands implemented today from commands planned for
+the first supported release.
 
-<Callout type="warning" title="In design">
-These commands describe intended behavior. The CLI is not yet implemented. Shapes
-and flags may change before the first release.
+<Callout type="warning" title="Phase 2 CLI">
+The current CLI is non-mutating except `init`, which writes `hostwright.yaml`
+only when absent. No current command observes or mutates Apple container runtime
+state.
 </Callout>
 
 <Figure
@@ -23,27 +25,29 @@ and flags may change before the first release.
 
 ## Commands
 
-| Command | Mutating? | Purpose |
+| Command | Status | Mutating? | Purpose |
 | --- | --- | --- |
-| `hostwright init` | writes files | Create a `hostwright.yaml` and project metadata. Does not overwrite without confirmation. |
-| `hostwright validate` | read-only | Check the manifest against the schema and semantic rules. |
-| `hostwright doctor` | read-only | Report host, macOS, architecture, and Apple container readiness. |
-| `hostwright plan` | read-only | Show the ordered runtime actions that `apply` would take. |
-| `hostwright apply` | mutating | Validate, compute a plan, persist intent, and apply idempotently. |
-| `hostwright status` | read-only | Show desired vs actual state, health, drift, restarts, and ports. |
-| `hostwright logs` | read-only | Fetch or stream service logs, honest about runtime limits. |
-| `hostwright restart` | mutating | Restart a service or project per policy and record an event. |
-| `hostwright down` | mutating | Stop project resources per ownership rules; preserves named volumes by default. |
-| `hostwright clean` | mutating | Remove stale, owned resources. Dry-run first. |
+| `hostwright --version` | implemented | read-only | Print the current development version. |
+| `hostwright init` | implemented | writes files | Create `hostwright.yaml` only when absent. |
+| `hostwright validate` | implemented | read-only | Check the restricted manifest subset and semantic rules. |
+| `hostwright doctor` | implemented | read-only | Run safe local checks without calling Apple container commands. |
+| `hostwright plan` | implemented | read-only | Show a non-mutating manifest-level plan and state that runtime observation is unavailable. |
+| `hostwright status` | implemented | read-only | Show manifest-level status only. |
+| `hostwright apply` | planned | mutating | Validate, compute a plan, persist intent, and apply idempotently. |
+| `hostwright logs` | planned | read-only | Fetch or stream service logs, honest about runtime limits. |
+| `hostwright restart` | planned | mutating | Restart a service or project per policy and record an event. |
+| `hostwright down` | planned | mutating | Stop project resources per ownership rules; preserves named volumes by default. |
+| `hostwright clean` | planned | mutating | Remove stale, owned resources. Dry-run first. |
 
 ## Read-only first
 
-The commands you reach for while iterating — `validate`, `plan`, `doctor`,
-`status`, `logs` — never change runtime state. You can run them freely.
+The implemented commands you reach for while iterating — `validate`, `plan`,
+`doctor`, and `status` — never change runtime state. You can run them freely.
 
 ## Destructive commands
 
-`down` and `clean` can remove resources, so they default to safe behavior:
+`down` and `clean` are planned commands. They can remove resources, so the first
+release requires safe behavior:
 
 ```bash
 hostwright down --dry-run        # preview what would stop
@@ -52,11 +56,12 @@ hostwright clean --confirmed     # remove safe, stale, owned resources only
 hostwright clean --volumes       # requires explicit confirmation; lists every named volume
 ```
 
-Cleanup only ever touches resources Hostwright can prove it owns. See the
+Cleanup is not implemented today. The release requirement is that cleanup only
+touches resources Hostwright can prove it owns. See the
 [safety model](/docs/concepts/safety-model/).
 
 ## Related
 
 - [`hostwright.yaml` reference](/docs/reference/hostwright-yaml/)
-- [Reconciliation](/docs/concepts/reconciliation/) — what `plan` and `apply` actually do.
+- [Reconciliation](/docs/concepts/reconciliation/) — what current `plan` does and what future `apply` must do.
 - [Limitations](/docs/reference/limitations/)
