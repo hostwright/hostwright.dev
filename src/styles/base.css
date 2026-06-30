@@ -133,6 +133,13 @@ pre.astro-code code {
   font-size: inherit;
 }
 
+@media (max-width: 39.99rem) {
+  pre.astro-code,
+  pre.shiki {
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
 /* ---- Layout primitives ---- */
 .container {
   width: 100%;
