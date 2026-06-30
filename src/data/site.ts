@@ -1,7 +1,7 @@
 // Site-wide constants. Edit URLs here only.
 //
 // NOTE: the name is "pre-screened", not yet reserved. The GitHub org, domain,
-// and social handles below are PLACEHOLDERS — confirm ownership before publishing.
+// and social handles below are the project's confirmed accounts.
 export const site = {
   name: "Hostwright",
   domain: "hostwright.dev",
@@ -15,9 +15,9 @@ export const site = {
   license: "Apache-2.0",
   maturity: "Early design and implementation",
   links: {
-    github: "https://github.com/hostwright/hostwright",
-    x: "https://x.com/hostwright",
-    reddit: "https://www.reddit.com/r/hostwright",
+    github: "https://github.com/hostwright",
+    x: "https://x.com/hostwrightdev",
+    reddit: "https://www.reddit.com/r/hostwright/",
     docs: "/docs/",
   },
 } as const;
