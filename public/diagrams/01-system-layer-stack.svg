@@ -57,7 +57,4 @@
 <path d="M 520.0 300 L 520.0 322" class="arrowAccent"/>
 <path d="M 520.0 400 L 520.0 417" class="arrow"/>
 <path d="M 520.0 493 L 520.0 507" class="arrow"/>
-<text x="170" y="595" class="small" text-anchor="start">
-  <tspan x="170" dy="0">Apple container is the execution substrate. Hostwright owns declared state, planning, reconciliation, health, drift, and cleanup — not Apple&#x27;s runtime internals.</tspan>
-</text>
 </svg>

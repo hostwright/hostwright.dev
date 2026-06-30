@@ -15,13 +15,22 @@ const navLinks = [
       <HostwrightLogo size={26} />
     </a>
 
-    <details class="nav">
+    <!-- Desktop nav: a plain <nav> so it never depends on the <details>
+         open state (a closed <details> hides its content in Safari/Chromium
+         regardless of author `display`). -->
+    <nav class="nav-desktop" aria-label="Primary">
+      {navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+      <a class="nav-github" href={site.links.github} rel="noopener">GitHub ↗</a>
+    </nav>
+
+    <!-- Mobile nav: disclosure menu, hidden on desktop. -->
+    <details class="nav-mobile">
       <summary class="nav-toggle" aria-label="Toggle navigation">
         <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <path d="M4 7h16M4 12h16M4 17h16"></path>
         </svg>
       </summary>
-      <nav class="nav-menu" aria-label="Primary">
+      <nav class="nav-menu" aria-label="Menu">
         {navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
         <a class="nav-github" href={site.links.github} rel="noopener">GitHub ↗</a>
       </nav>
@@ -50,6 +59,22 @@ const navLinks = [
     border-radius: var(--radius-sm);
   }
 
+  /* Desktop nav: hidden on small screens, inline row on wide screens. */
+  .nav-desktop {
+    display: none;
+  }
+  .nav-desktop a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+  }
+  .nav-desktop a:hover {
+    background: var(--color-surface);
+  }
+
   .nav-toggle {
     display: inline-flex;
     align-items: center;
@@ -67,8 +92,7 @@ const navLinks = [
   }
 
   .nav-menu {
-    /* Appearance of the mobile dropdown. Visibility is gated below so the
-       closed <details> stays hidden without JS. */
+    display: none;
     flex-direction: column;
     gap: var(--space-1);
     position: absolute;
@@ -97,28 +121,19 @@ const navLinks = [
     color: var(--color-accent) !important;
   }
 
-  /* Mobile: reveal only when the disclosure is open. */
-  .nav[open] .nav-menu {
+  /* Mobile: reveal the dropdown only when the disclosure is open. */
+  .nav-mobile[open] .nav-menu {
     display: flex;
   }
 
   @media (min-width: 48rem) {
-    .nav-toggle {
-      display: none;
-    }
-    .nav-menu {
-      /* Author-origin display beats the UA's closed-<details> hide,
-         so the inline menu always shows on desktop. */
+    .nav-desktop {
       display: flex;
-      position: static;
-      flex-direction: row;
       align-items: center;
       gap: var(--space-2);
-      padding: 0;
-      border: 0;
-      box-shadow: none;
-      background: none;
-      min-width: 0;
+    }
+    .nav-mobile {
+      display: none;
     }
   }
 </style>

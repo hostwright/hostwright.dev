@@ -67,7 +67,7 @@
 </text>
 <path d="M 614 176 L 624 176" class="arrow" stroke-dasharray="8 6"/>
 <rect x="628" y="150" width="82" height="52" rx="8" class="box-ink planned" />
-<text x="669.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">down --dry-run</text>
+<text x="669.0" y="176" class="small" text-anchor="middle" dominant-baseline="middle">down</text>
 <text x="669.0" y="218" class="tiny" text-anchor="middle" dominant-baseline="middle" fill="#5a5f67">Planned</text>
 <text x="669.0" y="245" class="tiny" text-anchor="middle">
   <tspan x="669.0" dy="0">safe cleanup</tspan>
