@@ -1,22 +1,23 @@
 /* Design tokens — single source of truth for color, type, space, and shape.
-   Brand: serious Mac-native infrastructure. Warm off-white, deep charcoal,
-   restrained navy accent, hairline borders. No gradients. */
+   "The Seam": clean, formal, near-monochrome. Warm paper, charcoal ink, one
+   restrained ink-navy accent reserved for interaction. Typography and the
+   seam motif carry the design. No decorative color, no gradients. */
 
 :root {
-  /* Surfaces & ink */
-  --color-bg: #faf9f6; /* warm off-white */
-  --color-surface: #f3f1ec; /* subtle stone card */
-  --color-surface-2: #ece9e2; /* deeper stone, code chrome */
-  --color-text: #202327; /* deep charcoal, matched to the logo */
-  --color-text-muted: #585d63;
-  --color-text-faint: #646973; /* AA: 5.2:1 on bg, 4.9:1 on surface */
-  --color-border: #e4e1da; /* hairline, low contrast */
-  --color-border-strong: #d4d0c6;
+  /* Surfaces & ink — a deliberate warm-neutral ramp */
+  --color-bg: #faf9f6; /* warm paper */
+  --color-surface: #f4f2ec; /* raised panel */
+  --color-surface-2: #ebe8e0; /* deeper panel, code chrome */
+  --color-text: #1c1e22; /* charcoal ink, matched to the logo */
+  --color-text-muted: #565b61;
+  --color-text-faint: #8a8f97; /* quiet labels; not for body copy */
+  --color-border: #e7e4dc; /* hairline */
+  --color-border-strong: #d7d3c8;
 
-  /* Accent — restrained deep navy. Verified >= 4.5:1 on --color-bg. */
+  /* Accent — a single deep ink-navy. Links, focus, primary CTA only. */
   --color-accent: #1f3a5f;
   --color-accent-hover: #16304f;
-  --color-accent-soft: #eef1f5;
+  --color-accent-soft: #edf0f4;
 
   /* Status (roadmap chips) — muted, accessible on light surfaces */
   --status-planned: #5a5f67; /* AA: 5.6:1 on its tint */
@@ -28,22 +29,28 @@
   --status-blocked: #9a4a32;
   --status-blocked-bg: #f6ece7;
 
-  /* Typography */
-  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Typography — General Sans (clean geometric, harmonizes with the wordmark)
+     for display + body; IBM Plex Mono for the technical/CLI voice. */
+  --font-sans: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "General Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "Menlo", monospace;
 
   --text-xs: 0.78rem;
   --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.3rem;
-  --text-2xl: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
-  --text-3xl: clamp(1.9rem, 1.4rem + 2.4vw, 2.85rem);
-  --text-4xl: clamp(2.35rem, 1.6rem + 3.6vw, 3.6rem);
+  --text-base: 1.02rem;
+  --text-lg: 1.16rem;
+  --text-xl: 1.35rem;
+  --text-2xl: clamp(1.55rem, 1.2rem + 1.6vw, 2.1rem);
+  --text-3xl: clamp(2rem, 1.4rem + 2.8vw, 3.1rem);
+  --text-4xl: clamp(2.6rem, 1.6rem + 4.6vw, 4.4rem);
 
-  --leading-tight: 1.18;
-  --leading-snug: 1.4;
-  --leading-normal: 1.65;
+  /* display tracking — tightened at large sizes, Apple-style optical feel */
+  --track-display: -0.022em;
+  --track-tight: -0.012em;
+
+  --leading-tight: 1.06;
+  --leading-snug: 1.38;
+  --leading-normal: 1.66;
 
   --weight-normal: 400;
   --weight-medium: 500;
@@ -68,12 +75,13 @@
   --sidebar-width: 17rem;
   --header-height: 4rem;
 
-  /* Shape */
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
+  /* Shape — softened to echo the mark's curves */
+  --radius-sm: 7px;
+  --radius: 12px;
+  --radius-lg: 18px;
 
-  /* Motion — subtle, opacity/translate only */
+  /* Motion */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --duration: 180ms;
+  --ease-display: cubic-bezier(0.16, 1, 0.3, 1); /* slow, formal settle */
+  --duration: 200ms;
 }

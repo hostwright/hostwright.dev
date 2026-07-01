@@ -1,5 +1,15 @@
 @import "./tokens.css";
 
+/* ---- Fonts ---- */
+/* General Sans (variable) — self-hosted, Fontshare Free License. */
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-Variable.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---- Reset ---- */
 *,
 *::before,
@@ -34,6 +44,12 @@ body {
   font-synthesis: none;
 }
 
+/* Tabular figures everywhere numbers align (roadmap, terminal, versions). */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
 img,
 svg {
   display: block;
@@ -45,19 +61,22 @@ h1,
 h2,
 h3,
 h4 {
+  font-family: var(--font-display);
   line-height: var(--leading-tight);
   font-weight: var(--weight-semibold);
-  letter-spacing: -0.018em;
+  letter-spacing: var(--track-tight);
   color: var(--color-text);
   text-wrap: balance;
 }
 
 h1 {
   font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--track-display);
 }
 h2 {
   font-size: var(--text-3xl);
+  letter-spacing: var(--track-display);
 }
 h3 {
   font-size: var(--text-xl);
@@ -67,16 +86,38 @@ p {
   text-wrap: pretty;
 }
 
+/* Prose/content links: an animated seam-underline that draws on hover. */
 a {
   color: var(--color-accent);
-  text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
-  text-underline-offset: 0.18em;
+  text-decoration: none;
   transition: color var(--duration) var(--ease);
+}
+
+:where(p, .lead, figcaption) a,
+.prose :where(p, li) a {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  padding-bottom: 0.06em;
+}
+
+@media (hover: hover) {
+  :where(p, .lead, figcaption) a,
+  .prose :where(p, li) a {
+    background-size: 0% 1px;
+    transition:
+      background-size var(--duration) var(--ease),
+      color var(--duration) var(--ease);
+  }
+  :where(p, .lead, figcaption) a:hover,
+  .prose :where(p, li) a:hover {
+    background-size: 100% 1px;
+  }
 }
 
 a:hover {
   color: var(--color-accent-hover);
-  text-decoration-color: currentColor;
 }
 
 strong {
@@ -158,14 +199,37 @@ pre.astro-code code {
   padding-block: var(--space-8);
 }
 
+@media (min-width: 48rem) {
+  .section {
+    padding-block: var(--space-9);
+  }
+}
+
+/* Seam divider — the logo's junction (two offset arcs) sits on a hairline
+   between sections. A quiet signature repeated down the page. */
 .section + .section {
+  position: relative;
   border-top: 1px solid var(--color-border);
+}
+
+.section + .section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 46px;
+  height: 26px;
+  transform: translate(-50%, -50%);
+  background:
+    var(--color-bg)
+    center / 30px auto no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 24' fill='none' stroke='%23cbc6ba' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M3 5 Q22 5 22 15'/%3E%3Cpath d='M41 19 Q22 19 22 9'/%3E%3C/svg%3E");
 }
 
 .eyebrow {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-faint);
   font-weight: var(--weight-medium);
@@ -185,13 +249,15 @@ pre.astro-code code {
   gap: var(--space-2);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  padding: 0.6rem 1.1rem;
+  padding: 0.72rem 1.3rem;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   text-decoration: none;
+  background-image: none;
   transition:
     background-color var(--duration) var(--ease),
     border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease),
     transform var(--duration) var(--ease);
 }
 
@@ -202,11 +268,14 @@ pre.astro-code code {
 .btn-primary {
   background: var(--color-accent);
   color: #fff;
+  box-shadow: 0 1px 2px rgba(28, 30, 34, 0.12);
 }
 
 .btn-primary:hover {
   background: var(--color-accent-hover);
   color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -10px rgba(31, 58, 95, 0.5);
 }
 
 .btn-secondary {
@@ -219,6 +288,28 @@ pre.astro-code code {
   background: var(--color-surface);
   color: var(--color-text);
   border-color: var(--color-text-faint);
+  transform: translateY(-1px);
+}
+
+/* ---- Scroll reveal — quiet, formal fade-up when a block enters view.
+   Enhanced by a tiny IntersectionObserver in BaseLayout; safe without JS. ---- */
+.reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.7s var(--ease-display),
+      transform 0.7s var(--ease-display);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .js .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ---- Cards ---- */

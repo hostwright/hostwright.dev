@@ -25,11 +25,12 @@ import HeroMotif from "./HeroMotif.astro";
 
 <style>
   .hero {
-    padding-block: var(--space-9) var(--space-8);
+    padding-block: clamp(var(--space-8), 4vw + var(--space-6), var(--space-10))
+      var(--space-9);
   }
   .hero-grid {
     display: grid;
-    gap: var(--space-7);
+    gap: var(--space-8);
     align-items: center;
   }
   .hero-inner {
@@ -38,15 +39,22 @@ import HeroMotif from "./HeroMotif.astro";
     align-items: flex-start;
     gap: var(--space-5);
   }
-  .hero-grid :global(.motif) {
-    display: none;
+  /* Mark shows on all sizes; it stacks below the copy on narrow screens. */
+  .hero-grid :global(.mark) {
+    order: -1;
+    max-width: 15rem;
+    justify-self: start;
+    margin-bottom: var(--space-2);
   }
   @media (min-width: 64rem) {
     .hero-grid {
-      grid-template-columns: 1.3fr 1fr;
+      grid-template-columns: 1.25fr 1fr;
     }
-    .hero-grid :global(.motif) {
-      display: block;
+    .hero-grid :global(.mark) {
+      order: 0;
+      max-width: 26rem;
+      justify-self: end;
+      margin-bottom: 0;
     }
   }
   .hero-status {
@@ -74,11 +82,13 @@ import HeroMotif from "./HeroMotif.astro";
     background: var(--color-accent);
   }
   .hero-title {
-    max-width: 18ch;
+    max-width: 15ch;
     font-size: var(--text-4xl);
+    line-height: 1.02;
+    letter-spacing: var(--track-display);
   }
   .hero-subtitle {
-    max-width: 56ch;
+    max-width: 52ch;
     font-size: var(--text-lg);
     color: var(--color-text-muted);
     line-height: var(--leading-snug);
@@ -87,6 +97,6 @@ import HeroMotif from "./HeroMotif.astro";
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
   }
 </style>
