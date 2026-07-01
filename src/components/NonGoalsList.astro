@@ -1,25 +1,67 @@
 ---
-import { nonGoals } from "../data/nonGoals.ts";
+import { nonGoals, underResearch } from "../data/nonGoals.ts";
 ---
 
-<ul class="nongoals">
-  {
-    nonGoals.map((item) => (
-      <li class="nongoal">
-        <svg class="nongoal-mark" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M8 12h8" stroke-linecap="round" />
-        </svg>
-        <div>
-          <p class="nongoal-title">{item.title}</p>
-          <p class="nongoal-detail">{item.detail}</p>
-        </div>
-      </li>
-    ))
-  }
-</ul>
+<div class="nongoals-groups">
+  <div class="nongoals-group">
+    <p class="nongoals-label">Architectural — not changing</p>
+    <ul class="nongoals">
+      {
+        nonGoals.map((item) => (
+          <li class="nongoal">
+            <svg class="nongoal-mark" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M8 12h8" stroke-linecap="round" />
+            </svg>
+            <div>
+              <p class="nongoal-title">{item.title}</p>
+              <p class="nongoal-detail">{item.detail}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="nongoals-group">
+    <p class="nongoals-label">Under research — not committed</p>
+    <ul class="nongoals">
+      {
+        underResearch.map((item) => (
+          <li class="nongoal">
+            <svg class="nongoal-mark nongoal-mark-open" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-dasharray="2.5 2.5">
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+            <div>
+              <p class="nongoal-title">{item.title}</p>
+              <p class="nongoal-detail">{item.detail}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <p class="nongoals-maturity">
+    Separately: this is an early infrastructure project under active design — nothing here is production-ready yet. That one changes as the project matures, not by design decision.
+  </p>
+</div>
 
 <style>
+  .nongoals-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+  .nongoals-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    font-weight: var(--weight-medium);
+    margin-bottom: var(--space-3);
+  }
   .nongoals {
     list-style: none;
     padding: 0;
@@ -38,6 +80,9 @@ import { nonGoals } from "../data/nonGoals.ts";
     margin-top: 0.15rem;
     color: var(--color-text-faint);
   }
+  .nongoal-mark-open {
+    color: var(--color-accent);
+  }
   .nongoal-title {
     font-weight: var(--weight-semibold);
     font-size: var(--text-base);
@@ -46,6 +91,13 @@ import { nonGoals } from "../data/nonGoals.ts";
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     margin-top: 0.15rem;
+  }
+  .nongoals-maturity {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+    max-width: var(--width-prose);
   }
 
   @media (min-width: 40rem) {

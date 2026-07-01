@@ -1,10 +1,12 @@
-// What Hostwright deliberately does not do (yet). Shown openly, not buried.
-// Each item is a hard boundary for the first supported release.
+// What Hostwright deliberately does not do, shown openly rather than buried
+// — split by how permanent the boundary actually is.
 export interface NonGoal {
   title: string;
   detail: string;
 }
 
+// Hard architectural boundaries. These define what Hostwright is — a
+// single-host, controller-first tool — not gaps expected to close later.
 export const nonGoals: NonGoal[] = [
   {
     title: "Not a CRI shim",
@@ -31,19 +33,17 @@ export const nonGoals: NonGoal[] = [
     detail:
       "No remote control plane, no multi-Mac orchestration, no hosted service.",
   },
+];
+
+// Open questions under active research — not ruled out, just not committed.
+// These could become real scope later.
+export const underResearch: NonGoal[] = [
   {
-    title: "Not a tunnel manager",
-    detail:
-      "No tunnels, no DNS service, no Cloudflare, Tailscale, or WireGuard integration. Research-only.",
+    title: "Tunnel and DNS integration",
+    detail: "Cloudflare, Tailscale, or WireGuard integration. Research-only — no commitment yet.",
   },
   {
-    title: "Not a GPU scheduler",
-    detail:
-      "No Apple GPU/ANE scheduling and no Metal, Core ML, or MLX container support. Research-only.",
-  },
-  {
-    title: "Not production-ready",
-    detail:
-      "This is an early infrastructure project under active design. Do not depend on it for production work.",
+    title: "GPU-aware scheduling",
+    detail: "Apple GPU/ANE scheduling, plus Metal, Core ML, or MLX container support. Research-only.",
   },
 ];
