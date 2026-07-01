@@ -10,7 +10,7 @@
   --color-surface-2: #ebe8e0; /* deeper panel, code chrome */
   --color-text: #1c1e22; /* charcoal ink, matched to the logo */
   --color-text-muted: #565b61;
-  --color-text-faint: #8a8f97; /* quiet labels; not for body copy */
+  --color-text-faint: #666b73; /* quiet labels; AA >= 4.5:1 on paper */
   --color-border: #e7e4dc; /* hairline */
   --color-border-strong: #d7d3c8;
 
