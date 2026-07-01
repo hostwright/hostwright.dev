@@ -16,21 +16,25 @@ import {
   Vector3,
 } from "three";
 import ContainerModel from "./ContainerModel";
+import DeltaCraft from "./DeltaCraft";
+import HBridge from "./HBridge";
 
-// The film: 16 Apple-style containers scroll-choreographed through three phases
-// — drift (chaos) → dock onto the Hostwright control plane (order) → disperse
-// into features. Progress `p` (0→1) is read from the #hero-film section each
-// frame; one Rig owns all animation so nothing races.
+// The film, 4 acts, all driven by scroll progress p (0→1) read from #hero-film:
+//   drift → dock on the control plane → gather into a cube a delta craft flies
+//   through the H-portal → unpack into the six features. One Rig owns every
+//   transform so nothing races.
 
-const COUNT = 16;
-const FEATURES = 6; // first 6 containers become feature reps on disperse
+const COUNT = 18;
+const FEATURES = 6;
+const CARGO_SCALE = 0.34;
 
 const smoothstep = (a: number, b: number, x: number) => {
   const t = MathUtils.clamp((x - a) / (b - a), 0, 1);
   return t * t * (3 - 2 * t);
 };
+const easeInOut = (t: number) =>
+  t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
-// Deterministic pseudo-random so layout is stable across reloads.
 function rng(seed: number) {
   let s = seed + 1;
   return () => {
@@ -44,29 +48,36 @@ type Layout = {
   driftRot: [number, number, number];
   spin: [number, number, number];
   dock: Vector3;
+  cube: Vector3; // local offset inside the flying cube
   disperse: Vector3;
   isFeature: boolean;
 };
 
 function buildLayouts(): Layout[] {
   const out: Layout[] = [];
+  const CG = 0.72;
   for (let i = 0; i < COUNT; i++) {
     const r = rng(i * 9.17);
-    const col = i % 4;
-    const row = Math.floor(i / 4);
+    const col = i % 6;
+    const row = Math.floor(i / 6);
     const isFeature = i < FEATURES;
+    // 3×3×2 cube (a Rubik's face with depth)
+    const cx = i % 3;
+    const cy = Math.floor(i / 3) % 3;
+    const cz = Math.floor(i / 9);
     out.push({
       drift: new Vector3(
-        (r() - 0.5) * 13,
+        (r() - 0.5) * 14,
         (r() - 0.5) * 8,
         (r() - 0.5) * 7 - 1,
       ),
       driftRot: [(r() - 0.5) * 6, (r() - 0.5) * 6, (r() - 0.5) * 6],
       spin: [(r() - 0.5) * 0.5, (r() - 0.5) * 0.5, (r() - 0.5) * 0.3],
-      dock: new Vector3((col - 1.5) * 1.95, (row - 1.5) * 1.8 + 0.7, 0),
+      dock: new Vector3((col - 2.5) * 1.8, (row - 1) * 1.8 + 0.6, 0),
+      cube: new Vector3((cx - 1) * CG, (cy - 1) * CG, (cz - 0.5) * CG * 1.4),
       disperse: isFeature
         ? new Vector3((i - (FEATURES - 1) / 2) * 2.5, 1.75, 1.6)
-        : new Vector3((r() - 0.5) * 18, 7 + (i % 3) * 2, -9),
+        : new Vector3((r() - 0.5) * 20, 8 + (i % 3) * 2, -10),
       isFeature,
     });
   }
@@ -85,12 +96,7 @@ function ControlPlane({
   const wordmark = useTexture("/hostwright-wordmark.png");
   return (
     <group ref={deckRef}>
-      <RoundedBox
-        args={[12, 0.6, 5]}
-        radius={0.18}
-        smoothness={5}
-        position={[0, 0, 0]}
-      >
+      <RoundedBox args={[12, 0.6, 5]} radius={0.18} smoothness={5}>
         <meshPhysicalMaterial
           ref={matRef}
           color="#20232a"
@@ -105,9 +111,6 @@ function ControlPlane({
           emissiveIntensity={0}
         />
       </RoundedBox>
-      {/* the wordmark, standing at the deck's front edge, facing camera. The PNG
-          is dark ink on transparent, so we use its alpha as a mask and paint it
-          light — legible against the dark deck. */}
       <mesh position={[0, 0.85, 1.9]}>
         <planeGeometry args={[5.4, 0.92]} />
         <meshBasicMaterial
@@ -128,14 +131,15 @@ function Rig() {
   const deckRef = useRef<Group>(null);
   const deckMat = useRef<MeshPhysicalMaterial>(null);
   const deckWord = useRef<MeshBasicMaterial>(null);
+  const craftRef = useRef<Group>(null);
+  const bridgeRef = useRef<Group>(null);
   const { camera } = useThree();
-  const progress = useRef(0);
   const filmEl = useRef<HTMLElement | null>(null);
 
-  const camDrift = useMemo(() => new Vector3(0, 0.8, 12.5), []);
-  const camDock = useMemo(() => new Vector3(0, 1.4, 13.2), []);
-  const camDisperse = useMemo(() => new Vector3(0, 0.8, 14.5), []);
   const tmp = useMemo(() => new Vector3(), []);
+  const tgt = useMemo(() => new Vector3(0, 0.3, 0), []);
+  const craftPos = useMemo(() => new Vector3(), []);
+  const cubeV = useMemo(() => new Vector3(), []);
 
   useEffect(() => {
     filmEl.current = document.getElementById("hero-film");
@@ -144,75 +148,122 @@ function Rig() {
   useFrame((state) => {
     const t = state.clock.elapsedTime;
 
-    // Scroll progress across the tall film section.
     let p = 0;
     const el = filmEl.current;
     if (el) {
       const r = el.getBoundingClientRect();
-      const total = r.height - window.innerHeight;
-      p = MathUtils.clamp(-r.top / Math.max(total, 1), 0, 1);
+      p = MathUtils.clamp(
+        -r.top / Math.max(r.height - window.innerHeight, 1),
+        0,
+        1,
+      );
     }
-    progress.current = p;
     window.dispatchEvent(new CustomEvent("hero-progress", { detail: p }));
 
-    const a = smoothstep(0.12, 0.44, p); // drift -> dock
-    const b = smoothstep(0.6, 0.9, p); // dock -> disperse
+    const a = smoothstep(0.12, 0.32, p); // drift -> dock
+    const g = smoothstep(0.36, 0.48, p); // dock -> cube (gather)
+    const f = smoothstep(0.48, 0.68, p); // fly through the H
+    const u = smoothstep(0.7, 0.84, p); // cube -> features (unpack)
 
-    // Camera keyframes.
-    if (p < 0.5) tmp.lerpVectors(camDrift, camDock, smoothstep(0, 0.5, p));
-    else tmp.lerpVectors(camDock, camDisperse, smoothstep(0.5, 1, p));
-    camera.position.lerp(tmp, 0.08);
-    camera.lookAt(0, 0.3, 0);
+    // Craft flight path: rises from the deck and arcs up-and-through the H.
+    const ef = easeInOut(f);
+    craftPos.set(
+      MathUtils.lerp(-1.5, 10, ef),
+      MathUtils.lerp(1.0, 5.2, ef) + Math.sin(f * Math.PI) * 1.4,
+      MathUtils.lerp(0, 2.6, ef),
+    );
 
-    // Containers.
+    // Cube spins slowly as it flies.
+    const cubeSpin = t * 0.3;
+    const cs = Math.cos(cubeSpin);
+    const sn = Math.sin(cubeSpin);
+
     for (let i = 0; i < COUNT; i++) {
-      const g = refs.current[i];
+      const m = refs.current[i];
       const L = layouts[i];
-      if (!g) continue;
+      if (!m) continue;
 
-      // position: drift -> dock -> disperse
-      g.position.x = MathUtils.lerp(
-        MathUtils.lerp(L.drift.x, L.dock.x, a),
+      // cube-world position (rides the craft, spinning)
+      const lx = L.cube.x * cs - L.cube.z * sn;
+      const lz = L.cube.x * sn + L.cube.z * cs;
+      cubeV.set(craftPos.x + lx, craftPos.y - 1.7 + L.cube.y, craftPos.z + lz);
+
+      // grid (drift->dock), then gather into cube, then unpack to feature
+      const gx = MathUtils.lerp(L.drift.x, L.dock.x, a);
+      const gy =
+        MathUtils.lerp(L.drift.y, L.dock.y, a) +
+        Math.sin(t * 0.5 + i) * 0.06 * a * (1 - g);
+      const gz = MathUtils.lerp(L.drift.z, L.dock.z, a);
+
+      m.position.x = MathUtils.lerp(
+        MathUtils.lerp(gx, cubeV.x, g),
         L.disperse.x,
-        b,
+        u,
       );
-      g.position.y =
-        MathUtils.lerp(
-          MathUtils.lerp(L.drift.y, L.dock.y, a),
-          L.disperse.y,
-          b,
-        ) +
-        Math.sin(t * 0.5 + i) * 0.06 * a * (1 - b);
-      g.position.z = MathUtils.lerp(
-        MathUtils.lerp(L.drift.z, L.dock.z, a),
+      m.position.y = MathUtils.lerp(
+        MathUtils.lerp(gy, cubeV.y, g),
+        L.disperse.y,
+        u,
+      );
+      m.position.z = MathUtils.lerp(
+        MathUtils.lerp(gz, cubeV.z, g),
         L.disperse.z,
-        b,
+        u,
       );
 
-      // rotation: tumble while drifting, settle face-on as it docks
-      const idle = Math.sin(t * 0.4 + i) * 0.03 * a;
-      g.rotation.x = (L.driftRot[0] + t * L.spin[0]) * (1 - a);
-      g.rotation.y = (L.driftRot[1] + t * L.spin[1]) * (1 - a) + idle;
-      g.rotation.z = (L.driftRot[2] + t * L.spin[2]) * (1 - a);
+      // rotation: tumble in drift, settle face-on, share the cube spin in flight
+      m.rotation.x = (L.driftRot[0] + t * L.spin[0]) * (1 - a);
+      m.rotation.y =
+        (L.driftRot[1] + t * L.spin[1]) * (1 - a) + cubeSpin * g * (1 - u);
+      m.rotation.z = (L.driftRot[2] + t * L.spin[2]) * (1 - a);
 
-      // non-feature containers shrink away during disperse
-      const sc = L.isFeature ? 1 : MathUtils.lerp(1, 0.02, b);
-      g.scale.setScalar(sc);
+      // scale: full -> cargo (gather) -> full (feature) / gone (flyaway)
+      const gathered = MathUtils.lerp(1, CARGO_SCALE, g);
+      const final = L.isFeature
+        ? MathUtils.lerp(gathered, 1, u)
+        : MathUtils.lerp(gathered, 0.02, u);
+      m.scale.setScalar(final);
     }
 
-    // Control plane rises in during dock, recedes on disperse.
+    // Craft: visible from gather through unpack.
+    if (craftRef.current) {
+      const vis = smoothstep(0.34, 0.44, p) * (1 - smoothstep(0.82, 0.92, p));
+      craftRef.current.position.copy(craftPos);
+      craftRef.current.rotation.set(0.12, -0.5, 0.06);
+      craftRef.current.scale.setScalar(vis * 1.15);
+    }
+
+    // H-portal: fades in for the crossing, out before the features land.
+    if (bridgeRef.current) {
+      const vis = smoothstep(0.3, 0.44, p) * (1 - smoothstep(0.7, 0.78, p));
+      bridgeRef.current.scale.setScalar(0.001 + vis);
+      bridgeRef.current.position.y = MathUtils.lerp(-3, 0.5, vis);
+    }
+
+    // Control plane: present during dock, gone once the cube gathers.
     if (deckRef.current) {
-      const y = MathUtils.lerp(MathUtils.lerp(-7, -2.7, a), -6, b);
-      deckRef.current.position.y = y;
+      deckRef.current.position.y = MathUtils.lerp(-2.7, -6, g);
     }
-    if (deckMat.current) {
-      deckMat.current.opacity = a * (1 - b) * 0.96;
-      deckMat.current.emissiveIntensity =
-        (0.15 + Math.sin(t * 1.6) * 0.08) * a * (1 - b);
+    if (deckMat.current) deckMat.current.opacity = a * (1 - g) * 0.96;
+    if (deckWord.current) deckWord.current.opacity = a * (1 - g);
+
+    // Camera: four framings, piecewise, with a moving look-at.
+    if (p < 0.32) {
+      tmp
+        .set(0, 0.8, 12.5)
+        .lerp(new Vector3(0, 1.4, 13.2), smoothstep(0, 0.32, p));
+      tgt.set(0, 0.3, 0);
+    } else if (p < 0.66) {
+      const k = smoothstep(0.32, 0.66, p);
+      tmp.set(0, 1.4, 13.2).lerp(new Vector3(6.5, 4.5, 17.5), k);
+      tgt.set(0, 0.3, 0).lerp(new Vector3(3.5, 3.2, 0), k);
+    } else {
+      const k = smoothstep(0.66, 1, p);
+      tmp.set(6.5, 4.5, 17.5).lerp(new Vector3(0, 0.9, 14.5), k);
+      tgt.set(3.5, 3.2, 0).lerp(new Vector3(0, 0.4, 0), k);
     }
-    if (deckWord.current) {
-      deckWord.current.opacity = a * (1 - b);
-    }
+    camera.position.lerp(tmp, 0.08);
+    camera.lookAt(tgt);
   });
 
   return (
@@ -220,6 +271,12 @@ function Rig() {
       <Suspense fallback={null}>
         <ControlPlane deckRef={deckRef} matRef={deckMat} wordRef={deckWord} />
       </Suspense>
+      <group ref={bridgeRef} scale={0.001}>
+        <HBridge />
+      </group>
+      <group ref={craftRef} scale={0.001}>
+        <DeltaCraft />
+      </group>
       {layouts.map((_, i) => (
         <ContainerModel key={i} ref={(el) => (refs.current[i] = el)} />
       ))}
@@ -234,7 +291,7 @@ function Studio() {
         form="rect"
         intensity={3}
         position={[0, 6, 4]}
-        scale={[14, 8, 1]}
+        scale={[16, 8, 1]}
         color="#ffffff"
       />
       <Lightformer
@@ -255,7 +312,7 @@ function Studio() {
         form="rect"
         intensity={2.2}
         position={[0, 3, -8]}
-        scale={[12, 6, 1]}
+        scale={[14, 6, 1]}
         color="#ffffff"
       />
     </Environment>
@@ -298,7 +355,7 @@ export default function HeroScene() {
       <Rig />
       <ContactShadows
         position={[0, -3.4, 0]}
-        opacity={0.32}
+        opacity={0.3}
         scale={22}
         blur={3}
         far={7}
@@ -308,9 +365,9 @@ export default function HeroScene() {
       <Studio />
       <EffectComposer enableNormalPass={false}>
         <DepthOfField
-          focusDistance={0.02}
-          focalLength={0.05}
-          bokehScale={3.5}
+          focusDistance={0.025}
+          focalLength={0.04}
+          bokehScale={2.6}
           height={480}
         />
       </EffectComposer>

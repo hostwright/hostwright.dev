@@ -50,8 +50,17 @@ const stations = [
         </p>
       </div>
 
-      <!-- Phase 3 — disperse into features. -->
+      <!-- Phase 3 — the crossing. -->
       <div class="ov ov-3" aria-hidden="true">
+        <p class="ov-eyebrow">Delivered as one</p>
+        <p class="ov-lead">
+          Your whole stack, gathered and carried across on Hostwright —
+          light, quick, and exactly as declared.
+        </p>
+      </div>
+
+      <!-- Phase 4 — disperse into features. -->
+      <div class="ov ov-4" aria-hidden="true">
         <p class="ov-eyebrow">One loop, six moves</p>
         <ul class="stations">
           {
@@ -81,7 +90,8 @@ const stations = [
   .hero-stage,
   .hero-scrim,
   .ov-2,
-  .ov-3 {
+  .ov-3,
+  .ov-4 {
     display: none;
   }
   .hero-inner {
@@ -104,7 +114,7 @@ const stations = [
   /* ---- Film layout: the pinned scroll cinema. ---- */
   @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
     .hero {
-      height: 340vh;
+      height: 460vh;
       padding: 0;
     }
     .hero-sticky {
@@ -158,14 +168,21 @@ const stations = [
       pointer-events: auto;
     }
     .ov-2,
-    .ov-3 {
+    .ov-3,
+    .ov-4 {
       display: flex;
       align-items: center;
       text-align: center;
     }
-    .ov-3 {
+    .ov-3,
+    .ov-4 {
       justify-content: flex-end;
-      padding-bottom: 12vh;
+      padding-bottom: 9vh;
+    }
+    /* crossing caption stays compact so the craft + cube own the frame */
+    .ov-3 .ov-lead {
+      max-width: 34ch;
+      font-size: var(--text-xl);
     }
     .ov-1 {
       align-items: flex-start;
@@ -177,6 +194,9 @@ const stations = [
       opacity: 1;
     }
     [data-phase="3"] .ov-3 {
+      opacity: 1;
+    }
+    [data-phase="4"] .ov-4 {
       opacity: 1;
     }
 
@@ -281,7 +301,7 @@ const stations = [
     window.addEventListener("hero-progress", (e) => {
       const p = (e as CustomEvent<number>).detail;
       film.style.setProperty("--p", p.toFixed(3));
-      const ph = p < 0.34 ? 1 : p < 0.62 ? 2 : 3;
+      const ph = p < 0.28 ? 1 : p < 0.44 ? 2 : p < 0.72 ? 3 : 4;
       if (ph !== phase) {
         phase = ph;
         film.dataset.phase = String(ph);
