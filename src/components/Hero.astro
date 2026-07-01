@@ -2,54 +2,87 @@
 import { hero } from "../data/homepage.ts";
 import HeroMotif from "./HeroMotif.astro";
 import HeroScene from "./hero/HeroScene.tsx";
+
+// Feature stations for the disperse phase — short, honest labels.
+const stations = [
+  { label: "Declare", note: "one manifest" },
+  { label: "Plan", note: "before mutation" },
+  { label: "Reconcile", note: "desired vs actual" },
+  { label: "Detect drift", note: "and correct" },
+  { label: "Doctor", note: "safe checks" },
+  { label: "Clean up", note: "dry-run first" },
+];
 ---
 
-<section class="hero">
-  <div class="hero-stage" aria-hidden="true">
-    <HeroScene client:only="react" />
-  </div>
-  <div class="hero-scrim" aria-hidden="true"></div>
-  <div class="container hero-grid">
-    <div class="hero-inner">
-      <a class="hero-status" href="#roadmap">
-        <span class="dot" aria-hidden="true"></span>
-        {hero.status}
-      </a>
-      <h1 class="hero-title">{hero.title}</h1>
-      <p class="hero-subtitle">{hero.subtitle}</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href={hero.ctaPrimary.href}>{hero.ctaPrimary.label}</a>
-        <a class="btn btn-secondary" href={hero.ctaSecondary.href} rel="noopener">
-          {hero.ctaSecondary.label} ↗
-        </a>
+<section class="hero" id="hero-film" data-phase="1">
+  <div class="hero-sticky">
+    <div class="hero-stage" aria-hidden="true">
+      <HeroScene client:only="react" />
+    </div>
+    <div class="hero-scrim" aria-hidden="true"></div>
+
+    <div class="container hero-overlays">
+      <!-- Phase 1 — drift. The real headline (SEO / no-JS lives here). -->
+      <div class="ov ov-1">
+        <div class="hero-inner">
+          <a class="hero-status" href="#roadmap">
+            <span class="dot" aria-hidden="true"></span>
+            {hero.status}
+          </a>
+          <h1 class="hero-title">{hero.title}</h1>
+          <p class="hero-subtitle">{hero.subtitle}</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href={hero.ctaPrimary.href}>{hero.ctaPrimary.label}</a>
+            <a class="btn btn-secondary" href={hero.ctaSecondary.href} rel="noopener">
+              {hero.ctaSecondary.label} ↗
+            </a>
+          </div>
+          <HeroMotif />
+        </div>
+      </div>
+
+      <!-- Phase 2 — assemble on the control plane. -->
+      <div class="ov ov-2" aria-hidden="true">
+        <p class="ov-eyebrow">The control plane</p>
+        <p class="ov-lead">
+          Every container — declared, reconciled, and kept in the state you
+          asked for. One Mac, one plane, in your control.
+        </p>
+      </div>
+
+      <!-- Phase 3 — disperse into features. -->
+      <div class="ov ov-3" aria-hidden="true">
+        <p class="ov-eyebrow">One loop, six moves</p>
+        <ul class="stations">
+          {
+            stations.map((s) => (
+              <li>
+                <span class="st-label">{s.label}</span>
+                <span class="st-note">{s.note}</span>
+              </li>
+            ))
+          }
+        </ul>
       </div>
     </div>
-    <HeroMotif />
   </div>
 </section>
 
 <style>
+  /* ---- Fallback layout (mobile / reduced-motion / no-WebGL): a normal hero. */
   .hero {
     position: relative;
-    overflow: hidden;
     padding-block: clamp(var(--space-8), 4vw + var(--space-6), var(--space-10))
       var(--space-9);
   }
-  /* 3D stage: hidden by default; only revealed on wide + motion-allowed. */
-  .hero-stage {
-    display: none;
+  .hero-sticky {
+    display: block;
   }
-  /* Legibility scrim: paper fading out over the left, so the headline stays
-     crisp above the fleet. Functional (paper-on-paper), not decorative. */
-  .hero-scrim {
+  .hero-stage,
+  .hero-scrim,
+  .ov-2,
+  .ov-3 {
     display: none;
-  }
-  .hero-grid {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    gap: var(--space-8);
-    align-items: center;
   }
   .hero-inner {
     display: flex;
@@ -57,30 +90,28 @@ import HeroScene from "./hero/HeroScene.tsx";
     align-items: flex-start;
     gap: var(--space-5);
   }
-  /* 2D mark (fallback): shows on all sizes until the 3D scene replaces it. */
-  .hero-grid :global(.mark) {
-    order: -1;
+  .hero-grid :global(.mark),
+  .hero-inner :global(.mark) {
     max-width: 15rem;
-    justify-self: start;
-    margin-bottom: var(--space-2);
+    margin-top: var(--space-2);
   }
   @media (min-width: 64rem) {
-    .hero-grid {
-      grid-template-columns: 1.25fr 1fr;
-    }
-    .hero-grid :global(.mark) {
-      order: 0;
-      max-width: 26rem;
-      justify-self: end;
-      margin-bottom: 0;
+    .hero-inner :global(.mark) {
+      max-width: 22rem;
     }
   }
-  /* The cinematic upgrade: real-time fleet replaces the 2D mark. */
+
+  /* ---- Film layout: the pinned scroll cinema. ---- */
   @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
     .hero {
-      min-height: min(86vh, 58rem);
-      display: flex;
-      align-items: center;
+      height: 340vh;
+      padding: 0;
+    }
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
     }
     .hero-stage {
       display: block;
@@ -95,25 +126,113 @@ import HeroScene from "./hero/HeroScene.tsx";
       inset: 0;
       z-index: 0;
       pointer-events: none;
+      opacity: clamp(0, calc(1 - var(--p, 0) * 3.2), 1);
       background: linear-gradient(
         90deg,
         var(--color-bg) 0%,
-        var(--color-bg) 26%,
-        color-mix(in srgb, var(--color-bg) 40%, transparent) 44%,
-        transparent 60%
+        var(--color-bg) 24%,
+        color-mix(in srgb, var(--color-bg) 40%, transparent) 42%,
+        transparent 58%
       );
     }
-    .hero-grid {
-      grid-template-columns: 1fr;
-      width: 100%;
+    .hero-overlays {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
     }
-    .hero-grid :global(.mark) {
+    .hero-inner :global(.mark) {
       display: none;
     }
-    .hero-inner {
-      max-width: 34rem;
+
+    .ov {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s var(--ease);
+    }
+    .ov a.btn {
+      pointer-events: auto;
+    }
+    .ov-2,
+    .ov-3 {
+      display: flex;
+      align-items: center;
+      text-align: center;
+    }
+    .ov-3 {
+      justify-content: flex-end;
+      padding-bottom: 12vh;
+    }
+    .ov-1 {
+      align-items: flex-start;
+    }
+    [data-phase="1"] .ov-1 {
+      opacity: 1;
+    }
+    [data-phase="2"] .ov-2 {
+      opacity: 1;
+    }
+    [data-phase="3"] .ov-3 {
+      opacity: 1;
+    }
+
+    .ov-lead {
+      max-width: 26ch;
+      font-family: var(--font-display, var(--font-sans));
+      font-size: var(--text-2xl);
+      line-height: 1.2;
+      letter-spacing: var(--track-display);
+      color: var(--color-text);
+      margin-inline: auto;
+      padding: var(--space-5) var(--space-6);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-bg) 74%, transparent);
+      backdrop-filter: blur(7px);
+    }
+    .ov-eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-faint);
+      margin-bottom: var(--space-4);
+    }
+    .stations {
+      list-style: none;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--space-4);
+      max-width: 62rem;
+      width: 100%;
+      padding: var(--space-5);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+      backdrop-filter: blur(7px);
+    }
+    .stations li {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--color-border-strong);
+    }
+    .st-label {
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-base);
+    }
+    .st-note {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
     }
   }
+
+  /* ---- Shared copy styles. ---- */
   .hero-status {
     display: inline-flex;
     align-items: center;
@@ -127,10 +246,6 @@ import HeroScene from "./hero/HeroScene.tsx";
     border: 1px solid var(--color-border-strong);
     border-radius: 999px;
     background: var(--color-surface);
-  }
-  .hero-status:hover {
-    color: var(--color-text);
-    border-color: var(--color-text-faint);
   }
   .hero-status .dot {
     width: 0.5rem;
@@ -157,3 +272,20 @@ import HeroScene from "./hero/HeroScene.tsx";
     margin-top: var(--space-3);
   }
 </style>
+
+<script>
+  // Single source of scroll progress → phase class + --p, from the 3D island.
+  const film = document.getElementById("hero-film");
+  if (film) {
+    let phase = 1;
+    window.addEventListener("hero-progress", (e) => {
+      const p = (e as CustomEvent<number>).detail;
+      film.style.setProperty("--p", p.toFixed(3));
+      const ph = p < 0.34 ? 1 : p < 0.62 ? 2 : 3;
+      if (ph !== phase) {
+        phase = ph;
+        film.dataset.phase = String(ph);
+      }
+    });
+  }
+</script>
