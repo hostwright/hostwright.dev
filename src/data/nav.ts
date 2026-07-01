@@ -18,7 +18,10 @@ function link(title: string, slug: string): NavLink {
 export const navGroups: NavGroup[] = [
   {
     label: "Start here",
-    items: [link("Overview", "index"), link("Getting started", "getting-started")],
+    items: [
+      link("Overview", "index"),
+      link("Getting started", "getting-started"),
+    ],
   },
   {
     label: "Concepts",
@@ -35,6 +38,7 @@ export const navGroups: NavGroup[] = [
     items: [
       link("CLI", "reference/cli"),
       link("hostwright.yaml", "reference/hostwright-yaml"),
+      link("For AI agents", "reference/ai-agents"),
       link("Limitations", "reference/limitations"),
       link("Compatibility", "reference/compatibility"),
     ],

@@ -1,0 +1,106 @@
+---
+title: For AI agents
+description: A ground-truth prompt for coding agents working with Hostwright, so they never invent commands or flags that don't exist yet.
+---
+
+import Callout from "../../../components/Callout.astro";
+
+Coding agents are trained on Docker Compose, Kubernetes, and a hundred other
+CLIs. Pointed at a young tool with a small command surface, they tend to guess
+— inventing an `apply` flag that doesn't exist, or claiming a manifest was
+applied to a runtime nothing has touched. The fix isn't a longer README; it's
+giving the agent the exact, current truth up front.
+
+<Callout type="warning" title="Phase 2, read-only">
+As of this page, `apply`, `down`, `restart`, `clean`, and `logs` are **not
+implemented**. Only `init`, `validate`, `plan`, `status`, and `doctor` exist,
+and none of them mutate Apple container runtime state. The block below encodes
+that boundary so an agent states it instead of guessing past it.
+</Callout>
+
+## Project rules
+
+Paste this into your agent's project rules — `AGENTS.md` at your repo root
+(the convention Claude Code, Cursor, and Copilot all read), `CLAUDE.md`, or
+directly into a chat before asking it to touch `hostwright.yaml`.
+
+```md
+# Hostwright — agent ground rules
+
+Hostwright is a Mac-native, single-host desired-state control plane for Apple
+container workloads. It is early: the CLI below is the entire implemented
+surface. Do not invent flags, subcommands, or behavior beyond this list.
+
+## Implemented today (Phase 2) — all read-only except `init`
+
+- `hostwright --version`     — print the current development version
+- `hostwright init`          — write hostwright.yaml, only if absent
+- `hostwright validate`      — check the manifest against schema + semantic rules
+- `hostwright plan`          — non-mutating, manifest-level plan only
+- `hostwright status`        — manifest-level status only
+- `hostwright doctor`        — local checks: OS, arch, Swift, `container` on PATH,
+                                manifest presence. Does not call the container runtime.
+
+## Not implemented — do not suggest these run or "did" anything
+
+`apply`, `down`, `restart`, `clean`, `logs` are planned, not built. If asked to
+"start", "run", or "tear down" a stack, say plainly that Hostwright cannot
+touch the runtime yet — point to `plan` and `doctor` instead of faking success.
+
+## hostwright.yaml — the only fields that exist
+
+project: <string>                          # required, scopes ownership
+services:
+  <name>:
+    image: <string>                        # required; prefer linux/arm64
+    ports: ["<host>:<container>", ...]
+    env: { KEY: value }
+    health:
+      command: [<argv...>]
+      interval: <duration, e.g. "10s">
+    restart:
+      policy: on-failure                   # the only documented value today
+
+Do not add fields not listed here (replicas, volumes, secrets, digests) —
+they are under design and unsupported. If a task needs one, say so explicitly
+instead of writing a field that will silently do nothing.
+
+## Safety
+
+Never claim a command changed running containers. Never write --force,
+--yes, or similar flags for these commands — none of them accept or need one.
+Prefer `hostwright validate` before editing a manifest further, and
+`hostwright doctor` before assuming the environment is ready.
+```
+
+## Starter prompt
+
+A first message that puts an agent to work inside those rules:
+
+```text
+Read AGENTS.md in this repo for the current Hostwright command surface —
+treat it as ground truth over anything you already know about Compose or
+Kubernetes. Then:
+
+1. Write a hostwright.yaml for a service named "api" (my Dockerfile image,
+   port 8080) and a "redis" service (redis:7, port 6379).
+2. Run `hostwright validate` and fix anything it flags.
+3. Run `hostwright plan` and show me the output — don't summarize it away.
+4. Do not run or claim to run apply, down, or any mutating command; they
+   don't exist yet.
+```
+
+## Why this exists
+
+The instinct to smooth over a young tool's gaps — assuming a flag probably
+works, or reporting a plan as if it ran — is exactly the failure mode that
+makes agents unsafe around infrastructure. Hostwright's own [safety
+model](/docs/concepts/safety-model/) is built on the same principle: never
+imply a capability before it's real. This page just extends that principle to
+the agents using it.
+
+## Related
+
+- [CLI reference](/docs/reference/cli/) — the authoritative command table this page mirrors.
+- [`hostwright.yaml` reference](/docs/reference/hostwright-yaml/) — full field documentation.
+- [Limitations](/docs/reference/limitations/) — what to expect, stated plainly.
