@@ -54,9 +54,12 @@ const navLinks = [
     height: var(--header-height);
   }
   .header-logo {
+    display: inline-block;
     text-decoration: none;
     color: var(--color-text);
     border-radius: var(--radius-sm);
+    transform: scale(var(--logo-scale, 1));
+    transform-origin: left center;
   }
 
   /* Desktop nav: hidden on small screens, inline row on wide screens. */
@@ -137,3 +140,56 @@ const navLinks = [
     }
   }
 </style>
+
+<script>
+  // The logo arrives large — an entrance, not a permanent fixture — then
+  // settles to its normal navbar size as the page is scrolled, continuously
+  // tied to scroll position. transform-only, so it never shifts layout.
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const logo = document.querySelector<HTMLElement>(".header-logo");
+  const navDesktop = document.querySelector<HTMLElement>(".nav-desktop");
+  const navMobile = document.querySelector<HTMLElement>(".nav-mobile");
+
+  if (logo && !reduce) {
+    const RANGE = 180; // px of scroll over which it settles to 1
+    let maxScale = 1;
+    let ticking = false;
+
+    function computeMaxScale() {
+      // Cap the entrance scale to whatever room actually exists before
+      // whichever nav control is visible, so the logo never collides.
+      const visible = [navDesktop, navMobile].find((el) => el && el.offsetParent !== null);
+      const logoBox = logo!.getBoundingClientRect();
+      const controlsLeft = visible?.getBoundingClientRect().left ?? Infinity;
+      const available = controlsLeft - logoBox.left - 24;
+      maxScale = Math.min(1.7, Math.max(1, available / logoBox.width));
+    }
+
+    function update() {
+      const t = Math.min(1, window.scrollY / RANGE);
+      const scale = maxScale - (maxScale - 1) * t;
+      logo!.style.setProperty("--logo-scale", scale.toFixed(3));
+      ticking = false;
+    }
+    computeMaxScale();
+    update();
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          requestAnimationFrame(update);
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
+    window.addEventListener(
+      "resize",
+      () => {
+        computeMaxScale();
+        update();
+      },
+      { passive: true }
+    );
+  }
+</script>

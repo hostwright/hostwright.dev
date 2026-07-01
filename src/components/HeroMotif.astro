@@ -2,15 +2,20 @@
 // The hero mark: the real Hostwright H, split at its central seam into two
 // halves. On load the halves begin drifted apart and faint (actual state,
 // diverged), then glide together at the seam into the perfect mark (declared
-// state, reconciled) — the product's whole idea in one quiet gesture.
-// Uses the actual logo pixels, so it is unmistakably the brand. Reduced-motion
-// renders the settled mark immediately.
+// state, reconciled). After settling, the mark stays interactive: moving the
+// cursor near it gently pulls the halves apart again (a live demonstration of
+// drift), and they snap back into alignment the instant the cursor leaves —
+// the reconciliation loop, made touchable. Uses the actual logo pixels, so
+// it is unmistakably the brand. Reduced-motion renders the settled mark
+// immediately with no interaction; the effect is desktop/fine-pointer only.
 ---
 
 <div class="mark" role="img" aria-label="The Hostwright mark: two halves reconciling into one at the seam.">
   <div class="mark-stage">
-    <img class="mark-half mark-left" src="/mark-left.png" alt="" width="512" height="512" fetchpriority="high" decoding="async" />
-    <img class="mark-half mark-right" src="/mark-right.png" alt="" width="512" height="512" fetchpriority="high" decoding="async" />
+    <div class="mark-stage-inner">
+      <img class="mark-half mark-left" src="/mark-left.png" alt="" width="512" height="512" fetchpriority="high" decoding="async" />
+      <img class="mark-half mark-right" src="/mark-right.png" alt="" width="512" height="512" fetchpriority="high" decoding="async" />
+    </div>
   </div>
   <p class="mark-caption"><span>declared</span><i aria-hidden="true"></i><span>actual</span></p>
 </div>
@@ -30,6 +35,12 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     max-width: 22rem;
+    perspective: 1000px;
+  }
+  .mark-stage-inner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
   }
   .mark-half {
     position: absolute;
@@ -75,20 +86,65 @@
 <script>
   // Reconcile entrance: the two halves drift in (actual, diverged) and settle
   // together at the seam (declared). WAAPI so it reliably plays on load and is
-  // easy to verify. Reduced-motion reveals the settled mark instantly; without
-  // JS the mark is already settled (CSS default).
+  // easy to verify. Reduced-motion reveals the settled mark instantly with no
+  // interaction afterward; without JS the mark is already settled (CSS default).
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const left = document.querySelector<HTMLElement>(".mark-left");
   const right = document.querySelector<HTMLElement>(".mark-right");
+  const stage = document.querySelector<HTMLElement>(".mark-stage");
+  const inner = document.querySelector<HTMLElement>(".mark-stage-inner");
   const ease = "cubic-bezier(0.16, 1, 0.3, 1)";
+
+  function initInteractiveDrift() {
+    if (!canHover || !left || !right || !stage || !inner) return;
+    // "Drift on approach, reconcile on rest" — the cursor stands in for the
+    // system observing state: proximity nudges the halves apart, stillness
+    // lets them settle back together. Values are deliberately small.
+    const DRIFT_PX = 8;
+    const TILT_DEG = 5;
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
+    let raf: number | null = null;
+
+    function tick() {
+      curX += (targetX - curX) * 0.14;
+      curY += (targetY - curY) * 0.14;
+      left!.style.transform = `translate(${-curX * DRIFT_PX}px, ${-curY * DRIFT_PX}px)`;
+      right!.style.transform = `translate(${curX * DRIFT_PX}px, ${curY * DRIFT_PX}px)`;
+      inner!.style.transform = `rotateX(${-curY * TILT_DEG}deg) rotateY(${curX * TILT_DEG}deg)`;
+      if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        raf = null;
+      }
+    }
+    function kick() {
+      if (raf === null) raf = requestAnimationFrame(tick);
+    }
+    stage.addEventListener("pointermove", (e) => {
+      const r = stage.getBoundingClientRect();
+      targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      kick();
+    });
+    stage.addEventListener("pointerleave", () => {
+      targetX = 0;
+      targetY = 0;
+      kick();
+    });
+  }
 
   if (left && right) {
     if (reduce) {
       left.style.opacity = "1";
       right.style.opacity = "1";
+      // No interaction for reduced-motion — the settled mark is the final state.
     } else {
       const opts = { duration: 1700, delay: 120, easing: ease, fill: "both" as FillMode };
-      left.animate(
+      const la = left.animate(
         [
           { opacity: 0, transform: "translate(-14%, -6%)" },
           { opacity: 1, offset: 0.55 },
@@ -96,7 +152,7 @@
         ],
         opts
       );
-      right.animate(
+      const ra = right.animate(
         [
           { opacity: 0, transform: "translate(14%, 6%)" },
           { opacity: 1, offset: 0.55 },
@@ -104,6 +160,18 @@
         ],
         opts
       );
+      // Once the entrance settles, commit its final frame to inline styles and
+      // release the Animation objects — otherwise their held "fill: both"
+      // effect would keep overriding the transforms the tilt sets afterward.
+      Promise.all([la.finished, ra.finished])
+        .then(() => {
+          [la, ra].forEach((a) => {
+            a.commitStyles();
+            a.cancel();
+          });
+          initInteractiveDrift();
+        })
+        .catch(() => {});
     }
   }
 </script>

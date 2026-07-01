@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "../components/Hero.astro";
 import SectionHeading from "../components/SectionHeading.astro";
-import NonGoalsList from "../components/NonGoalsList.astro";
 import CliPreview from "../components/CliPreview.astro";
 import CliTerminal from "../components/CliTerminal.astro";
 import ManifestPreview from "../components/ManifestPreview.astro";
@@ -65,18 +64,6 @@ const community = [
           ))
         }
       </ul>
-    </div>
-  </section>
-
-  <!-- Non-goals -->
-  <section class="section">
-    <div class="container reveal">
-      <SectionHeading
-        eyebrow="Scope"
-        title="What it deliberately does not do yet"
-        lead="Stated openly. A narrow, defensible first release matters more than a broad one."
-      />
-      <NonGoalsList />
     </div>
   </section>
 
