@@ -1,106 +1,91 @@
 ---
-title: For AI agents
-description: A ground-truth prompt for coding agents working with Hostwright, so they never invent commands or flags that don't exist yet.
+title: Using Hostwright with an AI assistant
+description: The exact prompt to give ChatGPT, Claude, or Cursor to get Hostwright cloned, built, and running correctly — no invented installer, no invented commands.
 ---
 
 import Callout from "../../../components/Callout.astro";
 
-Coding agents are trained on Docker Compose, Kubernetes, and a hundred other
-CLIs. Pointed at a young tool with a small command surface, they tend to guess
-— inventing an `apply` flag that doesn't exist, or claiming a manifest was
-applied to a runtime nothing has touched. The fix isn't a longer README; it's
-giving the agent the exact, current truth up front.
+Hostwright has no packaged release yet — no Homebrew formula, no
+curl-to-shell installer, no binary download. The only way to run it today is
+from source. That's exactly the kind of gap an AI assistant tends to paper
+over: it'll confidently suggest `brew install hostwright` (doesn't exist), or
+run `hostwright apply` (not implemented). This page is one prompt that fixes
+both, so you can hand a coding assistant the real setup instead of guessing
+alongside it.
 
-<Callout type="warning" title="Phase 2, read-only">
-As of this page, `apply`, `down`, `restart`, `clean`, and `logs` are **not
-implemented**. Only `init`, `validate`, `plan`, `status`, and `doctor` exist,
-and none of them mutate Apple container runtime state. The block below encodes
-that boundary so an agent states it instead of guessing past it.
+<Callout type="warning" title="No installer yet">
+Hostwright ships as Swift Package Manager source only. Getting it running
+means cloning the repository and using `swift build` / `swift run` — there is
+nothing to `brew install` or `curl | sh` yet.
 </Callout>
 
-## Project rules
+## The prompt
 
-Paste this into your agent's project rules — `AGENTS.md` at your repo root
-(the convention Claude Code, Cursor, and Copilot all read), `CLAUDE.md`, or
-directly into a chat before asking it to touch `hostwright.yaml`.
-
-```md
-# Hostwright — agent ground rules
-
-Hostwright is a Mac-native, single-host desired-state control plane for Apple
-container workloads. It is early: the CLI below is the entire implemented
-surface. Do not invent flags, subcommands, or behavior beyond this list.
-
-## Implemented today (Phase 2) — all read-only except `init`
-
-- `hostwright --version`     — print the current development version
-- `hostwright init`          — write hostwright.yaml, only if absent
-- `hostwright validate`      — check the manifest against schema + semantic rules
-- `hostwright plan`          — non-mutating, manifest-level plan only
-- `hostwright status`        — manifest-level status only
-- `hostwright doctor`        — local checks: OS, arch, Swift, `container` on PATH,
-                                manifest presence. Does not call the container runtime.
-
-## Not implemented — do not suggest these run or "did" anything
-
-`apply`, `down`, `restart`, `clean`, `logs` are planned, not built. If asked to
-"start", "run", or "tear down" a stack, say plainly that Hostwright cannot
-touch the runtime yet — point to `plan` and `doctor` instead of faking success.
-
-## hostwright.yaml — the only fields that exist
-
-project: <string>                          # required, scopes ownership
-services:
-  <name>:
-    image: <string>                        # required; prefer linux/arm64
-    ports: ["<host>:<container>", ...]
-    env: { KEY: value }
-    health:
-      command: [<argv...>]
-      interval: <duration, e.g. "10s">
-    restart:
-      policy: on-failure                   # the only documented value today
-
-Do not add fields not listed here (replicas, volumes, secrets, digests) —
-they are under design and unsupported. If a task needs one, say so explicitly
-instead of writing a field that will silently do nothing.
-
-## Safety
-
-Never claim a command changed running containers. Never write --force,
---yes, or similar flags for these commands — none of them accept or need one.
-Prefer `hostwright validate` before editing a manifest further, and
-`hostwright doctor` before assuming the environment is ready.
-```
-
-## Starter prompt
-
-A first message that puts an agent to work inside those rules:
+Paste this into ChatGPT, Claude, Cursor, or any AI assistant before asking it
+to help you set up Hostwright:
 
 ```text
-Read AGENTS.md in this repo for the current Hostwright command surface —
-treat it as ground truth over anything you already know about Compose or
-Kubernetes. Then:
+I want to try Hostwright, an early-stage Mac-native desired-state control
+plane for Apple container workloads. It has no packaged release — do not
+suggest brew, npm, curl-to-shell, or any installer. The only way to run it
+today is from source:
 
-1. Write a hostwright.yaml for a service named "api" (my Dockerfile image,
-   port 8080) and a "redis" service (redis:7, port 6379).
-2. Run `hostwright validate` and fix anything it flags.
-3. Run `hostwright plan` and show me the output — don't summarize it away.
-4. Do not run or claim to run apply, down, or any mutating command; they
-   don't exist yet.
+git clone https://github.com/hostwright/hostwright
+cd hostwright
+swift build
+swift test
+
+Run commands with `swift run`, not a bare `hostwright` binary:
+
+swift run hostwright -- --version
+swift run hostwright -- init
+swift run hostwright -- validate
+swift run hostwright -- plan
+swift run hostwright -- status
+swift run hostwright -- doctor
+
+That is the entire command surface. All of it is read-only except `init`,
+which only writes hostwright.yaml if one doesn't already exist. Commands
+like apply, down, restart, clean, and logs do not exist yet — if I ask for
+one of those, tell me plainly it isn't built rather than guessing at flags.
+
+The manifest (hostwright.yaml) supports only: project, services.<name>.image,
+ports, env, health.command, health.interval, restart.policy. Don't add
+fields like volumes, replicas, or secrets — they're still undesigned.
+
+Help me: clone and build it, generate a starter manifest with init, then
+validate and plan it.
 ```
 
 ## Why this exists
 
-The instinct to smooth over a young tool's gaps — assuming a flag probably
-works, or reporting a plan as if it ran — is exactly the failure mode that
-makes agents unsafe around infrastructure. Hostwright's own [safety
-model](/docs/concepts/safety-model/) is built on the same principle: never
-imply a capability before it's real. This page just extends that principle to
-the agents using it.
+An AI assistant's default instincts — assume a project this old has a
+package manager entry, assume "plan" means it's also safe to "apply" — are
+wrong for a tool this early. The prompt above isn't a workaround; it's the
+same ground truth [documented on this site](/docs/reference/cli/), handed to
+the assistant before it has a chance to guess.
+
+## If an agent is working inside your codebase
+
+The prompt above is for getting started by hand. If instead you're pointing a
+coding agent at a repository that *uses* Hostwright — so it reads project
+context automatically — drop the same constraints into a rules file it picks
+up on its own: `AGENTS.md` at your repo root (the convention Claude Code,
+Cursor, and Copilot all read), or `CLAUDE.md`.
+
+```md
+# Hostwright — agent ground rules
+
+Only these hostwright commands exist: --version, init, validate, plan,
+status, doctor. All read-only except init. apply, down, restart, clean,
+and logs are not implemented — say so, don't invent flags for them.
+
+hostwright.yaml supports only: project, services.<name>.image, ports, env,
+health.command, health.interval, restart.policy.
+```
 
 ## Related
 
-- [CLI reference](/docs/reference/cli/) — the authoritative command table this page mirrors.
+- [Getting started](/docs/getting-started/) — the current command surface, in full.
+- [CLI reference](/docs/reference/cli/) — the authoritative command table.
 - [`hostwright.yaml` reference](/docs/reference/hostwright-yaml/) — full field documentation.
-- [Limitations](/docs/reference/limitations/) — what to expect, stated plainly.

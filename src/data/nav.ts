@@ -38,7 +38,7 @@ export const navGroups: NavGroup[] = [
     items: [
       link("CLI", "reference/cli"),
       link("hostwright.yaml", "reference/hostwright-yaml"),
-      link("For AI agents", "reference/ai-agents"),
+      link("Using an AI assistant", "reference/ai-agents"),
       link("Limitations", "reference/limitations"),
       link("Compatibility", "reference/compatibility"),
     ],
