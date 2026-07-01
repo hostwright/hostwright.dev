@@ -1,9 +1,14 @@
 ---
 import { hero } from "../data/homepage.ts";
 import HeroMotif from "./HeroMotif.astro";
+import HeroScene from "./hero/HeroScene.tsx";
 ---
 
 <section class="hero">
+  <div class="hero-stage" aria-hidden="true">
+    <HeroScene client:only="react" />
+  </div>
+  <div class="hero-scrim" aria-hidden="true"></div>
   <div class="container hero-grid">
     <div class="hero-inner">
       <a class="hero-status" href="#roadmap">
@@ -25,10 +30,23 @@ import HeroMotif from "./HeroMotif.astro";
 
 <style>
   .hero {
+    position: relative;
+    overflow: hidden;
     padding-block: clamp(var(--space-8), 4vw + var(--space-6), var(--space-10))
       var(--space-9);
   }
+  /* 3D stage: hidden by default; only revealed on wide + motion-allowed. */
+  .hero-stage {
+    display: none;
+  }
+  /* Legibility scrim: paper fading out over the left, so the headline stays
+     crisp above the fleet. Functional (paper-on-paper), not decorative. */
+  .hero-scrim {
+    display: none;
+  }
   .hero-grid {
+    position: relative;
+    z-index: 1;
     display: grid;
     gap: var(--space-8);
     align-items: center;
@@ -39,7 +57,7 @@ import HeroMotif from "./HeroMotif.astro";
     align-items: flex-start;
     gap: var(--space-5);
   }
-  /* Mark shows on all sizes; it stacks below the copy on narrow screens. */
+  /* 2D mark (fallback): shows on all sizes until the 3D scene replaces it. */
   .hero-grid :global(.mark) {
     order: -1;
     max-width: 15rem;
@@ -55,6 +73,45 @@ import HeroMotif from "./HeroMotif.astro";
       max-width: 26rem;
       justify-self: end;
       margin-bottom: 0;
+    }
+  }
+  /* The cinematic upgrade: real-time fleet replaces the 2D mark. */
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .hero {
+      min-height: min(86vh, 58rem);
+      display: flex;
+      align-items: center;
+    }
+    .hero-stage {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-scrim {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        var(--color-bg) 0%,
+        var(--color-bg) 26%,
+        color-mix(in srgb, var(--color-bg) 40%, transparent) 44%,
+        transparent 60%
+      );
+    }
+    .hero-grid {
+      grid-template-columns: 1fr;
+      width: 100%;
+    }
+    .hero-grid :global(.mark) {
+      display: none;
+    }
+    .hero-inner {
+      max-width: 34rem;
     }
   }
   .hero-status {
