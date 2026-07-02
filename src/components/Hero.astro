@@ -17,7 +17,7 @@ const stations = [
 <section class="hero" id="hero-film" data-phase="1">
   <div class="hero-sticky">
     <div class="hero-stage" aria-hidden="true">
-      <HeroScene client:only="react" />
+      <HeroScene client:only="react" stations={stations} />
     </div>
     <div class="hero-scrim" aria-hidden="true"></div>
 
@@ -50,12 +50,12 @@ const stations = [
         </p>
       </div>
 
-      <!-- Phase 3 — the crossing. Caption swaps per drop via the script below. -->
+      <!-- Phase 3 — the crossing. Each feature's name floats above its own
+           container in 3D as it lands; this is just the framing line. -->
       <div class="ov ov-3" aria-hidden="true">
-        <p class="ov-eyebrow" data-crossing-eyebrow>Delivered as one</p>
-        <p class="ov-lead" data-crossing-lead>
-          Your whole stack, gathered and carried across on Hostwright —
-          light, quick, and exactly as declared.
+        <p class="ov-eyebrow">Delivered as one</p>
+        <p class="ov-lead">
+          Carried across on Hostwright — light, quick, and exactly as declared.
         </p>
       </div>
     </div>
@@ -244,12 +244,12 @@ const stations = [
   }
 </style>
 
-<script define:vars={{ stations }}>
+<script>
   // Single source of scroll progress → phase class + --p, from the 3D island.
+  // Per-feature captions now float above their own container in 3D; this
+  // script only owns the phase-level overlays (headline / control-plane /
+  // crossing framing line).
   const film = document.getElementById("hero-film");
-  const eyebrow = document.querySelector("[data-crossing-eyebrow]");
-  const lead = document.querySelector("[data-crossing-lead]");
-
   if (film) {
     let phase = 1;
     window.addEventListener("hero-progress", (e) => {
@@ -259,24 +259,6 @@ const stations = [
       if (ph !== phase) {
         phase = ph;
         film.dataset.phase = String(ph);
-      }
-    });
-
-    // Crossing caption: swaps to the just-dropped feature; the intro line
-    // shows until the first drop.
-    let dropIndex = -1;
-    window.addEventListener("hero-drop", (e) => {
-      const i = e.detail;
-      if (i === dropIndex || !eyebrow || !lead) return;
-      dropIndex = i;
-      if (i < 0) {
-        eyebrow.textContent = "Delivered as one";
-        lead.textContent =
-          "Your whole stack, gathered and carried across on Hostwright — light, quick, and exactly as declared.";
-      } else {
-        const s = stations[i];
-        eyebrow.textContent = `Feature ${i + 1} of ${stations.length}`;
-        lead.textContent = `${s.label} — ${s.note}`;
       }
     });
   }

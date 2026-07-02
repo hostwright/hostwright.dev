@@ -1,28 +1,48 @@
 import { RoundedBox } from "@react-three/drei";
-import { forwardRef } from "react";
-import type { Group } from "three";
+import { forwardRef, useMemo } from "react";
+import { CatmullRomCurve3, TubeGeometry, Vector3, type Group } from "three";
 
-// The Hostwright H, extruded into a real bridge: two towers (the mark's
-// verticals) with truss bracing and suspension cables holding up a crossbar
-// that IS the road — the logo carries the load. Charcoal + a navy accent to
-// stay on-brand; the lavender cargo remains the only saturated color.
+// A suspension bridge, formal and clean — the Golden Gate's silhouette
+// (towers, draping main cables, vertical suspenders) rebuilt in our own
+// charcoal + navy language, not its color. This is what actually reads as
+// "bridge" at a glance; the H is the towers-and-span structure, not a color.
 
 const CHARCOAL = "#262a30";
-const EDGE = "#3a4048";
+const BAND = "#3a4048";
 const ACCENT = "#1f3a5f";
+const CABLE = "#4a5058";
+const DECK_SILVER = "#8b8f98";
 
 export const TOWER_X = 5.2;
-export const TOWER_HEIGHT = 8.5;
-export const DECK_HALF_HEIGHT = 0.3; // crossbar args[1]/2
-export const DECK_Y = 0; // crossbar center height
+export const TOWER_HEIGHT = 9.5;
+export const DECK_HALF_HEIGHT = 0.3;
+export const DECK_Y = 0;
+
+const TOP_Y = TOWER_HEIGHT / 2 - 0.15;
+const SAG_Y = DECK_Y + DECK_HALF_HEIGHT + 0.9;
+const ANCHOR_X = TOWER_X + 2.2;
+const ANCHOR_Y = -TOWER_HEIGHT / 2 + 0.5;
+
+// Parabolic approximation of the main cable's height between the towers —
+// used both to build the curve and to place suspenders precisely on it.
+function cableY(x: number) {
+  const t = x / TOWER_X;
+  return SAG_Y + (TOP_Y - SAG_Y) * t * t;
+}
 
 function Tower({ x }: { x: number }) {
   const inner = x < 0 ? 0.62 : -0.62;
   return (
     <group position={[x, 0, 0]}>
-      <RoundedBox args={[1.2, TOWER_HEIGHT, 1.5]} radius={0.18} smoothness={5}>
+      <RoundedBox args={[1.2, TOWER_HEIGHT, 1.5]} radius={0.16} smoothness={5}>
         <meshPhysicalMaterial color={CHARCOAL} roughness={0.4} metalness={0.4} clearcoat={0.4} clearcoatRoughness={0.4} envMapIntensity={1} />
       </RoundedBox>
+      {/* Golden-Gate-style crossbeam bands — the detail that reads "tower". */}
+      {[TOP_Y - 2.0, TOP_Y - 4.4, TOP_Y - 6.8].map((y, i) => (
+        <RoundedBox key={i} args={[1.34, 0.28, 1.64]} radius={0.06} smoothness={3} position={[0, y, 0]}>
+          <meshPhysicalMaterial color={BAND} roughness={0.42} metalness={0.45} clearcoat={0.35} />
+        </RoundedBox>
+      ))}
       <mesh position={[inner, 0, 0.76]}>
         <boxGeometry args={[0.03, TOWER_HEIGHT * 0.94, 0.04]} />
         <meshStandardMaterial color={ACCENT} emissive={ACCENT} emissiveIntensity={0.5} />
@@ -31,33 +51,43 @@ function Tower({ x }: { x: number }) {
   );
 }
 
-// A diagonal truss strut from a tower face up to the crossbar underside.
-function Strut({ towerX, sign }: { towerX: number; sign: 1 | -1 }) {
-  const dx = sign * 1.55;
-  const y0 = -1.7;
-  const length = Math.hypot(dx, 1.7);
-  const angle = Math.atan2(1.7, dx);
+function MainCable({ z }: { z: number }) {
+  const geo = useMemo(() => {
+    const pts = [
+      new Vector3(-ANCHOR_X, ANCHOR_Y, z),
+      new Vector3(-TOWER_X, TOP_Y, z),
+      new Vector3(-TOWER_X * 0.5, cableY(-TOWER_X * 0.5), z),
+      new Vector3(0, SAG_Y, z),
+      new Vector3(TOWER_X * 0.5, cableY(TOWER_X * 0.5), z),
+      new Vector3(TOWER_X, TOP_Y, z),
+      new Vector3(ANCHOR_X, ANCHOR_Y, z),
+    ];
+    const curve = new CatmullRomCurve3(pts, false, "catmullrom", 0.2);
+    return new TubeGeometry(curve, 64, 0.045, 8, false);
+  }, [z]);
   return (
-    <mesh position={[towerX + dx / 2, y0 / 2, 0]} rotation={[0, 0, angle - Math.PI / 2]}>
-      <boxGeometry args={[0.18, length, 0.5]} />
-      <meshPhysicalMaterial color={EDGE} roughness={0.42} metalness={0.4} clearcoat={0.3} />
+    <mesh geometry={geo}>
+      <meshPhysicalMaterial color={CABLE} roughness={0.35} metalness={0.65} clearcoat={0.4} />
     </mesh>
   );
 }
 
-// A suspension cable from a tower top down to the crossbar edge on that side.
-function Cable({ towerX, sign }: { towerX: number; sign: 1 | -1 }) {
-  const topY = TOWER_HEIGHT / 2 - 0.4;
-  const deckEdgeX = towerX + sign * 1.4;
-  const dx = deckEdgeX - towerX;
-  const dy = DECK_Y + DECK_HALF_HEIGHT - topY;
-  const length = Math.hypot(dx, dy);
-  const angle = Math.atan2(dy, dx);
+function Suspenders({ z }: { z: number }) {
+  const xs = [-4.5, -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 4.5];
   return (
-    <mesh position={[towerX + dx / 2, topY + dy / 2, 0.5]} rotation={[0, 0, angle]}>
-      <cylinderGeometry args={[0.035, 0.035, length, 8]} />
-      <meshStandardMaterial color="#4a5058" roughness={0.5} metalness={0.6} />
-    </mesh>
+    <>
+      {xs.map((x) => {
+        const topY = cableY(x);
+        const bottomY = DECK_Y + DECK_HALF_HEIGHT;
+        const len = topY - bottomY;
+        return (
+          <mesh key={x} position={[x, bottomY + len / 2, z]}>
+            <cylinderGeometry args={[0.018, 0.018, len, 6]} />
+            <meshStandardMaterial color={CABLE} roughness={0.5} metalness={0.5} />
+          </mesh>
+        );
+      })}
+    </>
   );
 }
 
@@ -67,27 +97,22 @@ const HBridge = forwardRef<Group>((_, ref) => {
       <Tower x={-TOWER_X} />
       <Tower x={TOWER_X} />
 
-      {/* truss bracing — the detail that actually reads "bridge" up close */}
-      <Strut towerX={-TOWER_X} sign={1} />
-      <Strut towerX={-TOWER_X} sign={-1} />
-      <Strut towerX={TOWER_X} sign={1} />
-      <Strut towerX={TOWER_X} sign={-1} />
+      <MainCable z={1.3} />
+      <MainCable z={-1.3} />
+      <Suspenders z={1.3} />
+      <Suspenders z={-1.3} />
 
-      {/* suspension cables from each tower top to the near deck edge */}
-      <Cable towerX={-TOWER_X} sign={1} />
-      <Cable towerX={TOWER_X} sign={-1} />
-
-      {/* the crossbar = the road span */}
+      {/* the crossbar = the roadway, a silver deck distinct from the towers */}
       <RoundedBox args={[TOWER_X * 2 + 0.3, DECK_HALF_HEIGHT * 2, 3.0]} radius={0.1} smoothness={4} position={[0, DECK_Y, 0]}>
-        <meshPhysicalMaterial color={CHARCOAL} roughness={0.36} metalness={0.5} clearcoat={0.5} clearcoatRoughness={0.35} envMapIntensity={1.1} />
+        <meshPhysicalMaterial color={DECK_SILVER} roughness={0.34} metalness={0.55} clearcoat={0.55} clearcoatRoughness={0.3} envMapIntensity={1.2} />
       </RoundedBox>
       <mesh position={[0, DECK_Y + DECK_HALF_HEIGHT, 1.42]}>
         <boxGeometry args={[TOWER_X * 2, 0.05, 0.07]} />
-        <meshStandardMaterial color={EDGE} />
+        <meshStandardMaterial color={BAND} />
       </mesh>
       <mesh position={[0, DECK_Y + DECK_HALF_HEIGHT, -1.42]}>
         <boxGeometry args={[TOWER_X * 2, 0.05, 0.07]} />
-        <meshStandardMaterial color={EDGE} />
+        <meshStandardMaterial color={BAND} />
       </mesh>
       {/* the seam — declared meets actual — glowing at the span's centre */}
       <mesh position={[0, DECK_Y + DECK_HALF_HEIGHT + 0.01, 0]}>
