@@ -32,7 +32,7 @@ import HBridge, {
 const COUNT = 16;
 const FEATURES = 6;
 const CONTAINER_HALF = 0.75;
-const FEATURE_REST_SCALE = 1.4;
+const FEATURE_REST_SCALE = 1.12;
 
 // Three slots per shelf, spaced apart (unlike the tight dock grid).
 const SHELF_SLOT_XS = [-2.6, 0, 2.6];
