@@ -5,8 +5,9 @@ import {
   Lightformer,
   RoundedBox,
   Text,
+  useTexture,
 } from "@react-three/drei";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { MathUtils, type Group } from "three";
 
 // Act 4 of the hero film, after the fleet settles onto the shelf: a terminal
@@ -17,68 +18,91 @@ import { MathUtils, type Group } from "three";
 
 type LineKind = "cmd" | "muted" | "add" | "ok" | "blank";
 
+// Compressed into t:[0, ~0.57] on purpose, leaving the back half of the
+// section's scroll range for the pack-frame reveal + a real hold on it,
+// rather than squeezing that payoff into a sliver at the very end.
 const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
-  { text: "$ hostwright plan", kind: "cmd", start: 0.0, dur: 0.05 },
-  { text: "∙ reading hostwright.yaml", kind: "muted", start: 0.06, dur: 0.02 },
-  { text: "∙ validating manifest … ok", kind: "muted", start: 0.09, dur: 0.02 },
+  { text: "$ hostwright plan", kind: "cmd", start: 0.0, dur: 0.035 },
+  {
+    text: "∙ reading hostwright.yaml",
+    kind: "muted",
+    start: 0.042,
+    dur: 0.014,
+  },
+  {
+    text: "∙ validating manifest … ok",
+    kind: "muted",
+    start: 0.063,
+    dur: 0.014,
+  },
   {
     text: "  + create   service/postgres  postgres:16",
     kind: "add",
-    start: 0.13,
-    dur: 0.02,
+    start: 0.091,
+    dur: 0.014,
   },
   {
     text: "  + create   service/redis     redis:7",
     kind: "add",
-    start: 0.16,
-    dur: 0.02,
+    start: 0.112,
+    dur: 0.014,
   },
   {
     text: "  + create   service/api       ghcr.io/example/api",
     kind: "add",
-    start: 0.19,
-    dur: 0.02,
+    start: 0.133,
+    dur: 0.014,
   },
   {
     text: "  + create   service/worker    ghcr.io/example/worker",
     kind: "add",
-    start: 0.22,
-    dur: 0.02,
+    start: 0.154,
+    dur: 0.014,
   },
   {
     text: "  + create   service/nginx     nginx:1.27",
     kind: "add",
-    start: 0.25,
-    dur: 0.02,
+    start: 0.175,
+    dur: 0.014,
   },
   {
     text: "  plan: 5 to create, 0 to change, 0 to destroy",
     kind: "muted",
-    start: 0.29,
-    dur: 0.02,
+    start: 0.203,
+    dur: 0.014,
   },
-  { text: "", kind: "blank", start: 0.34, dur: 0 },
-  { text: "$ hostwright apply", kind: "cmd", start: 0.37, dur: 0.05 },
+  { text: "", kind: "blank", start: 0.238, dur: 0 },
+  { text: "$ hostwright apply", kind: "cmd", start: 0.259, dur: 0.035 },
   {
     text: "∙ starting postgres … healthy",
     kind: "muted",
-    start: 0.44,
-    dur: 0.02,
+    start: 0.308,
+    dur: 0.014,
   },
-  { text: "∙ starting redis … healthy", kind: "muted", start: 0.51, dur: 0.02 },
-  { text: "∙ starting api … healthy", kind: "muted", start: 0.58, dur: 0.02 },
+  {
+    text: "∙ starting redis … healthy",
+    kind: "muted",
+    start: 0.357,
+    dur: 0.014,
+  },
+  { text: "∙ starting api … healthy", kind: "muted", start: 0.406, dur: 0.014 },
   {
     text: "∙ starting worker … healthy",
     kind: "muted",
-    start: 0.65,
-    dur: 0.02,
+    start: 0.455,
+    dur: 0.014,
   },
-  { text: "∙ starting nginx … healthy", kind: "muted", start: 0.72, dur: 0.02 },
+  {
+    text: "∙ starting nginx … healthy",
+    kind: "muted",
+    start: 0.504,
+    dur: 0.014,
+  },
   {
     text: "✓ applied — 5 running, 0 pending",
     kind: "ok",
-    start: 0.79,
-    dur: 0.03,
+    start: 0.553,
+    dur: 0.021,
   },
 ];
 
@@ -106,11 +130,21 @@ const smoothstep = (a: number, b: number, x: number) => {
 };
 
 const STACK_X = 3.2;
+const LAYER_W = 2.6;
 const LAYER_H = 0.6;
+const LAYER_D = 1.7;
 const LAYER_GAP = 0.14;
 const STEP = LAYER_H + LAYER_GAP;
 const BASE_Y = -1.4;
 const STACK_CENTER_Y = BASE_Y + ((LAYERS.length - 1) * STEP) / 2;
+
+// The pack frame: a translucent shell that scales in around the whole stack
+// once the last service is healthy — Hostwright as the thing holding it all.
+const STACK_BOTTOM = BASE_Y - LAYER_H / 2;
+const STACK_TOP = BASE_Y + (LAYERS.length - 1) * STEP + LAYER_H / 2;
+const FRAME_W = LAYER_W + 0.34;
+const FRAME_H = STACK_TOP - STACK_BOTTOM + 0.34;
+const FRAME_D = LAYER_D + 0.34;
 
 function Layer({
   index,
@@ -124,7 +158,11 @@ function Layer({
   const y = BASE_Y + index * STEP;
   return (
     <group ref={groupRef} position={[STACK_X, y, 0]} scale={0.001}>
-      <RoundedBox args={[2.6, LAYER_H, 1.7]} radius={0.11} smoothness={5}>
+      <RoundedBox
+        args={[LAYER_W, LAYER_H, LAYER_D]}
+        radius={0.11}
+        smoothness={5}
+      >
         <meshPhysicalMaterial
           color="#7c80a4"
           roughness={0.38}
@@ -147,12 +185,51 @@ function Layer({
   );
 }
 
+function PackFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
+  const wordmark = useTexture("/hostwright-wordmark.png");
+  return (
+    <group ref={frameRef} position={[STACK_X, STACK_CENTER_Y, 0]} scale={0.001}>
+      <RoundedBox
+        args={[FRAME_W, FRAME_H, FRAME_D]}
+        radius={0.16}
+        smoothness={5}
+      >
+        <meshPhysicalMaterial
+          color="#20232a"
+          transparent
+          opacity={0.14}
+          roughness={0.15}
+          metalness={0.4}
+          clearcoat={0.7}
+          clearcoatRoughness={0.2}
+          envMapIntensity={1.2}
+          depthWrite={false}
+        />
+      </RoundedBox>
+      <mesh position={[0, FRAME_H / 2 - 0.02, 0]}>
+        <boxGeometry args={[FRAME_W * 0.92, 0.03, FRAME_D * 0.92]} />
+        <meshStandardMaterial
+          color="#1f3a5f"
+          emissive="#1f3a5f"
+          emissiveIntensity={0.7}
+        />
+      </mesh>
+      <mesh position={[0, -FRAME_H / 2 + 0.32, FRAME_D / 2 + 0.005]}>
+        <planeGeometry args={[FRAME_W * 0.62, (FRAME_W * 0.62) / 5.9]} />
+        <meshBasicMaterial alphaMap={wordmark} transparent color="#f4f1ea" />
+      </mesh>
+    </group>
+  );
+}
+
 function Rig({
   layerRefs,
   lineRefs,
+  frameRef,
 }: {
   layerRefs: React.MutableRefObject<(Group | null)[]>;
   lineRefs: React.MutableRefObject<(HTMLSpanElement | null)[]>;
+  frameRef: React.RefObject<Group | null>;
 }) {
   const { camera } = useThree();
   const filmEl = useRef<HTMLElement | null>(null);
@@ -199,6 +276,11 @@ function Rig({
       const grp = layerRefs.current[i];
       if (grp) grp.scale.setScalar(Math.max(0.001, pop));
     });
+
+    if (frameRef.current) {
+      const pop = smoothstep(0.62, 0.75, t);
+      frameRef.current.scale.setScalar(Math.max(0.001, pop));
+    }
   });
 
   return (
@@ -211,6 +293,9 @@ function Rig({
           groupRef={(el) => (layerRefs.current[i] = el)}
         />
       ))}
+      <Suspense fallback={null}>
+        <PackFrame frameRef={frameRef} />
+      </Suspense>
       <ContactShadows
         position={[STACK_X, BASE_Y - 0.36, 0]}
         opacity={0.32}
@@ -317,6 +402,7 @@ const dotStyle: React.CSSProperties = {
 function TerminalBuildCanvas() {
   const layerRefs = useRef<(Group | null)[]>([]);
   const lineRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const frameRef = useRef<Group | null>(null);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -337,7 +423,7 @@ function TerminalBuildCanvas() {
       >
         <ambientLight intensity={0.35} />
         <directionalLight position={[6, 9, 7]} intensity={0.6} />
-        <Rig layerRefs={layerRefs} lineRefs={lineRefs} />
+        <Rig layerRefs={layerRefs} lineRefs={lineRefs} frameRef={frameRef} />
       </Canvas>
       <TerminalOverlay lineRefs={lineRefs} />
     </div>
