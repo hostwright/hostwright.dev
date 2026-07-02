@@ -17,19 +17,25 @@ import {
   Vector3,
 } from "three";
 import ContainerModel from "./ContainerModel";
-import HBridge, { DECK_HALF_HEIGHT, DECK_Y } from "./HBridge";
+import HBridge, {
+  DECK_HALF_HEIGHT,
+  SHELF_Y_TOP,
+  SHELF_Y_BOTTOM,
+} from "./HBridge";
 
-// The film: 16 Apple-style containers scroll-choreographed through three
-// simple phases — drift (chaos) → dock onto the Hostwright control plane
-// (order) → disperse to rest on the H, one feature per slot, spaced apart,
-// its name floating above it. No flying craft, no gimmicks — the fleet
-// settles directly. Progress `p` (0→1) drives everything from one Rig.
+// The film: 18 Apple-style containers scroll-choreographed through three
+// simple phases — drift (chaos) → dock onto the Hostwright control plane,
+// packed edge to edge (order) → disperse to rest on the H's two shelves,
+// three features per rung, spaced apart, names floating above each. No
+// flying craft, no gimmicks — the fleet settles directly.
 
-const COUNT = 16;
+const COUNT = 18;
 const FEATURES = 6;
 
-const SLOT_XS = [-3.9, -2.34, -0.78, 0.78, 2.34, 3.9];
-const SLOT_Y = DECK_Y + DECK_HALF_HEIGHT + 0.78;
+// Three slots per shelf, spaced apart (unlike the tight dock grid).
+const SHELF_SLOT_XS = [-2.3, 0, 2.3];
+const REST_Y_TOP = SHELF_Y_TOP + DECK_HALF_HEIGHT + 0.78;
+const REST_Y_BOTTOM = SHELF_Y_BOTTOM + DECK_HALF_HEIGHT + 0.78;
 
 const smoothstep = (a: number, b: number, x: number) => {
   const t = MathUtils.clamp((x - a) / (b - a), 0, 1);
@@ -58,9 +64,12 @@ function buildLayouts(): Layout[] {
   const out: Layout[] = [];
   for (let i = 0; i < COUNT; i++) {
     const r = rng(i * 9.17);
-    const col = i % 4;
-    const row = Math.floor(i / 4);
+    const col = i % 6;
+    const row = Math.floor(i / 6);
     const isFeature = i < FEATURES;
+    // First 3 features rest on the top shelf, next 3 on the bottom shelf.
+    const onTop = i < 3;
+    const shelfSlot = SHELF_SLOT_XS[i % 3];
     out.push({
       drift: new Vector3(
         (r() - 0.5) * 13,
@@ -69,9 +78,10 @@ function buildLayouts(): Layout[] {
       ),
       driftRot: [(r() - 0.5) * 6, (r() - 0.5) * 6, (r() - 0.5) * 6],
       spin: [(r() - 0.5) * 0.5, (r() - 0.5) * 0.5, (r() - 0.5) * 0.3],
-      dock: new Vector3((col - 1.5) * 1.95, (row - 1.5) * 1.8 + 0.7, 0),
+      // Tight, edge-to-edge — no gaps, a clean centred block.
+      dock: new Vector3((col - 2.5) * 1.35, (row - 1) * 1.35 + 0.6, 0),
       disperse: isFeature
-        ? new Vector3(SLOT_XS[i], SLOT_Y, 0)
+        ? new Vector3(shelfSlot, onTop ? REST_Y_TOP : REST_Y_BOTTOM, 0)
         : new Vector3((r() - 0.5) * 18, 7 + (i % 3) * 2, -9),
       isFeature,
       featureIndex: isFeature ? i : -1,
