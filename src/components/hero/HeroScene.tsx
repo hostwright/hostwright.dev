@@ -284,7 +284,11 @@ function Rig({
 
     if (dofRef.current) {
       const dist = camera.position.distanceTo(FOCUS_TARGET);
-      dofRef.current.focusDistance = MathUtils.clamp(dist / camera.far, 0, 1);
+      dofRef.current.circleOfConfusionMaterial.focusDistance = MathUtils.clamp(
+        dist / camera.far,
+        0,
+        1,
+      );
     }
 
     for (let i = 0; i < COUNT; i++) {
