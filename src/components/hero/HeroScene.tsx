@@ -9,13 +9,7 @@ import {
 } from "@react-three/drei";
 import { EffectComposer, DepthOfField } from "@react-three/postprocessing";
 import { Suspense, useMemo, useRef, useState, useEffect } from "react";
-import {
-  Group,
-  MathUtils,
-  MeshBasicMaterial,
-  MeshPhysicalMaterial,
-  Vector3,
-} from "three";
+import { Group, MathUtils, MeshPhysicalMaterial, Vector3 } from "three";
 import ContainerModel from "./ContainerModel";
 import HBridge, {
   DECK_HALF_HEIGHT,
@@ -44,6 +38,10 @@ const DOCK_FRAME_PAD = 0.15;
 const DOCK_FRAME_W = GRID_BOX_HALF * 2 + DOCK_FRAME_PAD;
 const DOCK_FRAME_H = GRID_BOX_HALF * 2 + DOCK_FRAME_PAD;
 const DOCK_FRAME_D = 1.3;
+// Patch sits high on the box, above where the centered caption card lands
+// on screen, instead of the middle where it competes with the message.
+const DOCK_PATCH_H = DOCK_FRAME_H * 0.18;
+const DOCK_PATCH_Y = DOCK_FRAME_H / 2 - DOCK_PATCH_H / 2 - 0.15;
 
 // Three slots per shelf, spaced apart (unlike the tight dock grid).
 const SHELF_SLOT_XS = [-2.6, 0, 2.6];
@@ -165,13 +163,10 @@ function FeatureContainer({
 function ControlPlane({
   deckRef,
   matRef,
-  wordRef,
 }: {
   deckRef: React.RefObject<Group>;
   matRef: React.RefObject<MeshPhysicalMaterial>;
-  wordRef: React.RefObject<MeshBasicMaterial>;
 }) {
-  const wordmark = useTexture("/hostwright-wordmark.png");
   return (
     <group ref={deckRef}>
       <RoundedBox args={[12, 0.6, 5]} radius={0.18} smoothness={5}>
@@ -189,16 +184,6 @@ function ControlPlane({
           emissiveIntensity={0}
         />
       </RoundedBox>
-      <mesh position={[0, 0.85, 1.9]}>
-        <planeGeometry args={[5.4, 0.92]} />
-        <meshBasicMaterial
-          ref={wordRef}
-          alphaMap={wordmark}
-          transparent
-          opacity={0}
-          color="#efece3"
-        />
-      </mesh>
     </group>
   );
 }
@@ -229,15 +214,15 @@ function DockFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
           emissiveIntensity={0.7}
         />
       </mesh>
-      <mesh position={[0, 0, DOCK_FRAME_D / 2 + 0.003]}>
-        <planeGeometry args={[DOCK_FRAME_W * 0.62, DOCK_FRAME_H * 0.18]} />
+      <mesh position={[0, DOCK_PATCH_Y, DOCK_FRAME_D / 2 + 0.003]}>
+        <planeGeometry args={[DOCK_FRAME_W * 0.62, DOCK_PATCH_H]} />
         <meshStandardMaterial
           color="#fbfaf6"
           roughness={0.4}
           metalness={0.05}
         />
       </mesh>
-      <mesh position={[0, 0, DOCK_FRAME_D / 2 + 0.008]}>
+      <mesh position={[0, DOCK_PATCH_Y, DOCK_FRAME_D / 2 + 0.008]}>
         <planeGeometry
           args={[DOCK_FRAME_W * 0.5, (DOCK_FRAME_W * 0.5) / 5.9]}
         />
@@ -260,7 +245,6 @@ function Rig({
   const refs = useRef<(Group | null)[]>([]);
   const deckRef = useRef<Group>(null);
   const deckMat = useRef<MeshPhysicalMaterial>(null);
-  const deckWord = useRef<MeshBasicMaterial>(null);
   const bridgeRef = useRef<Group>(null);
   const rackRef = useRef<Group>(null);
   const { camera } = useThree();
@@ -346,8 +330,6 @@ function Rig({
       deckMat.current.emissiveIntensity =
         (0.15 + Math.sin(t * 1.6) * 0.08) * a * (1 - b);
     }
-    if (deckWord.current) deckWord.current.opacity = a * (1 - b);
-
     if (rackRef.current) {
       const rackIn = smoothstep(0.85, 1, a);
       const rackOut = 1 - smoothstep(0, 0.35, b);
@@ -358,7 +340,7 @@ function Rig({
   return (
     <>
       <Suspense fallback={null}>
-        <ControlPlane deckRef={deckRef} matRef={deckMat} wordRef={deckWord} />
+        <ControlPlane deckRef={deckRef} matRef={deckMat} />
       </Suspense>
       <Suspense fallback={null}>
         <DockFrame frameRef={rackRef} />
