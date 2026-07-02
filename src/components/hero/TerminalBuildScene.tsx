@@ -196,14 +196,11 @@ function PackFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
       >
         <meshPhysicalMaterial
           color="#aeb2bc"
-          transparent
-          opacity={0.5}
-          roughness={0.2}
+          roughness={0.22}
           metalness={0.8}
           clearcoat={0.85}
           clearcoatRoughness={0.12}
           envMapIntensity={1.5}
-          depthWrite={false}
         />
       </RoundedBox>
       <mesh position={[0, FRAME_H / 2 - 0.02, 0]}>
@@ -214,8 +211,16 @@ function PackFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
           emissiveIntensity={0.7}
         />
       </mesh>
-      <mesh position={[0, 0, FRAME_D / 2 + 0.005]}>
-        <planeGeometry args={[FRAME_W * 0.68, (FRAME_W * 0.68) / 5.9]} />
+      <mesh position={[0, 0, FRAME_D / 2 + 0.003]}>
+        <planeGeometry args={[FRAME_W * 0.76, FRAME_H * 0.22]} />
+        <meshStandardMaterial
+          color="#20232a"
+          roughness={0.35}
+          metalness={0.3}
+        />
+      </mesh>
+      <mesh position={[0, 0, FRAME_D / 2 + 0.008]}>
+        <planeGeometry args={[FRAME_W * 0.62, (FRAME_W * 0.62) / 5.9]} />
         <meshBasicMaterial alphaMap={wordmark} transparent color="#ffffff" />
       </mesh>
     </group>
