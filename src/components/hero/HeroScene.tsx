@@ -31,11 +31,22 @@ import HBridge, {
 
 const COUNT = 16;
 const FEATURES = 6;
+const CONTAINER_HALF = 0.75;
+const FEATURE_REST_SCALE = 1.4;
 
 // Three slots per shelf, spaced apart (unlike the tight dock grid).
-const SHELF_SLOT_XS = [-2.3, 0, 2.3];
-const REST_Y_TOP = SHELF_Y_TOP + DECK_HALF_HEIGHT + 0.78;
-const REST_Y_BOTTOM = SHELF_Y_BOTTOM + DECK_HALF_HEIGHT + 0.78;
+const SHELF_SLOT_XS = [-2.6, 0, 2.6];
+const REST_GAP = 0.05;
+const REST_Y_TOP =
+  SHELF_Y_TOP +
+  DECK_HALF_HEIGHT +
+  CONTAINER_HALF * FEATURE_REST_SCALE +
+  REST_GAP;
+const REST_Y_BOTTOM =
+  SHELF_Y_BOTTOM +
+  DECK_HALF_HEIGHT +
+  CONTAINER_HALF * FEATURE_REST_SCALE +
+  REST_GAP;
 
 const smoothstep = (a: number, b: number, x: number) => {
   const t = MathUtils.clamp((x - a) / (b - a), 0, 1);
@@ -106,39 +117,25 @@ const tagStyle: React.CSSProperties = {
 };
 
 function FeatureContainer({
-  layout,
   label,
   bRef,
+  groupRef,
 }: {
-  layout: Layout;
   label: string;
   bRef: React.RefObject<number>;
+  groupRef: (el: Group | null) => void;
 }) {
-  const group = useRef<Group>(null);
   const tag = useRef<HTMLDivElement>(null);
 
-  useFrame((state) => {
-    const gr = group.current;
-    if (!gr) return;
-    const t = state.clock.elapsedTime;
+  useFrame(() => {
     const b = bRef.current ?? 0;
-
-    gr.position.x = layout.disperse.x;
-    gr.position.y = layout.disperse.y;
-    gr.position.z = layout.disperse.z;
-
-    gr.rotation.y = Math.sin(t * 0.3 + layout.featureIndex) * 0.02 * b;
-
-    const emerging = smoothstep(0.05, 0.4, b);
-    gr.scale.setScalar(MathUtils.lerp(0.001, 1, emerging));
-
     if (tag.current) {
       tag.current.style.opacity = b > 0.45 ? "1" : "0";
     }
   });
 
   return (
-    <group ref={group}>
+    <group ref={groupRef}>
       <ContainerModel />
       <Html
         position={[0, 1.05, 0]}
@@ -239,7 +236,7 @@ function Rig({ stations }: { stations: { label: string; note: string }[] }) {
     for (let i = 0; i < COUNT; i++) {
       const g = refs.current[i];
       const L = layouts[i];
-      if (!g || L.isFeature) continue;
+      if (!g) continue;
 
       const gx = MathUtils.lerp(L.drift.x, L.dock.x, a);
       const gy =
@@ -256,7 +253,11 @@ function Rig({ stations }: { stations: { label: string; note: string }[] }) {
       g.rotation.y = (L.driftRot[1] + t * L.spin[1]) * (1 - a) + idle;
       g.rotation.z = (L.driftRot[2] + t * L.spin[2]) * (1 - a);
 
-      g.scale.setScalar(MathUtils.lerp(1, 0.02, b));
+      g.scale.setScalar(
+        L.isFeature
+          ? MathUtils.lerp(1, FEATURE_REST_SCALE, b)
+          : MathUtils.lerp(1, 0.02, b),
+      );
     }
 
     if (bridgeRef.current) {
@@ -291,9 +292,9 @@ function Rig({ stations }: { stations: { label: string; note: string }[] }) {
         L.isFeature ? (
           <FeatureContainer
             key={i}
-            layout={L}
             label={stations[L.featureIndex]?.label ?? ""}
             bRef={bValue}
+            groupRef={(el) => (refs.current[i] = el)}
           />
         ) : (
           <ContainerModel key={i} ref={(el) => (refs.current[i] = el)} />

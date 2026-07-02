@@ -226,7 +226,7 @@ const stations = [
     window.addEventListener("hero-progress", (e) => {
       const p = e.detail;
       film.style.setProperty("--p", p.toFixed(3));
-      const ph = p < 0.34 ? 1 : 2;
+      const ph = p < 0.34 ? 1 : p < 0.6 ? 2 : 3;
       if (ph !== phase) {
         phase = ph;
         film.dataset.phase = String(ph);
