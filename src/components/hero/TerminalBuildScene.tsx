@@ -232,8 +232,8 @@ function Rig({
   lineRefs,
   frameRef,
 }: {
-  layerRefs: React.MutableRefObject<(Group | null)[]>;
-  lineRefs: React.MutableRefObject<(HTMLSpanElement | null)[]>;
+  layerRefs: React.RefObject<(Group | null)[]>;
+  lineRefs: React.RefObject<(HTMLSpanElement | null)[]>;
   frameRef: React.RefObject<Group | null>;
 }) {
   const { camera } = useThree();
@@ -326,7 +326,7 @@ function Rig({
 function TerminalOverlay({
   lineRefs,
 }: {
-  lineRefs: React.MutableRefObject<(HTMLSpanElement | null)[]>;
+  lineRefs: React.RefObject<(HTMLSpanElement | null)[]>;
 }) {
   return (
     <div
@@ -386,7 +386,11 @@ function TerminalOverlay({
             key={i}
             style={{ minHeight: "1.4em", color: KIND_COLOR[line.kind] }}
           >
-            <span ref={(el) => (lineRefs.current[i] = el)}>
+            <span
+              ref={(el) => {
+                lineRefs.current[i] = el;
+              }}
+            >
               {i === 0 ? line.text : ""}
             </span>
           </div>

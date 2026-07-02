@@ -241,7 +241,7 @@ const stations = [
   if (film) {
     let phase = 1;
     window.addEventListener("hero-progress", (e) => {
-      const p = e.detail;
+      const p = (e as CustomEvent<number>).detail;
       film.style.setProperty("--p", p.toFixed(3));
       const ph = p < 0.34 ? 1 : p < 0.6 ? 2 : 3;
       if (ph !== phase) {

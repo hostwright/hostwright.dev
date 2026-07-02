@@ -8,6 +8,7 @@ import {
   useTexture,
 } from "@react-three/drei";
 import { EffectComposer, DepthOfField } from "@react-three/postprocessing";
+import type { DepthOfFieldEffect } from "postprocessing";
 import { Suspense, useMemo, useRef, useState, useEffect } from "react";
 import { Group, MathUtils, MeshPhysicalMaterial, Vector3 } from "three";
 import ContainerModel from "./ContainerModel";
@@ -164,8 +165,8 @@ function ControlPlane({
   deckRef,
   matRef,
 }: {
-  deckRef: React.RefObject<Group>;
-  matRef: React.RefObject<MeshPhysicalMaterial>;
+  deckRef: React.RefObject<Group | null>;
+  matRef: React.RefObject<MeshPhysicalMaterial | null>;
 }) {
   return (
     <group ref={deckRef}>
@@ -239,7 +240,7 @@ function Rig({
   dofRef,
 }: {
   stations: { label: string; note: string }[];
-  dofRef: React.RefObject<{ focusDistance: number } | null>;
+  dofRef: React.RefObject<DepthOfFieldEffect | null>;
 }) {
   const layouts = useMemo(buildLayouts, []);
   const refs = useRef<(Group | null)[]>([]);
@@ -357,7 +358,12 @@ function Rig({
             groupRef={(el) => (refs.current[i] = el)}
           />
         ) : (
-          <ContainerModel key={i} ref={(el) => (refs.current[i] = el)} />
+          <ContainerModel
+            key={i}
+            ref={(el) => {
+              refs.current[i] = el;
+            }}
+          />
         ),
       )}
     </>
@@ -426,7 +432,7 @@ export default function HeroScene({ stations }: HeroSceneProps) {
 }
 
 function HeroCanvas({ stations }: HeroSceneProps) {
-  const dofRef = useRef<{ focusDistance: number } | null>(null);
+  const dofRef = useRef<DepthOfFieldEffect | null>(null);
 
   return (
     <Canvas
