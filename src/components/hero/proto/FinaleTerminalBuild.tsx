@@ -1,33 +1,73 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
-import { useEffect, useRef } from "react";
 import {
-  AdditiveBlending,
-  type Group,
-  type Mesh,
-  MeshBasicMaterial,
-} from "three";
-import ContainerModel from "../ContainerModel";
-import HBridge from "../HBridge";
-import { FEATURE_REST_SCALE, STATIONS, slotPosition, smoothstep } from "./finaleShared";
+  ContactShadows,
+  Environment,
+  Lightformer,
+  RoundedBox,
+  Text,
+} from "@react-three/drei";
+import { useEffect, useRef } from "react";
+import type { Group } from "three";
+import { smoothstep } from "./finaleShared";
 
-// Concept D: a terminal types a real `hostwright plan` run, and the moment
-// each line finishes typing, that step's container builds onto the shelf —
-// the "something is running and I can see it happen" confidence pattern,
-// tied directly to the product's own CLI output rather than an abstract effect.
+// Concept D (act 4, after the shelf): a real `plan` -> `apply` transcript
+// runs in a terminal on the left, reusing the site's own canonical example
+// stack (service/redis + service/api, from data/homepage.ts's manifestExample)
+// — not invented content. The moment "starting <service> ... healthy" finishes
+// typing, that service's layer physically stacks in on the right: redis first
+// (the dependency), api on top of it (built on it) — a literal infra stack.
 
-const LOOP = 9;
+const LOOP = 10;
 
-const LINES = [
-  "$ hostwright plan",
-  ...STATIONS.map((s) => `∙ ${s.label.padEnd(14)} ${s.note}`),
-  "✓ reconciled — one loop, six steps",
+type LineKind = "cmd" | "muted" | "add" | "ok" | "blank";
+
+const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
+  { text: "$ hostwright plan", kind: "cmd", start: 0.0, dur: 0.05 },
+  { text: "∙ reading hostwright.yaml", kind: "muted", start: 0.06, dur: 0.05 },
+  { text: "∙ validating manifest … ok", kind: "muted", start: 0.12, dur: 0.05 },
+  {
+    text: "  + create   service/redis   redis:7",
+    kind: "add",
+    start: 0.18,
+    dur: 0.06,
+  },
+  {
+    text: "  + create   service/api     ghcr.io/example/api:latest",
+    kind: "add",
+    start: 0.25,
+    dur: 0.07,
+  },
+  {
+    text: "  plan: 2 to create, 0 to change, 0 to destroy",
+    kind: "muted",
+    start: 0.33,
+    dur: 0.06,
+  },
+  { text: "", kind: "blank", start: 0.4, dur: 0 },
+  { text: "$ hostwright apply", kind: "cmd", start: 0.44, dur: 0.05 },
+  { text: "∙ starting redis … healthy", kind: "muted", start: 0.51, dur: 0.05 },
+  { text: "∙ starting api … healthy", kind: "muted", start: 0.58, dur: 0.05 },
+  {
+    text: "✓ applied — 2 running, 0 pending",
+    kind: "ok",
+    start: 0.66,
+    dur: 0.06,
+  },
 ];
 
-const LINE_START = LINES.map((_, i) =>
-  i === 0 ? 0 : i <= STATIONS.length ? 0.08 + (i - 1) * 0.11 : 0.78,
-);
-const LINE_DUR = LINES.map((_, i) => (i === 0 ? 0.05 : i <= STATIONS.length ? 0.08 : 0.08));
+// index into LINE whose completion triggers each layer stacking in.
+const LAYERS = [
+  { label: "redis", lineIndex: 8 },
+  { label: "api", lineIndex: 9 },
+];
+
+const KIND_COLOR: Record<LineKind, string> = {
+  cmd: "#1f3a5f",
+  muted: "#9a978d",
+  add: "#3f7a5c",
+  ok: "#3f7a5c",
+  blank: "transparent",
+};
 
 function ClockBridge({ onTick }: { onTick: (t: number) => void }) {
   useFrame((state) => {
@@ -36,63 +76,76 @@ function ClockBridge({ onTick }: { onTick: (t: number) => void }) {
   return null;
 }
 
-function Scene({
-  containerRefs,
-  auraRefs,
+const STACK_X = 3.2;
+const LAYER_H = 0.72;
+const LAYER_GAP = 0.16;
+const BASE_Y = -1.0;
+
+function Layer({
+  index,
+  label,
+  groupRef,
 }: {
-  containerRefs: React.MutableRefObject<(Group | null)[]>;
-  auraRefs: React.MutableRefObject<(Mesh | null)[]>;
+  index: number;
+  label: string;
+  groupRef: (el: Group | null) => void;
+}) {
+  const y = BASE_Y + index * (LAYER_H + LAYER_GAP);
+  return (
+    <group ref={groupRef} position={[STACK_X, y, 0]} scale={0.001}>
+      <RoundedBox args={[2.6, LAYER_H, 1.7]} radius={0.12} smoothness={5}>
+        <meshPhysicalMaterial
+          color="#7c80a4"
+          roughness={0.38}
+          metalness={0.1}
+          clearcoat={0.6}
+          clearcoatRoughness={0.3}
+          envMapIntensity={1.1}
+        />
+      </RoundedBox>
+      <Text
+        position={[0, 0, 0.87]}
+        fontSize={0.26}
+        color="#f4f1ea"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {label}
+      </Text>
+    </group>
+  );
+}
+
+function Scene({
+  layerRefs,
+}: {
+  layerRefs: React.MutableRefObject<(Group | null)[]>;
 }) {
   const { camera } = useThree();
 
   useEffect(() => {
-    camera.position.set(0, 1.0, 15);
-    camera.lookAt(0, 0.4, 0);
+    camera.position.set(0.6, 0.6, 11);
+    camera.lookAt(1.6, -0.2, 0);
   }, [camera]);
 
   return (
     <>
       <ambientLight intensity={0.35} />
       <directionalLight position={[6, 9, 7]} intensity={0.6} />
-      <HBridge />
-      {STATIONS.map((_, i) => {
-        const pos = slotPosition(i);
-        return (
-          <group
-            key={i}
-            ref={(el) => (containerRefs.current[i] = el)}
-            position={pos}
-            scale={0.001}
-          >
-            <ContainerModel />
-          </group>
-        );
-      })}
-      {STATIONS.map((_, i) => {
-        const pos = slotPosition(i);
-        return (
-          <mesh
-            key={i}
-            ref={(el) => (auraRefs.current[i] = el)}
-            position={[pos[0], pos[1], pos[2] + 0.5]}
-          >
-            <planeGeometry args={[2.0, 2.0]} />
-            <meshBasicMaterial
-              color="#f0a83c"
-              transparent
-              opacity={0}
-              depthWrite={false}
-              blending={AdditiveBlending}
-            />
-          </mesh>
-        );
-      })}
+      {LAYERS.map((l, i) => (
+        <Layer
+          key={l.label}
+          index={i}
+          label={l.label}
+          groupRef={(el) => (layerRefs.current[i] = el)}
+        />
+      ))}
       <ContactShadows
-        position={[0, -1.9, 0]}
-        opacity={0.3}
-        scale={16}
-        blur={3}
-        far={6}
+        position={[STACK_X, BASE_Y - 0.42, 0]}
+        opacity={0.32}
+        scale={7}
+        blur={2.6}
+        far={5}
         resolution={512}
         color="#2a2620"
       />
@@ -100,8 +153,8 @@ function Scene({
         <Lightformer
           form="rect"
           intensity={2.5}
-          position={[0, 5, 4]}
-          scale={[12, 6, 1]}
+          position={[2, 5, 4]}
+          scale={[10, 6, 1]}
           color="#ffffff"
         />
       </Environment>
@@ -110,42 +163,39 @@ function Scene({
 }
 
 export default function FinaleTerminalBuild() {
-  const containerRefs = useRef<(Group | null)[]>([]);
-  const auraRefs = useRef<(Mesh | null)[]>([]);
+  const layerRefs = useRef<(Group | null)[]>([]);
   const lineRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   const handleTick = (t: number) => {
-    LINES.forEach((line, i) => {
-      const progress = smoothstep(LINE_START[i], LINE_START[i] + LINE_DUR[i], t);
-      const chars = Math.floor(progress * line.length);
+    LINE.forEach((line, i) => {
+      const progress = smoothstep(
+        line.start,
+        line.start + Math.max(line.dur, 0.001),
+        t,
+      );
+      const chars = Math.floor(progress * line.text.length);
       const el = lineRefs.current[i];
-      if (el) el.textContent = line.slice(0, chars);
+      if (el) el.textContent = line.text.slice(0, chars);
+    });
 
-      if (i >= 1 && i <= STATIONS.length) {
-        const idx = i - 1;
-        const doneAt = LINE_START[i] + LINE_DUR[i];
-        const pop = smoothstep(doneAt, doneAt + 0.05, t);
-        const grp = containerRefs.current[idx];
-        if (grp) grp.scale.setScalar(Math.max(0.001, pop * FEATURE_REST_SCALE));
-
-        const flash =
-          smoothstep(doneAt, doneAt + 0.04, t) - smoothstep(doneAt + 0.25, doneAt + 0.55, t);
-        const aura = auraRefs.current[idx];
-        const mat = aura?.material as MeshBasicMaterial | undefined;
-        if (mat) mat.opacity = Math.max(0, flash) * 0.7;
-      }
+    LAYERS.forEach((l, i) => {
+      const src = LINE[l.lineIndex];
+      const doneAt = src.start + src.dur;
+      const pop = smoothstep(doneAt, doneAt + 0.06, t);
+      const grp = layerRefs.current[i];
+      if (grp) grp.scale.setScalar(Math.max(0.001, pop));
     });
   };
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <Canvas
-        camera={{ position: [0, 1.0, 15], fov: 34 }}
+        camera={{ position: [0.6, 0.6, 11], fov: 34 }}
         dpr={[1, 1.8]}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%", background: "#f4f1ea" }}
       >
-        <Scene containerRefs={containerRefs} auraRefs={auraRefs} />
+        <Scene layerRefs={layerRefs} />
         <ClockBridge onTick={handleTick} />
       </Canvas>
 
@@ -153,8 +203,9 @@ export default function FinaleTerminalBuild() {
         style={{
           position: "absolute",
           left: "32px",
-          bottom: "32px",
-          width: "26rem",
+          top: "50%",
+          transform: "translateY(-50%)",
+          width: "27rem",
           maxWidth: "calc(100% - 64px)",
           border: "1px solid #ddd8cc",
           borderRadius: "12px",
@@ -178,8 +229,14 @@ export default function FinaleTerminalBuild() {
             <i style={dotStyle} />
             <i style={dotStyle} />
           </span>
-          <span style={{ fontFamily: "ui-monospace, monospace", fontSize: "11px", color: "#8a8577" }}>
-            hostwright plan
+          <span
+            style={{
+              fontFamily: "ui-monospace, monospace",
+              fontSize: "11px",
+              color: "#8a8577",
+            }}
+          >
+            hostwright apply
           </span>
         </div>
         <pre
@@ -189,13 +246,15 @@ export default function FinaleTerminalBuild() {
             fontFamily: "ui-monospace, monospace",
             fontSize: "13px",
             lineHeight: 1.85,
-            color: "#20232a",
             whiteSpace: "pre-wrap",
-            minHeight: "9.5rem",
+            minHeight: "13rem",
           }}
         >
-          {LINES.map((_, i) => (
-            <div key={i} style={{ minHeight: "1.4em" }}>
+          {LINE.map((line, i) => (
+            <div
+              key={i}
+              style={{ minHeight: "1.4em", color: KIND_COLOR[line.kind] }}
+            >
               <span ref={(el) => (lineRefs.current[i] = el)} />
             </div>
           ))}
