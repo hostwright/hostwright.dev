@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hostwright-dev",
+  "name": "hostwrightdev",
   "compatibility_date": "2026-06-29",
   // Static site: serve the Astro build output as assets, no Worker script.
   "assets": {
