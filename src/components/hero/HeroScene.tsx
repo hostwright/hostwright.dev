@@ -34,6 +34,17 @@ const FEATURES = 6;
 const CONTAINER_HALF = 0.75;
 const FEATURE_REST_SCALE = 1.12;
 
+// The dock rack: a silver cage that racks the 4x4 grid once it settles,
+// posts + top/bottom bars only (not a solid box) so the grid stays visible
+// inside it. Bounds computed from the actual grid spacing/offset above.
+const GRID_SPACING = 1.42;
+const GRID_HALF = 1.5 * GRID_SPACING;
+const GRID_Y_OFFSET = 0.6;
+const RACK_PAD = 0.3;
+const RACK_HALF = GRID_HALF + CONTAINER_HALF + RACK_PAD;
+const RACK_Y_TOP = GRID_Y_OFFSET + RACK_HALF;
+const RACK_Y_BOTTOM = GRID_Y_OFFSET - RACK_HALF;
+
 // Three slots per shelf, spaced apart (unlike the tight dock grid).
 const SHELF_SLOT_XS = [-2.6, 0, 2.6];
 const REST_GAP = 0.05;
@@ -192,6 +203,66 @@ function ControlPlane({
   );
 }
 
+function DockRack({ rackRef }: { rackRef: React.RefObject<Group | null> }) {
+  const wordmark = useTexture("/hostwright-wordmark.png");
+  const postH = RACK_Y_TOP - RACK_Y_BOTTOM;
+  const postY = (RACK_Y_TOP + RACK_Y_BOTTOM) / 2;
+  const barW = RACK_HALF * 2 + 0.3;
+
+  return (
+    <group ref={rackRef} scale={0.001}>
+      {[-RACK_HALF, RACK_HALF].map((x) => (
+        <RoundedBox
+          key={x}
+          args={[0.22, postH, 0.5]}
+          radius={0.08}
+          smoothness={4}
+          position={[x, postY, 0]}
+        >
+          <meshPhysicalMaterial
+            color="#aeb2bc"
+            roughness={0.22}
+            metalness={0.8}
+            clearcoat={0.85}
+            clearcoatRoughness={0.12}
+            envMapIntensity={1.5}
+          />
+        </RoundedBox>
+      ))}
+      {[RACK_Y_TOP, RACK_Y_BOTTOM].map((y) => (
+        <RoundedBox
+          key={y}
+          args={[barW, 0.18, 0.5]}
+          radius={0.08}
+          smoothness={4}
+          position={[0, y, 0]}
+        >
+          <meshPhysicalMaterial
+            color="#aeb2bc"
+            roughness={0.22}
+            metalness={0.8}
+            clearcoat={0.85}
+            clearcoatRoughness={0.12}
+            envMapIntensity={1.5}
+          />
+        </RoundedBox>
+      ))}
+      <mesh position={[0, RACK_Y_TOP, 0.28]}>
+        <planeGeometry args={[barW * 0.5, barW * 0.5 * 0.32]} />
+        <meshStandardMaterial
+          color="#20232a"
+          roughness={0.35}
+          metalness={0.3}
+        />
+      </mesh>
+      <mesh position={[0, RACK_Y_TOP, 0.29]}>
+        <planeGeometry args={[barW * 0.4, (barW * 0.4) / 5.9]} />
+        <meshBasicMaterial alphaMap={wordmark} transparent color="#ffffff" />
+      </mesh>
+    </group>
+  );
+}
+
 const FOCUS_TARGET = new Vector3(0, 0.6, 0);
 
 function Rig({
@@ -207,6 +278,7 @@ function Rig({
   const deckMat = useRef<MeshPhysicalMaterial>(null);
   const deckWord = useRef<MeshBasicMaterial>(null);
   const bridgeRef = useRef<Group>(null);
+  const rackRef = useRef<Group>(null);
   const { camera } = useThree();
   const filmEl = useRef<HTMLElement | null>(null);
   const bValue = useRef(0);
@@ -291,12 +363,21 @@ function Rig({
         (0.15 + Math.sin(t * 1.6) * 0.08) * a * (1 - b);
     }
     if (deckWord.current) deckWord.current.opacity = a * (1 - b);
+
+    if (rackRef.current) {
+      const rackIn = smoothstep(0.85, 1, a);
+      const rackOut = 1 - smoothstep(0, 0.35, b);
+      rackRef.current.scale.setScalar(Math.max(0.001, rackIn * rackOut));
+    }
   });
 
   return (
     <>
       <Suspense fallback={null}>
         <ControlPlane deckRef={deckRef} matRef={deckMat} wordRef={deckWord} />
+      </Suspense>
+      <Suspense fallback={null}>
+        <DockRack rackRef={rackRef} />
       </Suspense>
       <group ref={bridgeRef} scale={0.001}>
         <HBridge />
