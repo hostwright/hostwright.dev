@@ -3,7 +3,8 @@ import { hero } from "../data/homepage.ts";
 import HeroMotif from "./HeroMotif.astro";
 import HeroScene from "./hero/HeroScene.tsx";
 
-// Feature captions, revealed one per drop during the bridge crossing.
+// Feature captions, each floating above its own container once the fleet
+// settles onto the bridge.
 const stations = [
   { label: "Declare", note: "one manifest" },
   { label: "Plan", note: "before mutation" },
@@ -50,12 +51,13 @@ const stations = [
         </p>
       </div>
 
-      <!-- Phase 3 — the crossing. Each feature's name floats above its own
-           container in 3D as it lands; this is just the framing line. -->
+      <!-- Phase 3 — disperse onto the H. Each feature's name floats above
+           its own container in 3D; this is just the framing line. -->
       <div class="ov ov-3" aria-hidden="true">
-        <p class="ov-eyebrow">Delivered as one</p>
+        <p class="ov-eyebrow">One loop, six moves</p>
         <p class="ov-lead">
-          Carried across on Hostwright — light, quick, and exactly as declared.
+          Declared, planned, reconciled — every move Hostwright makes, laid
+          out on the mark itself.
         </p>
       </div>
     </div>
@@ -98,7 +100,7 @@ const stations = [
   /* ---- Film layout: the pinned scroll cinema. ---- */
   @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
     .hero {
-      height: 220vh;
+      height: 340vh;
       padding: 0;
     }
     .hero-sticky {
@@ -161,7 +163,7 @@ const stations = [
       justify-content: flex-end;
       padding-bottom: 9vh;
     }
-    /* crossing caption stays compact so the bridge + craft own the frame */
+    /* disperse caption stays compact so the bridge + containers own the frame */
     .ov-3 .ov-lead {
       max-width: 34ch;
       font-size: var(--text-xl);
@@ -246,16 +248,16 @@ const stations = [
 
 <script>
   // Single source of scroll progress → phase class + --p, from the 3D island.
-  // Per-feature captions now float above their own container in 3D; this
-  // script only owns the phase-level overlays (headline / control-plane /
-  // crossing framing line).
+  // Per-feature captions float above their own container in 3D; this script
+  // only owns the phase-level overlays (headline / control-plane / disperse
+  // framing line).
   const film = document.getElementById("hero-film");
   if (film) {
     let phase = 1;
     window.addEventListener("hero-progress", (e) => {
       const p = e.detail;
       film.style.setProperty("--p", p.toFixed(3));
-      const ph = p < 0.16 ? 1 : p < 0.28 ? 2 : 3;
+      const ph = p < 0.34 ? 1 : p < 0.62 ? 2 : 3;
       if (ph !== phase) {
         phase = ph;
         film.dataset.phase = String(ph);
