@@ -27,7 +27,12 @@ const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
     start: 0.13,
     dur: 0.02,
   },
-  { text: "  + create   service/redis     redis:7", kind: "add", start: 0.16, dur: 0.02 },
+  {
+    text: "  + create   service/redis     redis:7",
+    kind: "add",
+    start: 0.16,
+    dur: 0.02,
+  },
   {
     text: "  + create   service/api       ghcr.io/example/api",
     kind: "add",
@@ -40,7 +45,12 @@ const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
     start: 0.22,
     dur: 0.02,
   },
-  { text: "  + create   service/nginx     nginx:1.27", kind: "add", start: 0.25, dur: 0.02 },
+  {
+    text: "  + create   service/nginx     nginx:1.27",
+    kind: "add",
+    start: 0.25,
+    dur: 0.02,
+  },
   {
     text: "  plan: 5 to create, 0 to change, 0 to destroy",
     kind: "muted",
@@ -49,12 +59,27 @@ const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
   },
   { text: "", kind: "blank", start: 0.34, dur: 0 },
   { text: "$ hostwright apply", kind: "cmd", start: 0.37, dur: 0.05 },
-  { text: "∙ starting postgres … healthy", kind: "muted", start: 0.44, dur: 0.02 },
+  {
+    text: "∙ starting postgres … healthy",
+    kind: "muted",
+    start: 0.44,
+    dur: 0.02,
+  },
   { text: "∙ starting redis … healthy", kind: "muted", start: 0.51, dur: 0.02 },
   { text: "∙ starting api … healthy", kind: "muted", start: 0.58, dur: 0.02 },
-  { text: "∙ starting worker … healthy", kind: "muted", start: 0.65, dur: 0.02 },
+  {
+    text: "∙ starting worker … healthy",
+    kind: "muted",
+    start: 0.65,
+    dur: 0.02,
+  },
   { text: "∙ starting nginx … healthy", kind: "muted", start: 0.72, dur: 0.02 },
-  { text: "✓ applied — 5 running, 0 pending", kind: "ok", start: 0.79, dur: 0.03 },
+  {
+    text: "✓ applied — 5 running, 0 pending",
+    kind: "ok",
+    start: 0.79,
+    dur: 0.03,
+  },
 ];
 
 // index into LINE whose completion triggers each layer stacking in, bottom
@@ -148,12 +173,20 @@ function Rig({
     }
 
     LINE.forEach((line, i) => {
+      if (i === 0) return; // always shown from first paint, not scroll-driven
       const isTyped = line.kind === "cmd";
-      const progress = smoothstep(line.start, line.start + Math.max(line.dur, 0.001), t);
+      const progress = smoothstep(
+        line.start,
+        line.start + Math.max(line.dur, 0.001),
+        t,
+      );
       const lineEl = lineRefs.current[i];
       if (!lineEl) return;
       if (isTyped) {
-        lineEl.textContent = line.text.slice(0, Math.floor(progress * line.text.length));
+        lineEl.textContent = line.text.slice(
+          0,
+          Math.floor(progress * line.text.length),
+        );
       } else {
         lineEl.textContent = progress > 0.5 ? line.text : "";
       }
@@ -238,7 +271,11 @@ function TerminalOverlay({
           <i style={dotStyle} />
         </span>
         <span
-          style={{ fontFamily: "ui-monospace, monospace", fontSize: "11px", color: "#8a8577" }}
+          style={{
+            fontFamily: "ui-monospace, monospace",
+            fontSize: "11px",
+            color: "#8a8577",
+          }}
         >
           hostwright apply
         </span>
@@ -255,8 +292,13 @@ function TerminalOverlay({
         }}
       >
         {LINE.map((line, i) => (
-          <div key={i} style={{ minHeight: "1.4em", color: KIND_COLOR[line.kind] }}>
-            <span ref={(el) => (lineRefs.current[i] = el)} />
+          <div
+            key={i}
+            style={{ minHeight: "1.4em", color: KIND_COLOR[line.kind] }}
+          >
+            <span ref={(el) => (lineRefs.current[i] = el)}>
+              {i === 0 ? line.text : ""}
+            </span>
           </div>
         ))}
       </pre>
@@ -281,7 +323,11 @@ function TerminalBuildCanvas() {
       <Canvas
         camera={{ position: [0.6, 0.2, 13.5], fov: 34 }}
         dpr={[1, 1.8]}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+        }}
         style={{
           width: "100%",
           height: "100%",
@@ -303,7 +349,8 @@ export default function TerminalBuildScene() {
 
   useEffect(() => {
     const wide = window.matchMedia("(min-width: 64rem)").matches;
-    const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)")
+      .matches;
     let webgl = false;
     try {
       const c = document.createElement("canvas");
