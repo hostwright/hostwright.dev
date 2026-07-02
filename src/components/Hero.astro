@@ -98,7 +98,7 @@ const stations = [
   /* ---- Film layout: the pinned scroll cinema. ---- */
   @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
     .hero {
-      height: 460vh;
+      height: 220vh;
       padding: 0;
     }
     .hero-sticky {
@@ -190,8 +190,8 @@ const stations = [
       margin-inline: auto;
       padding: var(--space-5) var(--space-6);
       border-radius: var(--radius-lg);
-      background: color-mix(in srgb, var(--color-bg) 74%, transparent);
-      backdrop-filter: blur(7px);
+      background: var(--color-bg);
+      box-shadow: 0 12px 32px -16px rgba(32, 35, 39, 0.35);
     }
     .ov-eyebrow {
       font-family: var(--font-mono);
@@ -255,7 +255,7 @@ const stations = [
     window.addEventListener("hero-progress", (e) => {
       const p = e.detail;
       film.style.setProperty("--p", p.toFixed(3));
-      const ph = p < 0.28 ? 1 : p < 0.34 ? 2 : 3;
+      const ph = p < 0.16 ? 1 : p < 0.28 ? 2 : 3;
       if (ph !== phase) {
         phase = ph;
         film.dataset.phase = String(ph);
