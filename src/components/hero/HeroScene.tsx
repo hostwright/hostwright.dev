@@ -34,20 +34,16 @@ const FEATURES = 6;
 const CONTAINER_HALF = 0.75;
 const FEATURE_REST_SCALE = 1.12;
 
-// The dock rack: a silver cage that racks the 4x4 grid once it settles, with
-// a solid branded header block (same shape language as the terminal act's
-// pack frame) mounted at the top rail instead of a flat floating plaque.
+// The dock frame: the exact same solid pack-frame treatment as the terminal
+// act's stack, sized to fully encapsulate the 4x4 grid once it settles.
 const GRID_SPACING = 1.42;
 const GRID_HALF = 1.5 * GRID_SPACING;
 const GRID_Y_OFFSET = 0.6;
-const RACK_PAD = 0.2;
-const RACK_HALF = GRID_HALF + CONTAINER_HALF + RACK_PAD;
-const RACK_Y_TOP = GRID_Y_OFFSET + RACK_HALF;
-const RACK_Y_BOTTOM = GRID_Y_OFFSET - RACK_HALF;
-const HEADER_W = RACK_HALF * 1.4;
-const HEADER_H = 0.9;
-const HEADER_D = 0.6;
-const HEADER_Y = RACK_Y_TOP + HEADER_H / 2 - 0.12;
+const GRID_BOX_HALF = GRID_HALF + CONTAINER_HALF;
+const DOCK_FRAME_PAD = 0.3;
+const DOCK_FRAME_W = GRID_BOX_HALF * 2 + DOCK_FRAME_PAD;
+const DOCK_FRAME_H = GRID_BOX_HALF * 2 + DOCK_FRAME_PAD;
+const DOCK_FRAME_D = 1.3;
 
 // Three slots per shelf, spaced apart (unlike the tight dock grid).
 const SHELF_SLOT_XS = [-2.6, 0, 2.6];
@@ -207,74 +203,50 @@ function ControlPlane({
   );
 }
 
-const RACK_METAL = {
-  color: "#aeb2bc",
-  roughness: 0.22,
-  metalness: 0.8,
-  clearcoat: 0.85,
-  clearcoatRoughness: 0.12,
-  envMapIntensity: 1.5,
-};
-
-function DockRack({ rackRef }: { rackRef: React.RefObject<Group | null> }) {
+function DockFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
   const wordmark = useTexture("/hostwright-wordmark.png");
-  const postH = RACK_Y_TOP - RACK_Y_BOTTOM;
-  const postY = (RACK_Y_TOP + RACK_Y_BOTTOM) / 2;
-  const barW = RACK_HALF * 2 + 0.3;
-
   return (
-    <group ref={rackRef} scale={0.001}>
-      {[-RACK_HALF, RACK_HALF].map((x) => (
-        <RoundedBox
-          key={x}
-          args={[0.22, postH, 0.5]}
-          radius={0.08}
-          smoothness={4}
-          position={[x, postY, 0]}
-        >
-          <meshPhysicalMaterial {...RACK_METAL} />
-        </RoundedBox>
-      ))}
+    <group ref={frameRef} position={[0, GRID_Y_OFFSET, 0]} scale={0.001}>
       <RoundedBox
-        args={[barW, 0.18, 0.5]}
-        radius={0.08}
-        smoothness={4}
-        position={[0, RACK_Y_BOTTOM, 0]}
+        args={[DOCK_FRAME_W, DOCK_FRAME_H, DOCK_FRAME_D]}
+        radius={0.16}
+        smoothness={5}
       >
-        <meshPhysicalMaterial {...RACK_METAL} />
+        <meshPhysicalMaterial
+          color="#aeb2bc"
+          roughness={0.22}
+          metalness={0.8}
+          clearcoat={0.85}
+          clearcoatRoughness={0.12}
+          envMapIntensity={1.5}
+        />
       </RoundedBox>
-
-      {/* Solid branded header block, same shape language as the terminal
-          act's pack frame — not a flat sign floating above the rail. */}
-      <group position={[0, HEADER_Y, 0]}>
-        <RoundedBox
-          args={[HEADER_W, HEADER_H, HEADER_D]}
-          radius={0.14}
-          smoothness={5}
-        >
-          <meshPhysicalMaterial {...RACK_METAL} />
-        </RoundedBox>
-        <mesh position={[0, HEADER_H / 2 - 0.02, 0]}>
-          <boxGeometry args={[HEADER_W * 0.92, 0.03, HEADER_D * 0.92]} />
-          <meshStandardMaterial
-            color="#1f3a5f"
-            emissive="#1f3a5f"
-            emissiveIntensity={0.7}
-          />
-        </mesh>
-        <mesh position={[0, 0, HEADER_D / 2 + 0.003]}>
-          <planeGeometry args={[HEADER_W * 0.82, HEADER_H * 0.42]} />
-          <meshStandardMaterial
-            color="#fbfaf6"
-            roughness={0.4}
-            metalness={0.05}
-          />
-        </mesh>
-        <mesh position={[0, 0, HEADER_D / 2 + 0.008]}>
-          <planeGeometry args={[HEADER_W * 0.68, (HEADER_W * 0.68) / 5.9]} />
-          <meshBasicMaterial alphaMap={wordmark} transparent color="#20232a" />
-        </mesh>
-      </group>
+      <mesh position={[0, DOCK_FRAME_H / 2 - 0.02, 0]}>
+        <boxGeometry args={[DOCK_FRAME_W * 0.92, 0.03, DOCK_FRAME_D * 0.92]} />
+        <meshStandardMaterial
+          color="#1f3a5f"
+          emissive="#1f3a5f"
+          emissiveIntensity={0.7}
+        />
+      </mesh>
+      <mesh position={[0, 0, DOCK_FRAME_D / 2 + 0.003]}>
+        <planeGeometry args={[DOCK_FRAME_W * 0.62, DOCK_FRAME_H * 0.18]} />
+        <meshStandardMaterial
+          color="#fbfaf6"
+          roughness={0.4}
+          metalness={0.05}
+        />
+      </mesh>
+      <mesh position={[0, 0, DOCK_FRAME_D / 2 + 0.008]}>
+        <planeGeometry
+          args={[DOCK_FRAME_W * 0.5, (DOCK_FRAME_W * 0.5) / 5.9]}
+        />
+        <meshBasicMaterial
+          alphaMap={wordmark}
+          alphaTest={0.15}
+          color="#20232a"
+        />
+      </mesh>
     </group>
   );
 }
@@ -393,7 +365,7 @@ function Rig({
         <ControlPlane deckRef={deckRef} matRef={deckMat} wordRef={deckWord} />
       </Suspense>
       <Suspense fallback={null}>
-        <DockRack rackRef={rackRef} />
+        <DockFrame frameRef={rackRef} />
       </Suspense>
       <group ref={bridgeRef} scale={0.001}>
         <HBridge />

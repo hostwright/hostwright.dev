@@ -221,7 +221,11 @@ function PackFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
       </mesh>
       <mesh position={[0, 0, FRAME_D / 2 + 0.008]}>
         <planeGeometry args={[FRAME_W * 0.62, (FRAME_W * 0.62) / 5.9]} />
-        <meshBasicMaterial alphaMap={wordmark} transparent color="#20232a" />
+        <meshBasicMaterial
+          alphaMap={wordmark}
+          alphaTest={0.15}
+          color="#20232a"
+        />
       </mesh>
     </group>
   );
