@@ -214,14 +214,14 @@ function PackFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
       <mesh position={[0, 0, FRAME_D / 2 + 0.003]}>
         <planeGeometry args={[FRAME_W * 0.76, FRAME_H * 0.22]} />
         <meshStandardMaterial
-          color="#20232a"
-          roughness={0.35}
-          metalness={0.3}
+          color="#fbfaf6"
+          roughness={0.4}
+          metalness={0.05}
         />
       </mesh>
       <mesh position={[0, 0, FRAME_D / 2 + 0.008]}>
         <planeGeometry args={[FRAME_W * 0.62, (FRAME_W * 0.62) / 5.9]} />
-        <meshBasicMaterial alphaMap={wordmark} transparent color="#ffffff" />
+        <meshBasicMaterial alphaMap={wordmark} transparent color="#20232a" />
       </mesh>
     </group>
   );

@@ -250,14 +250,14 @@ function DockRack({ rackRef }: { rackRef: React.RefObject<Group | null> }) {
       <mesh position={[0, RACK_Y_TOP, 0.28]}>
         <planeGeometry args={[barW * 0.5, barW * 0.5 * 0.32]} />
         <meshStandardMaterial
-          color="#20232a"
-          roughness={0.35}
-          metalness={0.3}
+          color="#fbfaf6"
+          roughness={0.4}
+          metalness={0.05}
         />
       </mesh>
       <mesh position={[0, RACK_Y_TOP, 0.29]}>
         <planeGeometry args={[barW * 0.4, (barW * 0.4) / 5.9]} />
-        <meshBasicMaterial alphaMap={wordmark} transparent color="#ffffff" />
+        <meshBasicMaterial alphaMap={wordmark} transparent color="#20232a" />
       </mesh>
     </group>
   );
