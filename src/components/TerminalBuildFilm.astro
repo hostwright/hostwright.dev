@@ -1,0 +1,37 @@
+---
+import TerminalBuildScene from "./hero/TerminalBuildScene.tsx";
+---
+
+<section class="tb-film" id="terminal-build-film">
+  <div class="tb-sticky">
+    <div class="tb-stage" aria-hidden="true">
+      <TerminalBuildScene client:only="react" />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Purely a cinematic bridge to the next section — no fallback content, no
+     scroll-jack outside the desktop+motion+WebGL gate the component itself
+     also checks in JS. */
+  .tb-film {
+    display: none;
+  }
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .tb-film {
+      display: block;
+      position: relative;
+      height: 175vh;
+    }
+    .tb-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .tb-stage {
+      position: absolute;
+      inset: 0;
+    }
+  }
+</style>

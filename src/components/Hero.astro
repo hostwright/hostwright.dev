@@ -1,37 +1,82 @@
 ---
 import { hero } from "../data/homepage.ts";
 import HeroMotif from "./HeroMotif.astro";
+import HeroScene from "./hero/HeroScene.tsx";
+
+// Feature captions, each floating above its own container once the fleet
+// settles onto the bridge.
+const stations = [
+  { label: "Declare", note: "one manifest" },
+  { label: "Plan", note: "before mutation" },
+  { label: "Reconcile", note: "desired vs actual" },
+  { label: "Detect drift", note: "and correct" },
+  { label: "Doctor", note: "safe checks" },
+  { label: "Clean up", note: "dry-run first" },
+];
 ---
 
-<section class="hero">
-  <div class="container hero-grid">
-    <div class="hero-inner">
-      <a class="hero-status" href="#roadmap">
-        <span class="dot" aria-hidden="true"></span>
-        {hero.status}
-      </a>
-      <h1 class="hero-title">{hero.title}</h1>
-      <p class="hero-subtitle">{hero.subtitle}</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href={hero.ctaPrimary.href}>{hero.ctaPrimary.label}</a>
-        <a class="btn btn-secondary" href={hero.ctaSecondary.href} rel="noopener">
-          {hero.ctaSecondary.label} ↗
-        </a>
+<section class="hero" id="hero-film" data-phase="1">
+  <div class="hero-sticky">
+    <div class="hero-stage" aria-hidden="true">
+      <HeroScene client:only="react" stations={stations} />
+    </div>
+    <div class="hero-scrim" aria-hidden="true"></div>
+
+    <div class="container hero-overlays">
+      <!-- Phase 1 — drift. The real headline (SEO / no-JS lives here). -->
+      <div class="ov ov-1">
+        <div class="hero-inner">
+          <a class="hero-status" href="#roadmap">
+            <span class="dot" aria-hidden="true"></span>
+            {hero.status}
+          </a>
+          <h1 class="hero-title">{hero.title}</h1>
+          <p class="hero-subtitle">{hero.subtitle}</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href={hero.ctaPrimary.href}>{hero.ctaPrimary.label}</a>
+            <a class="btn btn-secondary" href={hero.ctaSecondary.href} rel="noopener">
+              {hero.ctaSecondary.label} ↗
+            </a>
+          </div>
+          <HeroMotif />
+        </div>
+      </div>
+
+      <!-- Phase 2 — assemble on the control plane. -->
+      <div class="ov ov-2" aria-hidden="true">
+        <p class="ov-lead">
+          Every container — declared, reconciled, and kept in the state you
+          asked for. One Mac, one plane, in your control.
+        </p>
+      </div>
+
+      <!-- Phase 3 — disperse onto the H. Each feature's name floats above
+           its own container in 3D; this closes the loop below the shelf. -->
+      <div class="ov ov-3" aria-hidden="true">
+        <p class="ov-lead">
+          Six steps, one loop. Every apply runs the same way, in order,
+          every time.
+        </p>
       </div>
     </div>
-    <HeroMotif />
   </div>
 </section>
 
 <style>
+  /* ---- Fallback layout (mobile / reduced-motion / no-WebGL): a normal hero. */
   .hero {
+    position: relative;
     padding-block: clamp(var(--space-8), 4vw + var(--space-6), var(--space-10))
       var(--space-9);
   }
-  .hero-grid {
-    display: grid;
-    gap: var(--space-8);
-    align-items: center;
+  .hero-sticky {
+    display: block;
+  }
+  .hero-stage,
+  .hero-scrim,
+  .ov-2,
+  .ov-3 {
+    display: none;
   }
   .hero-inner {
     display: flex;
@@ -39,24 +84,114 @@ import HeroMotif from "./HeroMotif.astro";
     align-items: flex-start;
     gap: var(--space-5);
   }
-  /* Mark shows on all sizes; it stacks below the copy on narrow screens. */
-  .hero-grid :global(.mark) {
-    order: -1;
+  .hero-grid :global(.mark),
+  .hero-inner :global(.mark) {
     max-width: 15rem;
-    justify-self: start;
-    margin-bottom: var(--space-2);
+    margin-top: var(--space-2);
   }
   @media (min-width: 64rem) {
-    .hero-grid {
-      grid-template-columns: 1.25fr 1fr;
-    }
-    .hero-grid :global(.mark) {
-      order: 0;
-      max-width: 26rem;
-      justify-self: end;
-      margin-bottom: 0;
+    .hero-inner :global(.mark) {
+      max-width: 22rem;
     }
   }
+
+  /* ---- Film layout: the pinned scroll cinema. ---- */
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .hero {
+      height: 220vh;
+      padding: 0;
+    }
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .hero-stage {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-scrim {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: clamp(0, calc(1 - var(--p, 0) * 3.2), 1);
+      background: linear-gradient(
+        90deg,
+        var(--color-bg) 0%,
+        var(--color-bg) 24%,
+        color-mix(in srgb, var(--color-bg) 40%, transparent) 42%,
+        transparent 58%
+      );
+    }
+    .hero-overlays {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+    }
+    .hero-inner :global(.mark) {
+      display: none;
+    }
+
+    .ov {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s var(--ease);
+    }
+    .ov a.btn {
+      pointer-events: auto;
+    }
+    .ov-2 {
+      display: flex;
+      align-items: center;
+      text-align: center;
+    }
+    .ov-3 {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: center;
+      padding-bottom: clamp(var(--space-8), 6vw, var(--space-10));
+    }
+    .ov-1 {
+      align-items: flex-start;
+    }
+    [data-phase="1"] .ov-1 {
+      opacity: 1;
+    }
+    [data-phase="2"] .ov-2 {
+      opacity: 1;
+    }
+    [data-phase="3"] .ov-3 {
+      opacity: 1;
+    }
+
+    .ov-lead {
+      max-width: 26ch;
+      font-family: var(--font-display, var(--font-sans));
+      font-size: var(--text-2xl);
+      line-height: 1.2;
+      letter-spacing: var(--track-display);
+      color: var(--color-text);
+      margin-inline: auto;
+      padding: var(--space-5) var(--space-6);
+      border-radius: var(--radius-lg);
+      background: var(--color-bg);
+      box-shadow: 0 12px 32px -16px rgba(32, 35, 39, 0.35);
+    }
+  }
+
+  /* ---- Shared copy styles. ---- */
   .hero-status {
     display: inline-flex;
     align-items: center;
@@ -70,10 +205,6 @@ import HeroMotif from "./HeroMotif.astro";
     border: 1px solid var(--color-border-strong);
     border-radius: 999px;
     background: var(--color-surface);
-  }
-  .hero-status:hover {
-    color: var(--color-text);
-    border-color: var(--color-text-faint);
   }
   .hero-status .dot {
     width: 0.5rem;
@@ -100,3 +231,23 @@ import HeroMotif from "./HeroMotif.astro";
     margin-top: var(--space-3);
   }
 </style>
+
+<script>
+  // Single source of scroll progress → phase class + --p, from the 3D island.
+  // Per-feature captions float above their own container in 3D once
+  // dispersed, so this script only owns the headline / control-plane
+  // overlays.
+  const film = document.getElementById("hero-film");
+  if (film) {
+    let phase = 1;
+    window.addEventListener("hero-progress", (e) => {
+      const p = (e as CustomEvent<number>).detail;
+      film.style.setProperty("--p", p.toFixed(3));
+      const ph = p < 0.34 ? 1 : p < 0.6 ? 2 : 3;
+      if (ph !== phase) {
+        phase = ph;
+        film.dataset.phase = String(ph);
+      }
+    });
+  }
+</script>
