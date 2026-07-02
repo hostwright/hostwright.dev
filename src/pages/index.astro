@@ -29,7 +29,6 @@ const community = [
   <section class="section section-demo">
     <div class="container demo-grid">
       <div class="demo-copy">
-        <span class="eyebrow">Plan, then apply</span>
         <h2 class="demo-title">See the change before it happens.</h2>
         <p class="demo-lead">
           Every run computes a reviewable plan from your manifest. Today
@@ -44,7 +43,7 @@ const community = [
   <!-- Problem -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading eyebrow="The problem" title={problem.heading} />
+      <SectionHeading title={problem.heading} />
       <div class="prose-block">
         {problem.body.map((p) => <p>{p}</p>)}
       </div>
@@ -54,7 +53,7 @@ const community = [
   <!-- What Hostwright is -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading eyebrow="What it does" title={whatItIs.heading} lead={whatItIs.intro} />
+      <SectionHeading title={whatItIs.heading} lead={whatItIs.intro} />
       <ul class="feature-grid">
         {
           whatItIs.capabilities.map((c) => (
@@ -71,7 +70,7 @@ const community = [
   <!-- CLI preview -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading eyebrow="Command line" title="A small, honest CLI" />
+      <SectionHeading title="A small, honest CLI" />
       <CliPreview />
     </div>
   </section>
@@ -79,7 +78,7 @@ const community = [
   <!-- Architecture -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading eyebrow="Architecture" title={architecture.heading} lead={architecture.intro} />
+      <SectionHeading title={architecture.heading} lead={architecture.intro} />
       <Figure
         src="/diagrams/01-system-layer-stack.svg"
         alt="Layered architecture: the hostwright CLI and planned daemon sit above the RuntimeAdapter boundary, which drives Apple's container runtime and Linux VMs."
@@ -92,7 +91,7 @@ const community = [
   <!-- Manifest -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading eyebrow="Manifest" title="Declare a stack in one file" />
+      <SectionHeading title="Declare a stack in one file" />
       <ManifestPreview />
     </div>
   </section>
@@ -100,7 +99,7 @@ const community = [
   <!-- Safety -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading eyebrow="Safety" title={safety.heading} lead={safety.intro} />
+      <SectionHeading title={safety.heading} lead={safety.intro} />
       <ul class="safety-grid">
         {
           safety.principles.map((s) => (
@@ -118,7 +117,6 @@ const community = [
   <section class="section" id="roadmap">
     <div class="container reveal">
       <SectionHeading
-        eyebrow="Current state"
         title="Roadmap"
         lead="Honest status. The design is locked; the build is just beginning."
       />
@@ -130,7 +128,6 @@ const community = [
   <section class="section">
     <div class="container reveal">
       <SectionHeading
-        eyebrow="Scope"
         title="What it deliberately does not do yet"
         lead="Stated openly. A narrow, defensible first release matters more than a broad one."
       />
@@ -141,7 +138,7 @@ const community = [
   <!-- Community -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading eyebrow="Community" title="Follow along" />
+      <SectionHeading title="Follow along" />
       <ul class="community-grid">
         {
           community.map((c) => (

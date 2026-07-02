@@ -23,13 +23,13 @@ import HBridge, {
   SHELF_Y_BOTTOM,
 } from "./HBridge";
 
-// The film: 18 Apple-style containers scroll-choreographed through three
-// simple phases — drift (chaos) → dock onto the Hostwright control plane,
-// packed edge to edge (order) → disperse to rest on the H's two shelves,
-// three features per rung, spaced apart, names floating above each. No
-// flying craft, no gimmicks — the fleet settles directly.
+// The film: 16 Apple-style containers scroll-choreographed through three
+// simple phases — drift (chaos) → dock onto the Hostwright control plane, a
+// tight 4×4 block with no gaps (order) → disperse to rest on the H's two
+// shelves, three features per rung, spaced apart, names floating above each.
+// No flying craft, no gimmicks — the fleet settles directly.
 
-const COUNT = 18;
+const COUNT = 16;
 const FEATURES = 6;
 
 // Three slots per shelf, spaced apart (unlike the tight dock grid).
@@ -64,8 +64,8 @@ function buildLayouts(): Layout[] {
   const out: Layout[] = [];
   for (let i = 0; i < COUNT; i++) {
     const r = rng(i * 9.17);
-    const col = i % 6;
-    const row = Math.floor(i / 6);
+    const col = i % 4;
+    const row = Math.floor(i / 4);
     const isFeature = i < FEATURES;
     // First 3 features rest on the top shelf, next 3 on the bottom shelf.
     const onTop = i < 3;
@@ -78,8 +78,8 @@ function buildLayouts(): Layout[] {
       ),
       driftRot: [(r() - 0.5) * 6, (r() - 0.5) * 6, (r() - 0.5) * 6],
       spin: [(r() - 0.5) * 0.5, (r() - 0.5) * 0.5, (r() - 0.5) * 0.3],
-      // Tight, edge-to-edge — no gaps, a clean centred block.
-      dock: new Vector3((col - 2.5) * 1.35, (row - 1) * 1.35 + 0.6, 0),
+      // Tight, edge-to-edge 4×4 block — no gaps, cleanly centred.
+      dock: new Vector3((col - 1.5) * 1.42, (row - 1.5) * 1.42 + 0.6, 0),
       disperse: isFeature
         ? new Vector3(shelfSlot, onTop ? REST_Y_TOP : REST_Y_BOTTOM, 0)
         : new Vector3((r() - 0.5) * 18, 7 + (i % 3) * 2, -9),

@@ -44,7 +44,6 @@ const stations = [
 
       <!-- Phase 2 — assemble on the control plane. -->
       <div class="ov ov-2" aria-hidden="true">
-        <p class="ov-eyebrow">The control plane</p>
         <p class="ov-lead">
           Every container — declared, reconciled, and kept in the state you
           asked for. One Mac, one plane, in your control.
@@ -52,14 +51,7 @@ const stations = [
       </div>
 
       <!-- Phase 3 — disperse onto the H. Each feature's name floats above
-           its own container in 3D; this is just the framing line. -->
-      <div class="ov ov-3" aria-hidden="true">
-        <p class="ov-eyebrow">One loop, six moves</p>
-        <p class="ov-lead">
-          Declared, planned, reconciled — every move Hostwright makes, laid
-          out on the mark itself.
-        </p>
-      </div>
+           its own container in 3D; no separate caption needed here. -->
     </div>
   </div>
 </section>
@@ -76,8 +68,7 @@ const stations = [
   }
   .hero-stage,
   .hero-scrim,
-  .ov-2,
-  .ov-3 {
+  .ov-2 {
     display: none;
   }
   .hero-inner {
@@ -153,21 +144,10 @@ const stations = [
     .ov a.btn {
       pointer-events: auto;
     }
-    .ov-2,
-    .ov-3 {
+    .ov-2 {
       display: flex;
       align-items: center;
       text-align: center;
-    }
-    .ov-3 {
-      justify-content: flex-end;
-      padding-bottom: 9vh;
-    }
-    /* disperse caption stays compact so the bridge + containers own the frame */
-    .ov-3 .ov-lead {
-      max-width: 34ch;
-      font-size: var(--text-xl);
-      transition: opacity 0.25s var(--ease);
     }
     .ov-1 {
       align-items: flex-start;
@@ -176,9 +156,6 @@ const stations = [
       opacity: 1;
     }
     [data-phase="2"] .ov-2 {
-      opacity: 1;
-    }
-    [data-phase="3"] .ov-3 {
       opacity: 1;
     }
 
@@ -194,14 +171,6 @@ const stations = [
       border-radius: var(--radius-lg);
       background: var(--color-bg);
       box-shadow: 0 12px 32px -16px rgba(32, 35, 39, 0.35);
-    }
-    .ov-eyebrow {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--color-text-faint);
-      margin-bottom: var(--space-4);
     }
   }
 
@@ -248,16 +217,16 @@ const stations = [
 
 <script>
   // Single source of scroll progress → phase class + --p, from the 3D island.
-  // Per-feature captions float above their own container in 3D; this script
-  // only owns the phase-level overlays (headline / control-plane / disperse
-  // framing line).
+  // Per-feature captions float above their own container in 3D once
+  // dispersed, so this script only owns the headline / control-plane
+  // overlays.
   const film = document.getElementById("hero-film");
   if (film) {
     let phase = 1;
     window.addEventListener("hero-progress", (e) => {
       const p = e.detail;
       film.style.setProperty("--p", p.toFixed(3));
-      const ph = p < 0.34 ? 1 : p < 0.62 ? 2 : 3;
+      const ph = p < 0.34 ? 1 : 2;
       if (ph !== phase) {
         phase = ph;
         film.dataset.phase = String(ph);
