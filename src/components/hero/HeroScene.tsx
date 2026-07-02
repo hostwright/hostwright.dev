@@ -103,11 +103,11 @@ function buildLayouts(): Layout[] {
 
 const tagStyle: React.CSSProperties = {
   fontFamily: "var(--font-sans)",
-  fontSize: "13px",
-  fontWeight: 600,
+  fontSize: "19px",
+  fontWeight: 700,
   color: "var(--color-text)",
   background: "var(--color-bg)",
-  padding: "5px 11px",
+  padding: "9px 20px",
   borderRadius: "999px",
   whiteSpace: "nowrap",
   boxShadow: "0 8px 20px -10px rgba(32,35,39,0.4)",
@@ -140,7 +140,7 @@ function FeatureContainer({
       <Html
         position={[0, 1.05, 0]}
         center
-        distanceFactor={9}
+        distanceFactor={7.5}
         style={{ pointerEvents: "none" }}
       >
         <div ref={tag} style={tagStyle}>
@@ -205,7 +205,7 @@ function Rig({ stations }: { stations: { label: string; note: string }[] }) {
 
   const camDrift = useMemo(() => new Vector3(0, 0.8, 12.5), []);
   const camDock = useMemo(() => new Vector3(0, 1.4, 13.2), []);
-  const camDisperse = useMemo(() => new Vector3(0, 1.2, 15.5), []);
+  const camDisperse = useMemo(() => new Vector3(0, 1.0, 17.5), []);
   const tmp = useMemo(() => new Vector3(), []);
 
   useEffect(() => {
