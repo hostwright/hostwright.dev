@@ -192,7 +192,15 @@ function ControlPlane({
   );
 }
 
-function Rig({ stations }: { stations: { label: string; note: string }[] }) {
+const FOCUS_TARGET = new Vector3(0, 0.6, 0);
+
+function Rig({
+  stations,
+  dofRef,
+}: {
+  stations: { label: string; note: string }[];
+  dofRef: React.RefObject<{ focusDistance: number } | null>;
+}) {
   const layouts = useMemo(buildLayouts, []);
   const refs = useRef<(Group | null)[]>([]);
   const deckRef = useRef<Group>(null);
@@ -231,7 +239,12 @@ function Rig({ stations }: { stations: { label: string; note: string }[] }) {
     if (p < 0.5) tmp.lerpVectors(camDrift, camDock, smoothstep(0, 0.5, p));
     else tmp.lerpVectors(camDock, camDisperse, smoothstep(0.5, 1, p));
     camera.position.lerp(tmp, 0.08);
-    camera.lookAt(0, 0.6, 0);
+    camera.lookAt(FOCUS_TARGET);
+
+    if (dofRef.current) {
+      const dist = camera.position.distanceTo(FOCUS_TARGET);
+      dofRef.current.focusDistance = MathUtils.clamp(dist / camera.far, 0, 1);
+    }
 
     for (let i = 0; i < COUNT; i++) {
       const g = refs.current[i];
@@ -362,6 +375,12 @@ export default function HeroScene({ stations }: HeroSceneProps) {
 
   if (!ok) return null;
 
+  return <HeroCanvas stations={stations} />;
+}
+
+function HeroCanvas({ stations }: HeroSceneProps) {
+  const dofRef = useRef<{ focusDistance: number } | null>(null);
+
   return (
     <Canvas
       camera={{ position: [0, 0.8, 12.5], fov: 34 }}
@@ -376,7 +395,7 @@ export default function HeroScene({ stations }: HeroSceneProps) {
     >
       <ambientLight intensity={0.3} />
       <directionalLight position={[6, 9, 7]} intensity={0.6} />
-      <Rig stations={stations} />
+      <Rig stations={stations} dofRef={dofRef} />
       <ContactShadows
         position={[0, -3.4, 0]}
         opacity={0.32}
@@ -389,10 +408,11 @@ export default function HeroScene({ stations }: HeroSceneProps) {
       <Studio />
       <EffectComposer enableNormalPass={false}>
         <DepthOfField
+          ref={dofRef}
           focusDistance={0.02}
           focalLength={0.05}
-          bokehScale={3}
-          height={480}
+          bokehScale={1.4}
+          height={1080}
         />
       </EffectComposer>
     </Canvas>

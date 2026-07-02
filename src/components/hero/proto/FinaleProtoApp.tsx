@@ -2,11 +2,13 @@ import { useState } from "react";
 import FinaleCircuitPulse from "./FinaleCircuitPulse";
 import FinaleSplitFlap from "./FinaleSplitFlap";
 import FinaleAssembleWord from "./FinaleAssembleWord";
+import FinaleTerminalBuild from "./FinaleTerminalBuild";
 
 const TABS = [
   { key: "a", label: "A — Circuit pulse", Comp: FinaleCircuitPulse },
   { key: "b", label: "B — Flip reveal", Comp: FinaleSplitFlap },
   { key: "c", label: "C — Assemble word", Comp: FinaleAssembleWord },
+  { key: "d", label: "D — Terminal build", Comp: FinaleTerminalBuild },
 ] as const;
 
 export default function FinaleProtoApp() {
@@ -38,7 +40,8 @@ export default function FinaleProtoApp() {
             style={{
               padding: "10px 18px",
               borderRadius: "999px",
-              border: tab.key === active ? "2px solid #1f3a5f" : "1px solid #ccc",
+              border:
+                tab.key === active ? "2px solid #1f3a5f" : "1px solid #ccc",
               background: tab.key === active ? "#1f3a5f" : "#fff",
               color: tab.key === active ? "#fff" : "#20232a",
               fontWeight: 600,
