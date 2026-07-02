@@ -40,7 +40,7 @@ const GRID_SPACING = 1.42;
 const GRID_HALF = 1.5 * GRID_SPACING;
 const GRID_Y_OFFSET = 0.6;
 const GRID_BOX_HALF = GRID_HALF + CONTAINER_HALF;
-const DOCK_FRAME_PAD = 0.3;
+const DOCK_FRAME_PAD = 0.15;
 const DOCK_FRAME_W = GRID_BOX_HALF * 2 + DOCK_FRAME_PAD;
 const DOCK_FRAME_H = GRID_BOX_HALF * 2 + DOCK_FRAME_PAD;
 const DOCK_FRAME_D = 1.3;
@@ -241,11 +241,7 @@ function DockFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
         <planeGeometry
           args={[DOCK_FRAME_W * 0.5, (DOCK_FRAME_W * 0.5) / 5.9]}
         />
-        <meshBasicMaterial
-          alphaMap={wordmark}
-          alphaTest={0.15}
-          color="#20232a"
-        />
+        <meshBasicMaterial map={wordmark} transparent />
       </mesh>
     </group>
   );
@@ -272,7 +268,7 @@ function Rig({
   const bValue = useRef(0);
 
   const camDrift = useMemo(() => new Vector3(0, 0.8, 12.5), []);
-  const camDock = useMemo(() => new Vector3(0, 1.4, 13.2), []);
+  const camDock = useMemo(() => new Vector3(0, 1.4, 16.5), []);
   const camDisperse = useMemo(() => new Vector3(0, 1.0, 17.5), []);
   const tmp = useMemo(() => new Vector3(), []);
 
