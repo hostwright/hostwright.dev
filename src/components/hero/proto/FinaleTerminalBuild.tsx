@@ -10,55 +10,44 @@ import { useEffect, useRef } from "react";
 import type { Group } from "three";
 import { smoothstep } from "./finaleShared";
 
-// Concept D (act 4, after the shelf): a real `plan` -> `apply` transcript
-// runs in a terminal on the left, reusing the site's own canonical example
-// stack (service/redis + service/api, from data/homepage.ts's manifestExample)
-// — not invented content. The moment "starting <service> ... healthy" finishes
-// typing, that service's layer physically stacks in on the right: redis first
-// (the dependency), api on top of it (built on it) — a literal infra stack.
+// Concept D (act 4, after the shelf): a real `plan` -> `apply` transcript runs
+// in a terminal on the left; a 5-service stack builds on the right. Only the
+// two command lines a human "types" get a typewriter effect — every output
+// line snaps in fast with a short stagger, like real stdout, not a slow
+// character-by-character crawl. Loop is short and punchy on purpose.
 
-const LOOP = 10;
+const LOOP = 6.5;
 
 type LineKind = "cmd" | "muted" | "add" | "ok" | "blank";
 
 const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
   { text: "$ hostwright plan", kind: "cmd", start: 0.0, dur: 0.05 },
-  { text: "∙ reading hostwright.yaml", kind: "muted", start: 0.06, dur: 0.05 },
-  { text: "∙ validating manifest … ok", kind: "muted", start: 0.12, dur: 0.05 },
-  {
-    text: "  + create   service/redis   redis:7",
-    kind: "add",
-    start: 0.18,
-    dur: 0.06,
-  },
-  {
-    text: "  + create   service/api     ghcr.io/example/api:latest",
-    kind: "add",
-    start: 0.25,
-    dur: 0.07,
-  },
-  {
-    text: "  plan: 2 to create, 0 to change, 0 to destroy",
-    kind: "muted",
-    start: 0.33,
-    dur: 0.06,
-  },
-  { text: "", kind: "blank", start: 0.4, dur: 0 },
-  { text: "$ hostwright apply", kind: "cmd", start: 0.44, dur: 0.05 },
-  { text: "∙ starting redis … healthy", kind: "muted", start: 0.51, dur: 0.05 },
-  { text: "∙ starting api … healthy", kind: "muted", start: 0.58, dur: 0.05 },
-  {
-    text: "✓ applied — 2 running, 0 pending",
-    kind: "ok",
-    start: 0.66,
-    dur: 0.06,
-  },
+  { text: "∙ reading hostwright.yaml", kind: "muted", start: 0.06, dur: 0.02 },
+  { text: "∙ validating manifest … ok", kind: "muted", start: 0.09, dur: 0.02 },
+  { text: "  + create   service/postgres  postgres:16", kind: "add", start: 0.13, dur: 0.02 },
+  { text: "  + create   service/redis     redis:7", kind: "add", start: 0.16, dur: 0.02 },
+  { text: "  + create   service/api       ghcr.io/example/api", kind: "add", start: 0.19, dur: 0.02 },
+  { text: "  + create   service/worker    ghcr.io/example/worker", kind: "add", start: 0.22, dur: 0.02 },
+  { text: "  + create   service/nginx     nginx:1.27", kind: "add", start: 0.25, dur: 0.02 },
+  { text: "  plan: 5 to create, 0 to change, 0 to destroy", kind: "muted", start: 0.29, dur: 0.02 },
+  { text: "", kind: "blank", start: 0.34, dur: 0 },
+  { text: "$ hostwright apply", kind: "cmd", start: 0.37, dur: 0.05 },
+  { text: "∙ starting postgres … healthy", kind: "muted", start: 0.44, dur: 0.02 },
+  { text: "∙ starting redis … healthy", kind: "muted", start: 0.51, dur: 0.02 },
+  { text: "∙ starting api … healthy", kind: "muted", start: 0.58, dur: 0.02 },
+  { text: "∙ starting worker … healthy", kind: "muted", start: 0.65, dur: 0.02 },
+  { text: "∙ starting nginx … healthy", kind: "muted", start: 0.72, dur: 0.02 },
+  { text: "✓ applied — 5 running, 0 pending", kind: "ok", start: 0.79, dur: 0.03 },
 ];
 
-// index into LINE whose completion triggers each layer stacking in.
+// index into LINE whose completion triggers each layer stacking in, bottom
+// to top: data layer first, gateway last — a real dependency order.
 const LAYERS = [
-  { label: "redis", lineIndex: 8 },
-  { label: "api", lineIndex: 9 },
+  { label: "postgres", lineIndex: 11 },
+  { label: "redis", lineIndex: 12 },
+  { label: "api", lineIndex: 13 },
+  { label: "worker", lineIndex: 14 },
+  { label: "nginx", lineIndex: 15 },
 ];
 
 const KIND_COLOR: Record<LineKind, string> = {
@@ -77,9 +66,11 @@ function ClockBridge({ onTick }: { onTick: (t: number) => void }) {
 }
 
 const STACK_X = 3.2;
-const LAYER_H = 0.72;
-const LAYER_GAP = 0.16;
-const BASE_Y = -1.0;
+const LAYER_H = 0.6;
+const LAYER_GAP = 0.14;
+const STEP = LAYER_H + LAYER_GAP;
+const BASE_Y = -1.4;
+const STACK_CENTER_Y = BASE_Y + ((LAYERS.length - 1) * STEP) / 2;
 
 function Layer({
   index,
@@ -90,10 +81,10 @@ function Layer({
   label: string;
   groupRef: (el: Group | null) => void;
 }) {
-  const y = BASE_Y + index * (LAYER_H + LAYER_GAP);
+  const y = BASE_Y + index * STEP;
   return (
     <group ref={groupRef} position={[STACK_X, y, 0]} scale={0.001}>
-      <RoundedBox args={[2.6, LAYER_H, 1.7]} radius={0.12} smoothness={5}>
+      <RoundedBox args={[2.6, LAYER_H, 1.7]} radius={0.11} smoothness={5}>
         <meshPhysicalMaterial
           color="#7c80a4"
           roughness={0.38}
@@ -105,7 +96,7 @@ function Layer({
       </RoundedBox>
       <Text
         position={[0, 0, 0.87]}
-        fontSize={0.26}
+        fontSize={0.23}
         color="#f4f1ea"
         anchorX="center"
         anchorY="middle"
@@ -124,8 +115,8 @@ function Scene({
   const { camera } = useThree();
 
   useEffect(() => {
-    camera.position.set(0.6, 0.6, 11);
-    camera.lookAt(1.6, -0.2, 0);
+    camera.position.set(0.6, STACK_CENTER_Y * 0.4, 13.5);
+    camera.lookAt(STACK_X - 0.4, STACK_CENTER_Y, 0);
   }, [camera]);
 
   return (
@@ -141,7 +132,7 @@ function Scene({
         />
       ))}
       <ContactShadows
-        position={[STACK_X, BASE_Y - 0.42, 0]}
+        position={[STACK_X, BASE_Y - 0.36, 0]}
         opacity={0.32}
         scale={7}
         blur={2.6}
@@ -154,7 +145,7 @@ function Scene({
           form="rect"
           intensity={2.5}
           position={[2, 5, 4]}
-          scale={[10, 6, 1]}
+          scale={[10, 8, 1]}
           color="#ffffff"
         />
       </Environment>
@@ -168,20 +159,25 @@ export default function FinaleTerminalBuild() {
 
   const handleTick = (t: number) => {
     LINE.forEach((line, i) => {
+      const isTyped = line.kind === "cmd";
       const progress = smoothstep(
         line.start,
         line.start + Math.max(line.dur, 0.001),
         t,
       );
-      const chars = Math.floor(progress * line.text.length);
       const el = lineRefs.current[i];
-      if (el) el.textContent = line.text.slice(0, chars);
+      if (!el) return;
+      if (isTyped) {
+        el.textContent = line.text.slice(0, Math.floor(progress * line.text.length));
+      } else {
+        el.textContent = progress > 0.5 ? line.text : "";
+      }
     });
 
     LAYERS.forEach((l, i) => {
       const src = LINE[l.lineIndex];
       const doneAt = src.start + src.dur;
-      const pop = smoothstep(doneAt, doneAt + 0.06, t);
+      const pop = smoothstep(doneAt, doneAt + 0.05, t);
       const grp = layerRefs.current[i];
       if (grp) grp.scale.setScalar(Math.max(0.001, pop));
     });
@@ -190,7 +186,7 @@ export default function FinaleTerminalBuild() {
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <Canvas
-        camera={{ position: [0.6, 0.6, 11], fov: 34 }}
+        camera={{ position: [0.6, 0.2, 13.5], fov: 34 }}
         dpr={[1, 1.8]}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%", background: "#f4f1ea" }}
@@ -244,10 +240,10 @@ export default function FinaleTerminalBuild() {
             margin: 0,
             padding: "16px 18px",
             fontFamily: "ui-monospace, monospace",
-            fontSize: "13px",
-            lineHeight: 1.85,
+            fontSize: "12.5px",
+            lineHeight: 1.75,
             whiteSpace: "pre-wrap",
-            minHeight: "13rem",
+            minHeight: "17rem",
           }}
         >
           {LINE.map((line, i) => (
