@@ -198,12 +198,12 @@ function DockFrame({ frameRef }: { frameRef: React.RefObject<Group | null> }) {
         smoothness={5}
       >
         <meshPhysicalMaterial
-          color="#b7bac2"
-          roughness={0.32}
-          metalness={0.5}
-          clearcoat={0.4}
-          clearcoatRoughness={0.25}
-          envMapIntensity={1.0}
+          color="#aeb2bc"
+          roughness={0.22}
+          metalness={0.8}
+          clearcoat={0.85}
+          clearcoatRoughness={0.12}
+          envMapIntensity={1.5}
         />
       </RoundedBox>
       <mesh position={[0, DOCK_FRAME_H / 2 - 0.02, 0]}>
