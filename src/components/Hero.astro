@@ -51,7 +51,13 @@ const stations = [
       </div>
 
       <!-- Phase 3 — disperse onto the H. Each feature's name floats above
-           its own container in 3D; no separate caption needed here. -->
+           its own container in 3D; this closes the loop below the shelf. -->
+      <div class="ov ov-3" aria-hidden="true">
+        <p class="ov-lead">
+          Six steps, one loop. Every apply runs the same way, in order,
+          every time.
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -68,7 +74,8 @@ const stations = [
   }
   .hero-stage,
   .hero-scrim,
-  .ov-2 {
+  .ov-2,
+  .ov-3 {
     display: none;
   }
   .hero-inner {
@@ -149,6 +156,13 @@ const stations = [
       align-items: center;
       text-align: center;
     }
+    .ov-3 {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: center;
+      padding-bottom: clamp(var(--space-8), 6vw, var(--space-10));
+    }
     .ov-1 {
       align-items: flex-start;
     }
@@ -156,6 +170,9 @@ const stations = [
       opacity: 1;
     }
     [data-phase="2"] .ov-2 {
+      opacity: 1;
+    }
+    [data-phase="3"] .ov-3 {
       opacity: 1;
     }
 
