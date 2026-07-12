@@ -11,6 +11,8 @@ snapshots, the event ledger, operation records, ownership records, health
 results, restart policy state, restart recovery records, and operation recovery
 groups with step-level checkpoints.
 
+![An explicit SQLite state database feeding a ledger of desired, observed, events, operations, ownership, health, and recovery records, read back by the read-only events, recovery, and diagnostics commands.](/diagrams/15-state-ledger.png)
+
 ## Explicit paths only
 
 Hostwright **never chooses a database path for you**. There is no default under

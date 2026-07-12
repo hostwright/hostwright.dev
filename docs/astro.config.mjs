@@ -13,6 +13,29 @@ export default defineConfig({
       logo: { src: "./src/assets/hostwright-mark.png", alt: "Hostwright" },
       favicon: "/favicon.ico",
       customCss: ["./src/styles/theme.css"],
+      head: [
+        {
+          tag: "meta",
+          attrs: {
+            property: "og:image",
+            content: "https://docs.hostwright.dev/og.png",
+          },
+        },
+        {
+          tag: "meta",
+          attrs: {
+            name: "twitter:card",
+            content: "summary_large_image",
+          },
+        },
+        {
+          tag: "meta",
+          attrs: {
+            name: "twitter:image",
+            content: "https://docs.hostwright.dev/og.png",
+          },
+        },
+      ],
       plugins: [starlightLinksValidator()],
       social: [
         {
