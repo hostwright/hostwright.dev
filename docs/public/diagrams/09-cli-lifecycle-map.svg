@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="440" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
+  <title id="title">Hostwright CLI lifecycle map</title>
+  <desc id="desc">A clean lifecycle diagram showing implemented Hostwright CLI commands followed by planned commands.</desc>
+
+  <defs>
+    <style>
+      .bg { fill: #faf9f6; }
+      .card { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box { fill: #faf9f6; stroke: #202327; stroke-width: 1.9; }
+      .boxPlanned { fill: #faf9f6; stroke: #5a5f67; stroke-width: 1.9; stroke-dasharray: 7 7; }
+      .divider { stroke: #e4e1da; stroke-width: 1.4; }
+      .arrow { stroke: #202327; stroke-width: 1.9; fill: none; marker-end: url(#arrowHead); }
+      .arrowPlanned { stroke: #5a5f67; stroke-width: 1.9; fill: none; stroke-dasharray: 7 7; marker-end: url(#arrowHeadPlanned); }
+      .text { fill: #202327; font-family: Arial, Helvetica, sans-serif; }
+      .muted { fill: #646973; font-family: Arial, Helvetica, sans-serif; }
+      .plannedText { fill: #5a5f67; font-family: Arial, Helvetica, sans-serif; }
+    </style>
+
+    <marker id="arrowHead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#202327"/>
+    </marker>
+
+    <marker id="arrowHeadPlanned" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#5a5f67"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="720" height="440"/>
+  <rect class="card" x="32" y="56" width="656" height="332" rx="16"/>
+
+  <!-- Legend -->
+  <text class="muted" x="252" y="122" text-anchor="middle" font-size="14" font-weight="700">solid: implemented today</text>
+  <text class="plannedText" x="590" y="122" text-anchor="middle" font-size="14" font-weight="700">dashed: planned</text>
+
+  <!-- Split line -->
+  <line class="divider" x1="466" y1="142" x2="466" y2="326"/>
+
+  <!-- Baseline geometry:
+       all boxes are 74x56, all centers sit on y=204,
+       all arrows are horizontal and centered on the same y. -->
+
+  <!-- Implemented commands -->
+  <rect class="box" x="68" y="176" width="74" height="56" rx="8"/>
+  <rect class="box" x="166" y="176" width="74" height="56" rx="8"/>
+  <rect class="box" x="264" y="176" width="74" height="56" rx="8"/>
+  <rect class="box" x="362" y="176" width="74" height="56" rx="8"/>
+
+  <!-- Planned commands -->
+  <rect class="boxPlanned" x="506" y="176" width="74" height="56" rx="8"/>
+  <rect class="boxPlanned" x="616" y="176" width="74" height="56" rx="8"/>
+
+  <!-- Command labels -->
+  <text class="text" x="105" y="210" text-anchor="middle" font-size="15" font-weight="500">init</text>
+  <text class="text" x="203" y="210" text-anchor="middle" font-size="15" font-weight="500">validate</text>
+  <text class="text" x="301" y="210" text-anchor="middle" font-size="15" font-weight="500">plan</text>
+  <text class="text" x="399" y="210" text-anchor="middle" font-size="15" font-weight="500">doctor</text>
+  <text class="plannedText" x="543" y="210" text-anchor="middle" font-size="15" font-weight="500">apply</text>
+  <text class="plannedText" x="653" y="210" text-anchor="middle" font-size="15" font-weight="500">down</text>
+
+  <!-- Centered arrows -->
+  <path class="arrow" d="M142 204 H160"/>
+  <path class="arrow" d="M240 204 H258"/>
+  <path class="arrow" d="M338 204 H356"/>
+  <path class="arrowPlanned" d="M436 204 H500"/>
+  <path class="arrowPlanned" d="M580 204 H610"/>
+
+  <!-- Captions -->
+  <text class="muted" x="105" y="292" text-anchor="middle" font-size="12" font-weight="500">
+    <tspan x="105" dy="0">create local</tspan>
+    <tspan x="105" dy="16">scaffold</tspan>
+  </text>
+
+  <text class="muted" x="203" y="292" text-anchor="middle" font-size="12" font-weight="500">
+    <tspan x="203" dy="0">check</tspan>
+    <tspan x="203" dy="16">manifest</tspan>
+  </text>
+
+  <text class="muted" x="301" y="292" text-anchor="middle" font-size="12" font-weight="500">
+    <tspan x="301" dy="0">manifest</tspan>
+    <tspan x="301" dy="16">plan</tspan>
+  </text>
+
+  <text class="muted" x="399" y="292" text-anchor="middle" font-size="12" font-weight="500">
+    <tspan x="399" dy="0">safe local</tspan>
+    <tspan x="399" dy="16">checks</tspan>
+  </text>
+
+  <text class="plannedText" x="543" y="258" text-anchor="middle" font-size="12" font-weight="500">Planned</text>
+  <text class="plannedText" x="543" y="292" text-anchor="middle" font-size="12" font-weight="500">
+    <tspan x="543" dy="0">mutate</tspan>
+    <tspan x="543" dy="16">runtime</tspan>
+  </text>
+
+  <text class="plannedText" x="653" y="258" text-anchor="middle" font-size="12" font-weight="500">Planned</text>
+  <text class="plannedText" x="653" y="292" text-anchor="middle" font-size="12" font-weight="500">
+    <tspan x="653" dy="0">safe cleanup</tspan>
+    <tspan x="653" dy="16">plan</tspan>
+  </text>
+
+  <!-- Bottom caption -->
+  <text class="muted" x="360" y="354" text-anchor="middle" font-size="14" font-weight="500">Solid commands are implemented today; dashed commands are planned.</text>
+</svg>

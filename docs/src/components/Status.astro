@@ -1,0 +1,19 @@
+---
+// Status marker required by the Phase-37 copy rules: every claim about
+// non-current behavior must be labeled. Kinds mirror the core repo's
+// vocabulary: implemented, planned, deferred, rejected, research-only.
+interface Props {
+  kind: "implemented" | "planned" | "deferred" | "rejected" | "research-only";
+}
+
+const { kind } = Astro.props;
+const labels: Record<Props["kind"], string> = {
+  implemented: "Implemented",
+  planned: "Planned",
+  deferred: "Deferred",
+  rejected: "Rejected",
+  "research-only": "Research only",
+};
+---
+
+<span class={`hw-status hw-status--${kind}`}>{labels[kind]}</span>

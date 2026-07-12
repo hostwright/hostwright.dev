@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 460" role="img" aria-labelledby="title desc">
+  <title id="title">Declared versus actual reconciliation motif</title>
+  <desc id="desc">Two columns, declared and actual state, joined by a reconciliation line.</desc>
+  
+    <style><![CDATA[
+      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
+      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
+      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
+      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
+      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
+      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
+      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
+      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
+      .hair { stroke: #e4e1da; stroke-width: 1.5; }
+    ]]></style>
+    
+  <defs>
+    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
+    </marker>
+    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="560" height="460" fill="#faf9f6"/>
+<rect x="150" y="110" width="46" height="230" rx="6" fill="#202327"/>
+<rect x="364" y="110" width="46" height="230" rx="6" fill="#202327"/>
+<path d="M 196 225 L 364 225" stroke="#1f3a5f" stroke-width="14" stroke-linecap="square"/>
+<circle cx="280" cy="225" r="12" fill="#1f3a5f"/>
+<text x="173" y="90" class="small" text-anchor="middle">Declared</text>
+<text x="387" y="90" class="small" text-anchor="middle">Actual</text>
+<text x="280" y="382" class="small" text-anchor="middle">reconciliation line</text>
+</svg>

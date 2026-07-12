@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-labelledby="title desc">
+  <title id="title">Apple container responsibility split</title>
+  <desc id="desc">Responsibility split between what Hostwright owns and what Apple&#x27;s container runtime owns.</desc>
+  
+    <style><![CDATA[
+      .label { font-family: Helvetica, Arial, sans-serif; fill: #202327; font-size: 18px; font-weight: 600; }
+      .small { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 13px; font-weight: 400; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #202327; font-size: 15px; }
+      .tiny { font-family: Helvetica, Arial, sans-serif; fill: #646973; font-size: 11px; }
+      .box { fill: #f3f1ec; stroke: #e4e1da; stroke-width: 1.5; }
+      .box-ink { fill: #f3f1ec; stroke: #202327; stroke-width: 1.5; }
+      .planned { stroke: #5a5f67; stroke-dasharray: 8 6; }
+      .arrow { stroke: #202327; stroke-width: 1.7; fill: none; marker-end: url(#arrowInk); }
+      .arrowAccent { stroke: #1f3a5f; stroke-width: 2; fill: none; marker-end: url(#arrowAccent); }
+      .hair { stroke: #e4e1da; stroke-width: 1.5; }
+    ]]></style>
+    
+  <defs>
+    <marker id="arrowInk" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
+    </marker>
+    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="720" height="520" fill="#faf9f6"/>
+<rect x="55" y="65" width="280" height="350" rx="8" class="box-ink" />
+<rect x="385" y="65" width="280" height="350" rx="8" class="box-ink" />
+<text x="195" y="98" class="label" text-anchor="middle" dominant-baseline="middle">Hostwright owns</text>
+<text x="525" y="98" class="label" text-anchor="middle" dominant-baseline="middle">Apple container owns</text>
+<text x="95" y="140" class="small" text-anchor="start">
+  <tspan x="95" dy="0">• declared state</tspan>
+  <tspan x="95" dy="18">• planning</tspan>
+  <tspan x="95" dy="18">• reconciliation</tspan>
+  <tspan x="95" dy="18">• health policy</tspan>
+  <tspan x="95" dy="18">• drift detection</tspan>
+  <tspan x="95" dy="18">• event log</tspan>
+  <tspan x="95" dy="18">• ownership-tracked cleanup</tspan>
+</text>
+<text x="425" y="140" class="small" text-anchor="start">
+  <tspan x="425" dy="0">• image pull</tspan>
+  <tspan x="425" dy="18">• VM lifecycle</tspan>
+  <tspan x="425" dy="18">• process exec</tspan>
+  <tspan x="425" dy="18">• runtime internals</tspan>
+  <tspan x="425" dy="18">• volumes</tspan>
+  <tspan x="425" dy="18">• network primitives</tspan>
+  <tspan x="425" dy="18">• Containerization behavior</tspan>
+</text>
+<path d="M 360 55 L 360 430" class="hair"/>
+<rect x="255" y="438" width="210" height="44" rx="8" class="box" />
+<text x="360" y="461" class="small" text-anchor="middle" dominant-baseline="middle">orchestrates, not reimplements</text>
+</svg>
