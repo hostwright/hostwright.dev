@@ -1,0 +1,69 @@
+---
+title: Release process
+description: Tag policy, the release ladder, the source-only artifact policy, and the fail-closed gates between alpha, beta, and any future binary distribution.
+---
+
+Hostwright uses internal `phase-*` tags for engineering checkpoints and
+semantic `v*` tags for public releases. GitHub Releases are created only for
+`v*` tags.
+
+## Release ladder
+
+1. `v0.1.0-alpha.1` — current target, GitHub pre-release, **source-only**
+2. `v0.1.0-alpha.2`
+3. `v0.1.0-beta.1`
+4. `v0.1.0`
+5. `v1.0.0` — only after real users, operational feedback, compatibility
+   stability, and a separate maintainer decision
+
+## Artifact policy
+
+The alpha provides source only: no binary attachments, installer packages,
+Homebrew formula, or signing/notarization claims. This is enforced by two
+fail-closed gates, both documentation-and-review policy in the current tree:
+
+- **Distribution readiness** — before any binary, installer, install script,
+  Homebrew formula, SBOM, or provenance claim, a release run must start from a
+  clean public `v*` tag and produce matching evidence: Developer ID signing
+  and verification, notarization and stapling, Gatekeeper assessment,
+  checksums, SBOM and provenance records, and install/upgrade/downgrade/
+  uninstall smoke tests. None of that evidence exists today, so binary
+  publication stays blocked.
+- **Beta readiness** — before any beta tag: clean-checkout source install
+  proof, hosted CI, the full local gate, runtime proof (or an explicitly
+  recorded blocker), docs/limitations alignment, state upgrade evidence,
+  telemetry and support policy review, and maintainer approval. The checklist
+  existing does not create beta support by itself.
+
+## Required gates before a release tag
+
+```bash
+swift build
+swift test list || swift test --list-tests
+swift test
+scripts/grep-orchard.sh .
+scripts/test.sh
+```
+
+Plus review gates: CI green on the release PR; README, CLI, install,
+compatibility, limitations, release notes, and security docs agree; no public
+doc claims production readiness, binaries, or unsupported compatibility; and
+the repository contains no local-only files.
+
+## Claim gates
+
+- **Benchmark gate** — no release notes or docs may claim performance numbers,
+  capacity, version compatibility, or battery/thermal behavior until a
+  clean-source reviewed hardware report passes with no blockers and exact
+  cleanup. Dirty, blocked, failed, fixture, or scripted reports never satisfy
+  it.
+- **Public education gate** — website and release copy must cite core
+  reference docs for current-support claims, link limitations near unsupported
+  behavior, and keep planned/deferred/rejected/research-only work visibly
+  separate. That rule is why every page on this site links back to the core
+  repository's docs.
+
+## Release notes
+
+Website release notes mirror `docs/release/` in the core repository and never
+create new release facts. See [v0.1.0-alpha.1](/release/v0-1-0-alpha-1/).

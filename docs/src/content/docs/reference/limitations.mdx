@@ -1,0 +1,127 @@
+---
+title: Limitations
+description: What Hostwright v0.1.0-alpha.1 can do, cannot do, and refuses to do — stated plainly. The authoritative support boundary.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Hostwright `v0.1.0-alpha.1` can model and attempt read-only runtime
+observation through the RuntimeAdapter, persist desired and observed state to
+an explicit SQLite path, compute deterministic plans, execute one tightly
+gated create/start/restart mutation per confirmed apply, read bounded logs,
+render and filter events, write a local redacted diagnostics bundle, run a
+foreground daemon loop with loopback health probes, and delete exact
+cleanup-eligible Hostwright-owned stopped/created/exited containers.
+
+**Hostwright is not production ready.**
+
+## Implemented today
+
+- CLI: `--version`, `init` (no overwrite), `validate`, `plan` (+ JSON),
+  `import-stack` (conversion only), `status` (manifest-only, or live with
+  `--state-db`), `apply` (one confirmed action), `logs` (bounded, redacted),
+  `events` (filterable ledger), `recovery` (diagnostic), `diagnostics`
+  (local redacted bundle), `cleanup` (dry-run + exact token), `doctor`
+  (safe checks + resource intelligence), `benchmark` (explicit local
+  evidence), `hostwrightd --foreground` (non-mutating loop).
+- Manifest: `version: 1` (versionless accepted as legacy), fail-closed
+  restricted parser, `imagePolicy: require-digest`, `secretEnv` with
+  `keychain://` references and an opt-in noninteractive read-only Keychain
+  backend, unsafe env-key and unsafe mount-source rejection.
+- Planning: deterministic plan hash, typed issues/drift/actions, local policy
+  decisions for ports, binds, mounts, identities, images, secrets, lifecycle,
+  and accelerators.
+- Runtime: exact labeled Apple container 1.0.0 observation with network
+  metadata, collision-resistant versioned identifiers, exact ownership labels,
+  fail-closed parsing of unverified output, localhost-scoped port publishes.
+- State: explicit-path SQLite with checksummed contiguous migrations (schema
+  v6), future-schema refusal, event/operation/ownership/health/restart/recovery
+  records, cold backup/restore procedure, single-writer locking.
+- Safety: plan-hash-confirmed apply, intent persistence before mutation,
+  operation recovery groups with checkpoints, dry-run token-confirmed cleanup
+  of exact owned non-running containers only.
+- Policy and team workflow: local deterministic decisions, extension
+  declaration gates, explicit local team profiles with strict-only
+  requirements, exact approval bindings, redacted append-only audit records.
+- Governance: source-only `v0.1.0-alpha.1` release packaging, distribution and
+  beta readiness gates as documentation, docs-site source-of-truth boundaries.
+
+## Not implemented today
+
+- General runtime mutation; multi-action apply; automatic rollback; image
+  replacement; user-facing stop/restart commands; attach, exec, log-follow,
+  detailed inspect; image or volume deletion; broad cleanup or garbage
+  collection.
+- Default live macOS Keychain activation in the CLI; Keychain writes/deletes/
+  prompts/access groups; registry credential storage; credential sync or
+  upload.
+- Registry interaction of any kind: image resolution, tag-to-digest lookup,
+  automatic pulls, signature verification, SBOM, vulnerability scanning,
+  provenance.
+- Background daemon service, launch agent, keepalive, or unattended daemon
+  mutation; aggressive restart loops.
+- Default state database path, hidden global state writes, online
+  backup/restore/repair, production durability guarantees.
+- General YAML parsing, broad stack-file import, orchestrator schema
+  compatibility, automatic manifest upgrade/downgrade.
+- DNS, service discovery, network aliases, reverse proxy, tunnels (Cloudflare,
+  Tailscale, WireGuard), mTLS provisioning, public exposure management.
+- Cloud control plane, web dashboard, GUI runtime, daemon API, remote policy
+  service, plugin loader, remote plugin registry.
+- Accelerators: Apple GPU, ANE, Metal, Core ML, MLX, PyTorch MPS, host-native
+  helpers, device exposure, accelerator-aware scheduling.
+- Performance claims: density measurement, VM-overhead measurement, battery or
+  thermal endurance testing, hosted benchmarks, capacity planning, published
+  performance comparisons.
+- Distribution: binaries, installers, Homebrew, signing, notarization, SBOM,
+  install scripts, upgrade/rollback proofs, beta release tags.
+- JSON output for `validate`, `apply`, `logs`, and `cleanup` success paths;
+  shell completion installation.
+- Guaranteed Apple container observation on every machine; broad non-empty
+  Apple container JSON parsing beyond the verified shapes; localhost HTTP
+  reachability evidence on the current proof host.
+
+## Explicitly out of scope for the first supported release
+
+CRI shim; Kubernetes compatibility, API server, kubelet replacement,
+scheduler, PodSandbox, CNI; full Docker Compose parity; Docker API shim;
+Testcontainers compatibility; attach/exec/log-follow/port-forward
+compatibility; external scheduler APIs; multi-Mac orchestration, remote host
+agents, membership, peer discovery, state replication, remote mutation; local
+DNS resolver; tunnel integration; cloud control plane; GPU/ANE scheduling and
+accelerator support promises; automatic destructive garbage collection;
+privileged helpers without a design record and threat model.
+
+## Parser limitation
+
+The manifest parser is not a general YAML parser: it accepts only the
+documented subset and fails closed on unsupported YAML features, unsupported
+versions, unknown orchestrator fields, unsafe env keys, and unsafe mount
+sources. The stack importer converts only the reviewed import subset and fails
+closed on everything else. External orchestration compatibility and multi-host
+platform work are **research-only** — see [Research areas](/roadmap/research/).
+
+## Runtime truth
+
+`plan` renders deterministic planning output without live observation by
+default. `status --state-db` performs live observation but does not prove
+reachability or application-level health beyond observed runtime state. The
+observation parser accepts only reviewed shapes and fails closed otherwise.
+Apply uses `container create` / `start` / internal `stop`+`start` /
+`delete` only under the gates described in the
+[safety model](/concepts/safety-model/). Recovery is diagnostic and manual;
+diagnostics are local and manual; doctor's resource intelligence records
+explicit `unmeasured` dimensions; `benchmark` records local evidence only.
+
+## State truth
+
+The SQLite store writes only to explicit caller-supplied paths — never the
+repository, Application Support, XDG locations, or any global directory.
+Apply, status, logs, events, diagnostics, cleanup, and the foreground daemon
+touch state only through explicit `--state-db` paths.
+
+<Aside type="note">
+This page mirrors `docs/reference/limitations.md` in the core repository,
+which is the reviewed source of truth. If they ever disagree, the core
+repository wins.
+</Aside>

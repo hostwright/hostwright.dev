@@ -1,0 +1,49 @@
+---
+title: Compatibility
+description: The supported environment for v0.1.0-alpha.1 — Apple silicon, macOS 26+, SwiftPM, Apple container CLI, explicit SQLite paths, source-only artifacts.
+---
+
+Hostwright `v0.1.0-alpha.1` is a source-only alpha and is not production
+ready. Beta readiness criteria exist as a checklist, but no beta compatibility
+claim exists until a beta tag is approved and release notes are published.
+
+## Compatibility matrix
+
+| Area | Supported for `v0.1.0-alpha.1` | Notes |
+| --- | --- | --- |
+| CPU | Apple silicon only | Intel Macs are outside first alpha scope. |
+| macOS | macOS 26 or newer | Older versions are outside first alpha scope. |
+| Build system | Swift Package Manager | `Package.swift` declares macOS 26. |
+| Swift tools | Swift 6.2+ expected | Local verification used Swift 6.3.3 via full Xcode developer tools. |
+| Runtime | Apple container CLI | Required for observation, apply, logs, status, cleanup. |
+| Resource intelligence | Local host facts + explicit evidence-gated benchmark | Doctor stays read-only; benchmark measures a local pre-existing image with bounded samples and exact cleanup. No capacity guarantee. |
+| State | Explicit SQLite database path | No default state path exists. |
+| Artifact | Source only | No binaries, installers, Homebrew, signing, or notarization. |
+| Beta readiness | Checklist only | Defines required evidence before any beta tag; creates no beta support by itself. |
+
+## SwiftPM platform
+
+```swift
+platforms: [.macOS(.v26)]
+```
+
+Locally validated with Swift 6.3.3.
+
+## Runtime limitation
+
+The package can express macOS 26, but runtime compatibility is not complete.
+Read-only observation is implemented for **verified** Apple container output
+shapes; unsupported output fails closed instead of being guessed. Runtime
+mutation remains narrow: create one missing managed service, start or restart
+one restart-policy-allowed managed service, delete one exact cleanup-eligible
+managed container after token confirmation, or run an explicitly confirmed
+bounded benchmark with exact cleanup.
+
+## Resource intelligence limitation
+
+`hostwright doctor` reports local host facts (architecture, macOS major
+version, physical memory, processor count, thermal state). It does not run
+Apple container commands or infer production capacity. `hostwright benchmark`
+is a separate explicitly confirmed local path recording exact versions and
+bounded samples for one host and commit — local evidence, not a comparative or
+capacity claim.

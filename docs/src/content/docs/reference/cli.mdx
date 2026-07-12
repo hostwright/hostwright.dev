@@ -1,0 +1,194 @@
+---
+title: CLI reference
+description: Every hostwright and hostwrightd command, flag, output mode, and exit code.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The `hostwright` CLI is dependency-free, with narrow RuntimeAdapter-backed
+operation gates. Two executables exist: `hostwright` and the foreground daemon
+`hostwrightd`.
+
+## Command surface
+
+```bash
+hostwright --version
+hostwright init
+hostwright import-stack <path> [--output text|json] [--team-profile <path>]
+hostwright validate [path] [--team-profile <path>]
+hostwright plan [path] [--output text|json] [--team-profile <path>]
+hostwright status [path] [--state-db <path>] [--output text|json]
+hostwright apply [path] --state-db <path> --confirm-plan <hash> [--team-profile <path> --approval-record <path>]
+hostwright logs <service> [path] [--tail <n>] [--state-db <path>]
+hostwright events --state-db <path> [--project <name>] [--type <event>] [--service <name>] [--severity info|warning|error] [--limit <n>] [--sort asc|desc] [--output text|json]
+hostwright recovery --state-db <path> [--project <name>] [--output text|json]
+hostwright diagnostics --state-db <path> --bundle <path> [--project <name>] [--manifest <path>]
+hostwright cleanup [path] --state-db <path> --dry-run [--team-profile <path>]
+hostwright cleanup [path] --state-db <path> --confirm-cleanup <token> [--team-profile <path> --approval-record <path>]
+hostwright benchmark --image <local-image> --samples <3-10> --report <path> --source-commit <40-hex> --source-dirty <true|false> --expected-container-version <version> [--attended-sleep-wake-seconds <15-300>] --confirm-live
+hostwright doctor [--output text|json]
+hostwrightd --foreground --config <hostwright.yaml> --state-db <path> [options]
+```
+
+## Output modes
+
+Text is the default everywhere. `import-stack`, `plan`, `status`, `events`,
+`recovery`, and `doctor` also accept `--output json`. JSON output never
+changes behavior, state writes, observation, or mutation gates.
+
+When JSON mode is requested and the CLI can classify the failure, stderr uses:
+
+```json
+{"code":"HW-CLI-001","exitCode":64,"kind":"error","message":"..."}
+```
+
+Manifest failures use an `issues` array with stable codes. `doctor --output
+json` reports compatibility failures as a normal doctor document on stdout
+with `hasFailures: true` and exit code 65, not as an error envelope.
+
+## Exit codes
+
+| Exit code | Category |
+| ---: | --- |
+| `0` | Success |
+| `64` | Usage — unsupported flags, missing arguments, refused overwrite, local non-manifest file I/O failure |
+| `65` | Validation — missing/unreadable manifest, manifest/profile/approval validation, compatibility failure |
+| `66` | State unavailable — explicit SQLite path could not be opened, migrated, verified, locked, or read |
+| `69` | Runtime unavailable or evidence blocked |
+| `70` | Confirmation mismatch — plan hash, cleanup token, or approval binding does not match |
+| `71` | Unsafe operation — safety policy blocked mutation |
+| `72` | Partial failure — mixed cleanup outcome or failed benchmark evidence |
+
+The stable `HW-*` diagnostic codes are on the
+[error codes page](/reference/error-codes/).
+
+## `hostwright --version`
+
+Prints `0.1.0-alpha.1`.
+
+## `hostwright init`
+
+Creates `hostwright.yaml` in the current directory **only when it does not
+already exist**. `--force` is not implemented; existing manifests are never
+overwritten (`HW-CLI-002`, exit 64).
+
+## `hostwright import-stack <path>`
+
+Converts a narrow safe stack-file subset and prints `hostwright.yaml` text to
+stdout. Writes nothing, observes nothing, contacts nothing. Unsupported fields
+(build contexts, named volumes, `secrets`, `configs`, `env_file`,
+`depends_on`, `deploy`, networking/DNS fields, shell health checks) fail
+closed with stable diagnostics. See [Import a stack file](/tasks/stack-import/).
+
+## `hostwright validate [path]`
+
+Validates the restricted manifest shape. Does not contact registries or Apple
+container, does not check whether images exist remotely, does not mutate. With
+`--team-profile`, also enforces the profile's strict-only requirements and
+prints the profile and manifest SHA-256 hashes.
+
+## `hostwright plan [path]`
+
+Reads and validates the manifest, maps it to runtime-shaped desired state,
+runs planning policy checks, and prints a non-mutating dry-run plan with a
+deterministic `planHash`, typed issues, typed actions, and an explicit
+execution-unavailable notice. `plan` does not inspect Apple container by
+default (`observationConnected: false`).
+
+## `hostwright apply [path] --state-db <path> --confirm-plan <hash>`
+
+The narrow confirmed apply gate. Validates, observes live runtime state,
+recomputes the plan, requires the supplied hash to match, persists desired
+state, observed state, operation intent, and an apply-start event **before**
+mutation, then executes exactly one action: `createMissingService`, a
+restart-policy-allowed `startManagedService`, or a restart-policy-allowed
+`restartManagedService`. Records recovery groups, checkpoints, and redacted
+manual recovery hints, then success/failure events.
+
+Refusal conditions include: missing `--state-db` or `--confirm-plan`, hash
+mismatch, failed observation, plan blockers, zero or multiple executable
+actions, create actions with mounts/privileged ports/broad bind
+addresses/flag-like values, unconfirmed local image, non-matching
+start/restart preconditions, an active operation lease, or a missing/mismatched
+team approval. Ports are published to `127.0.0.1` by default. See the
+[safety model](/concepts/safety-model/).
+
+## `hostwright status [path] [--state-db <path>]`
+
+Without `--state-db`: manifest-level status only (a missing manifest is a
+validation failure, not a success). With `--state-db`: observes Apple
+container, persists a status event and snapshot, and renders desired services
+against observed lifecycle/health/port facts. Never mutates.
+
+## `hostwright logs <service> [--tail <n>] [--state-db <path>]`
+
+Last log lines for a declared and observed Hostwright-managed service. Default
+tail 100, clamped at 1000. Output is redacted. No `--follow`, attach,
+interactive, or exec. With `--state-db`, persists a `logs.read` event.
+
+## `hostwright events --state-db <path>`
+
+Reads the SQLite event ledger in deterministic timestamp/id order, with
+`--project`, `--type`, `--service`, `--severity`, `--limit`, and `--sort`
+filters. Reads an already-migrated database only — never creates or migrates
+one as a side effect.
+
+## `hostwright recovery --state-db <path>`
+
+Reads operation recovery groups and steps; renders legacy restart recovery
+records for older databases. Distinguishes: no automatic recovery required,
+manual inspection required, and rollback unsupported. Active groups include
+redacted lock owner and lease expiry. Diagnostic only — no retries, no
+rollback, no runtime inspection.
+
+## `hostwright diagnostics --state-db <path> --bundle <path>`
+
+Writes a local redacted JSON bundle: telemetry policy (local-only), schema
+metadata, optional manifest summary, and redacted events, operations, health
+results, restart state, ownership records, and snapshots. Refuses to overwrite
+an existing bundle. Never uploads, never observes runtime, never creates or
+migrates a database.
+
+## `hostwright cleanup [path] --state-db <path> --dry-run | --confirm-cleanup <token>`
+
+Exactly one of `--dry-run` or `--confirm-cleanup` is required. The dry run
+classifies candidates (`eligible`, `ambiguous`, `stale`, `running`, `unknown`,
+`blocked`, `never-delete`) and prints an exact confirmation token. Confirmed
+cleanup deletes only `eligible` containers covered by the current token —
+never images, volumes, networks, or unmanaged containers, never `--all` or
+`--force`. Partial failure exits 72 and preserves successful deletions in the
+report.
+
+## `hostwright benchmark ... --confirm-live`
+
+<Aside type="caution" title="Explicitly mutating">
+Benchmark is separate from doctor and requires live confirmation, a
+pre-existing local image, a bounded sample count (3–10), explicit source
+evidence, and a non-existing report path.
+</Aside>
+
+Writes a schema-v2 JSON hardware report. Each iteration creates one unique
+labeled Hostwright-owned resource through the RuntimeAdapter, records
+boot/poll/stats samples, then deletes exactly that identifier and verifies
+absence. Never pulls images, never writes SQLite, never uploads. Exit 0 only
+when every dimension was measured and exact cleanup succeeded; 69 when
+evidence is blocked; 72 when command/identity/cleanup evidence failed. One
+report is local evidence only — not a capacity, compatibility, or performance
+claim.
+
+## `hostwright doctor [--output json]`
+
+Safe local checks only: OS version, architecture/macOS gate, Swift toolchain
+version, `container` executable lookup, manifest presence, state-path policy,
+telemetry policy, and a local resource-intelligence report with explicit
+`unmeasured` dimensions. Never runs Apple container commands. See
+[Doctor checks](/reference/doctor-checks/).
+
+## `hostwrightd --foreground --config <path> --state-db <path>`
+
+The foreground development daemon loop. Options: `--interval <seconds>`
+(default 30), `--jitter <seconds>` (default 5), `--max-backoff <seconds>`
+(default 300), `--max-iterations <count>`, `--lock-file <path>` (default
+`<state-db>.hostwrightd.lock`). Each iteration validates, observes, plans, and
+records events — it never calls the mutation hook, installs no launch agent,
+and performs no unattended mutation. See [Daemon](/operations/daemon/).

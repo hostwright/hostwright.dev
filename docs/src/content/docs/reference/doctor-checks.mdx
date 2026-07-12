@@ -1,0 +1,39 @@
+---
+title: Doctor checks
+description: Every safe local check hostwright doctor performs, and the hard boundary on what it will not do.
+---
+
+`hostwright doctor` performs safe local checks only.
+
+## Implemented checks
+
+- Operating system version string.
+- Apple silicon architecture and macOS 26+ compatibility gate.
+- Swift toolchain version, through a controlled `swift --version` process.
+- Apple container CLI presence — **executable lookup only**.
+- `hostwright.yaml` presence in the current directory.
+- Explicit state database path policy.
+- Local-only telemetry policy.
+- Resource intelligence: local host facts (architecture, macOS major version,
+  physical memory, processor count, current thermal state) with explicit
+  `unmeasured` benchmark dimensions and no capacity guarantee.
+
+If `container` is missing, doctor reports a warning instead of crashing.
+Compatibility failures in `--output json` appear as a normal doctor document
+with `hasFailures: true` and exit code 65.
+
+## Safety boundary
+
+`doctor` does not run Apple container commands. It does not inspect
+containers, networks, volumes, images, logs, or runtime state — runtime
+observation exists only behind the
+[RuntimeAdapter](/concepts/runtime-adapter/). Apple container's version is
+unavailable in live doctor output unless supplied by an injected or
+fixture-backed report.
+
+Boot latency, runtime density, VM overhead, polling overhead, sleep/wake
+behavior, battery behavior, and workload memory pressure remain **unmeasured**
+in doctor. `hostwright benchmark` is the separate, explicitly confirmed,
+mutating path that records local evidence for its supported bounded
+dimensions — see the [CLI reference](/reference/cli/). Doctor never fabricates
+a number it did not measure.

@@ -1,0 +1,68 @@
+---
+title: Research areas
+description: Work that has design research behind it but no implementation, no promise, and no timeline — external orchestration, multi-host, secure exposure, accelerators.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import Status from "../../../components/Status.astro";
+
+<Aside type="caution" title="Research is not a promise">
+Everything on this page is <strong>research-only</strong>. It informs
+decisions; it does not become a claim until working, tested code exists and a
+maintainer approves the support boundary. None of it is current support.
+</Aside>
+
+## External orchestration compatibility
+
+<Status kind="research-only" /> CRI shims, Kubernetes node behavior, Docker
+API shims, Testcontainers targets, full Compose parity, and
+attach/exec/log-follow/port-forward compatibility were studied and **rejected
+for current core**: those contracts require protocol, stream, lifecycle,
+state-authority, identity, networking, logging, and scheduler behavior outside
+Hostwright's local RuntimeAdapter scope. Any prototype requires a separate
+maintainer-approved issue with an exact-version conformance target.
+
+## Multi-host platform
+
+<Status kind="research-only" /> Remote host agents, membership services, peer
+discovery, state replication, remote mutation, remote placement, and scheduler
+APIs were studied and **kept out of current core**: they require host
+identity, enrollment, transport trust, state authority, quorum or replication
+semantics, failure recovery, audit, and revocation models the local state
+design deliberately does not have. Any future work would live in a separate
+prototype or repository.
+
+## Secure exposure
+
+<Status kind="research-only" /> Tunnels (Cloudflare, Tailscale, WireGuard),
+local DNS, reverse proxies, mTLS provisioning, and public exposure management
+have research records and fail-closed policy blockers today. Hostwright-created
+port publishes stay on `127.0.0.1`; anything broader is refused rather than
+half-supported.
+
+## Apple silicon accelerators
+
+<Status kind="research-only" /> The accelerator investigation found **no
+supported Apple-container path** for GPU, ANE, Metal, Core ML, MLX, or PyTorch
+MPS acceleration inside managed Linux containers. Hostwright therefore ships
+fail-closed accelerator policy decisions and makes no accelerator claims. Any
+change requires an official supported access path, a local disposable proof, a
+threat model, a policy gate, and maintainer approval.
+
+## Advisory scheduling — the deliberate exception
+
+<Status kind="implemented" /> Local **advisory** scheduling exists precisely
+because it stops short of the research areas above: it produces deterministic
+in-memory recommendations, scores, and reason codes from declared inputs and
+existing policy decisions. It does not reserve capacity, place workloads,
+expose a scheduler API, or schedule accelerators — and it stays advisory until
+separate placement evidence exists.
+
+## What would change these statuses
+
+Every research area has the same reconsideration gate: a separate
+maintainer-approved issue defining product placement (core, plugin, prototype,
+or separate repository), an explicit behavior contract with non-goals, a state
+and trust model, a disposable proof path, and documentation rules that keep
+claims scoped to evidence. Until then, these remain research — documented so
+you know they were considered, labeled so you never mistake them for features.

@@ -1,0 +1,57 @@
+---
+title: Policy reference
+description: The decision shape, current defaults, team policy boundary, and everything policy evaluation refuses to do.
+---
+
+Hostwright policy is local and deterministic. It explains why a planned input
+is allowed, warned, or blocked before any supported mutation path can run. The
+conceptual overview is in [Policy engine](/concepts/policy-engine/).
+
+## Decision shape
+
+Every policy decision includes:
+
+- `category` — the policy area, such as `port`, `mount`, `image`, `secret`, `cleanup`, or `accelerator`;
+- `reasonCode` — a stable machine-readable reason;
+- `severity` — `allow`, `warning`, or `blocker`;
+- `message` — human-readable explanation;
+- `remediation` — operator guidance;
+- `stableDetailKey` — deterministic ordering and comparison detail.
+
+## Current defaults
+
+- Host publishes remain localhost-first; broad bind addresses are blocked.
+- Duplicate desired host ports and observed non-target host-port conflicts are blocked.
+- Privileged host ports produce warnings in planning and are rejected by the create path before mutation.
+- Host-root and parent-traversal mount sources are blocked.
+- Secret-like environment values are redacted from plans; unresolved secret references block mutation.
+- Cleanup deletes only exact Hostwright-owned non-running eligible containers after dry-run token confirmation.
+- Unsupported manifest fields, secure exposure, broad lifecycle actions, and accelerator requests fail closed.
+- Stack-file import maps unsupported fields to stable policy reason codes.
+- Advisory scheduling consumes policy decisions for explanations and scores without changing the gates.
+- Extension declarations are evaluated as local data: built-in or reviewed-local non-mutating declarations can be allowed only when every required boundary (RuntimeAdapter, state, policy, redaction, audit, explicit paths, ownership, confirmation, no runtime mutation) is declared. Third-party, untrusted, runtime-mutation, state-write, networking, tunnel, secret-resolution, and accelerator declarations fail closed.
+- Team policy profiles are explicit local opt-in, versioned, and auditable. Operational profiles can only add **stricter** digest or manifest-review requirements. Approval records authorize one exact bound mutation; they never weaken required gates.
+
+## What policy does not do
+
+Policy evaluation does not:
+
+- run Apple container commands, or create/stop/start/restart/delete containers;
+- read or write SQLite directly;
+- contact registries, pull images, or verify signatures/SBOMs/provenance;
+- upload telemetry;
+- install DNS, tunnels, reverse proxies, or cloud integration;
+- convert Compose or orchestrator semantics into runtime behavior;
+- expose accelerators (GPU, ANE, Metal, Core ML, MLX, PyTorch MPS);
+- place workloads, reserve capacity, or expose a scheduler API;
+- load, install, distribute, or execute plugins, or contact a plugin registry;
+- provide a cloud team service, hosted audit log, central remote control, or remote policy distribution.
+
+## Team policy boundary
+
+There is no remote policy service, silent bypass, or runtime-mutating policy
+action. Team profiles are enforced by the command layer **only when an
+operator supplies their path** with `--team-profile`. Exact approval records
+authorize a reviewed operation without bypassing hard-coded safety gates. The
+operational flow, JSON schemas, and audit records are documented in
+[Team workflow](/operations/team-workflow/).

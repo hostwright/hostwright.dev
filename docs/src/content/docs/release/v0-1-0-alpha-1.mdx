@@ -1,0 +1,84 @@
+---
+title: v0.1.0-alpha.1
+description: Release notes for the first public Hostwright release — a source-only alpha pre-release. Mirrors the core repository's release notes.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Hostwright is a Mac-native desired-state control plane for Apple container
+workloads. `v0.1.0-alpha.1` is a **source-only alpha pre-release**. It is not
+production ready.
+
+<Aside type="note">
+This page mirrors `docs/release/v0.1.0-alpha.1-notes.md` in the core
+repository, which describes the release **as of that tag**. Work merged since
+the tag (the daemon foreground loop, managed restart, recovery groups, team
+workflow, secrets backend, and more) is documented across this site and lands
+in the next release's notes.
+</Aside>
+
+## What works at this tag
+
+- Swift Package Manager build for `hostwright` and `hostwrightd`.
+- `hostwright --version`, `init`, `validate`, `plan`, `doctor`.
+- Restricted `hostwright.yaml` manifest parsing and validation.
+- Deterministic plan and drift output.
+- Explicit SQLite state database paths.
+- RuntimeAdapter-backed Apple container observation for verified output shapes.
+- Narrow `hostwright apply` for one create-missing-service action or one
+  restart-policy-allowed managed start action.
+- `hostwright status --state-db <path>`.
+- Bounded `hostwright logs <service> --tail <n>`.
+- `hostwright events --state-db <path>`.
+- Ownership-scoped `hostwright cleanup` with dry-run and exact token
+  confirmation.
+
+## Compatibility
+
+| Area | Status |
+| --- | --- |
+| CPU | Apple silicon only |
+| OS | macOS 26 or newer |
+| Build toolchain | Swift 6.2+ through Xcode / full developer tools |
+| Runtime | Apple container CLI required for observation and mutation |
+| Package manager | Swift Package Manager |
+| Release artifact | Source only |
+
+## Install from source
+
+```bash
+git clone https://github.com/hostwright/hostwright.git
+cd hostwright
+git checkout v0.1.0-alpha.1
+swift build
+swift test
+swift run hostwright --version
+```
+
+No binary, installer package, Homebrew formula, signed artifact, or notarized
+artifact is provided for this alpha. See
+[Install from source](/getting-started/install-from-source/).
+
+## Security and safety notes
+
+- Runtime behavior goes through the RuntimeAdapter.
+- `apply` requires explicit `--state-db` and `--confirm-plan`.
+- Hostwright-created port publishes are localhost-scoped by default.
+- Cleanup requires explicit `--state-db`, dry-run, a confirmation token,
+  ownership records, live observation, exact owned identifiers, and
+  non-running lifecycle state; it never deletes images, volumes, networks, or
+  unmanaged containers.
+- Redaction applies to logs, events, runtime output, and state payloads — but
+  redaction is heuristic and may not cover every secret format.
+
+## Known limitations at this tag
+
+Not production ready. No daemon reconciliation loop at this tag (`hostwrightd`
+was a scaffold). No default state path, no multi-action apply, no stop or
+restart command, no image replacement or rollback, no image/volume/unmanaged
+cleanup, no Kubernetes/CRI/Docker API/Compose compatibility, no DNS, tunnels,
+cloud control plane, GPU/ANE scheduling, privileged helper, installer,
+signing, or notarization.
+
+The full, current support boundary — including everything added since this
+tag — is on [Limitations](/reference/limitations/).

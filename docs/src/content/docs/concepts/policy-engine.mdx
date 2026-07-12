@@ -1,0 +1,59 @@
+---
+title: Policy engine
+description: Deterministic, explainable, fail-closed local safety decisions — no remote policy service, no silent bypass, no policy-driven mutation.
+---
+
+Hostwright has a local policy module for deterministic and explainable safety
+decisions. The policy engine evaluates in memory: it does not call Apple
+container, write SQLite, contact registries, upload telemetry, or mutate
+runtime state.
+
+Every decision records a category, a stable reason code, severity, subject,
+message, and remediation text — so a blocked plan tells you *why* and *what to
+change*, not just "no".
+
+## Where policy runs
+
+- **Planner safety checks** — desired identities, host ports, bind addresses,
+  privileged ports, mounts, and secret-like environment values are evaluated
+  before becoming plan issues.
+- **Cleanup classification** — ownership-backed and observed-only resources are
+  classified through policy decisions, preserving the dry-run/token gates.
+- **Image policy** — `imagePolicy: require-digest` failures are explained
+  locally, without registry calls.
+- **Secret references** — unresolved references fail closed, without carrying
+  raw keychain labels in messages.
+- **Advisory scheduling** — the local scheduler reuses policy decisions as
+  explanation and scoring inputs; it never places workloads or reserves
+  capacity.
+
+## Categories
+
+| Category | Current behavior |
+| --- | --- |
+| Identity | Empty project or service identity blocks planning and mutation. |
+| Ports | Duplicate desired host ports and observed host-port conflicts are blockers. Privileged host ports are warnings (the create path rejects them before mutation anyway). |
+| Exposure | Broad bind addresses are blockers. Tunnels, DNS, cloud, and reverse-proxy scopes are unsupported. |
+| Mounts | Ambiguous references, host-root mounts, and parent-traversal sources are blockers. |
+| Images | `require-digest` failures are local string-policy blockers only — no registry lookups. |
+| Environment and secrets | Secret-like env values are redaction warnings; unresolved secret references are blockers before mutation. |
+| Cleanup | Only exact Hostwright-owned non-running containers can become eligible; everything else fails closed. |
+| Lifecycle | Only the narrow create, managed-start, managed-restart, and cleanup gates are allowed. Broad lifecycle actions are blockers. |
+| Untrusted manifests | Unsupported fields are blockers. |
+| Accelerators | GPU, ANE, Metal, Core ML, MLX, and accelerator scheduling are blockers in current core scope. |
+
+## Defaults and overrides
+
+The default policy is local, deterministic, and fail-closed. Current overrides
+are code-level configuration inputs only: the privileged-port warning
+threshold, the broad-bind block list, the redaction policy, and the image
+digest policy.
+
+There is **no** remote policy service, central policy distribution, silent
+bypass, policy-driven runtime mutation, or automatic remediation. The
+[team workflow](/operations/team-workflow/) layer consumes these deterministic
+decisions through explicit local profile and approval files; policy evaluation
+itself stays non-mutating and strict-only.
+
+Reason codes and profile mechanics are documented in the
+[policy reference](/reference/policy/).

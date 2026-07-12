@@ -1,0 +1,60 @@
+---
+title: Why Hostwright
+description: The motivation — a new Mac-native runtime surface, the value of local desired-state control, and the decisions that follow.
+---
+
+Hostwright exists because of a specific change in the Mac development landscape,
+and because of a gap that change leaves open.
+
+![Hostwright as a control layer between your services and Apple's container runtime on macOS.](/diagrams/13-hostwright-local-dev-stack.svg)
+
+## Apple container is a new runtime surface
+
+For years, running Linux containers on a Mac meant a shared Linux VM managed by a
+third-party tool. Apple container changes the substrate: it is Mac-native, built
+for Apple silicon, and uses a lightweight VM per container with an OCI image flow.
+
+A new runtime surface is worth building on directly rather than wrapping in older
+abstractions. But a runtime is not a workflow. Apple container can start and stop
+containers; it does not, by itself, give you a disciplined way to declare a
+multi-service stack, validate it, converge to it, and notice when reality drifts.
+
+## Local desired-state control is the missing layer
+
+Most developers running a local stack end up with a pile of imperative commands
+and a mental model of what *should* be running. That model is fragile. A
+desired-state layer makes it durable:
+
+- You declare the stack once.
+- Changes are planned before they happen.
+- Drift between declared and observed state is detected, not discovered by surprise.
+- Cleanup is ownership-aware instead of best-effort.
+
+This is the layer Hostwright provides. It borrows the *idea* of a control loop
+from systems like Kubernetes without borrowing their scope.
+
+## Why single-host first
+
+A single Mac is a complete, honest problem. It is also the problem most developers
+actually have. Trying to be a cluster orchestrator on day one would mean shipping
+a distributed system that is shallow everywhere instead of a local system that is
+deep where it matters. Single-host first is a scope decision that makes the first
+release defensible.
+
+## Why Swift
+
+The runtime substrate is Apple-native, so the control plane is too. Swift gives
+Hostwright direct access to macOS facilities — the Keychain, process control,
+system SQLite — and a path to Apple's Containerization APIs without a
+foreign-language bridge. A Swift daemon, CLI, and core library keep the whole
+system in one idiomatic, testable codebase, with no external package
+dependencies.
+
+## Why the RuntimeAdapter is the core boundary
+
+Apple container is young and will change. The single most important design
+decision is to route every runtime operation through one typed boundary — the
+[RuntimeAdapter](/concepts/runtime-adapter/) — so that runtime change is
+contained to one place. It is what lets Hostwright start on the Apple container CLI
+today and move to a native API later without rewriting the reconciler. The
+boundary is the project's insurance policy against a moving substrate.

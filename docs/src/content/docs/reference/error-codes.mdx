@@ -1,0 +1,58 @@
+---
+title: Error and exit codes
+description: Stable HW-* diagnostic codes and the process exit code categories, in one place.
+---
+
+Hostwright uses stable error codes for CLI and manifest diagnostics, and a
+small set of process exit categories. JSON mode reports classified failures
+with an envelope on stderr:
+
+```json
+{"code":"HW-CLI-001","exitCode":64,"kind":"error","message":"..."}
+```
+
+## Error codes
+
+| Code | Meaning | Status |
+| --- | --- | --- |
+| `HW-CLI-001` | Invalid CLI usage. | Implemented |
+| `HW-CLI-002` | Refused to overwrite an existing file. | Implemented for `init`, diagnostics bundles, benchmark reports |
+| `HW-CLI-003` | Confirmation token or plan hash mismatch. | Implemented for apply plan mismatch and cleanup token mismatch |
+| `HW-CLI-004` | Partial operation failure. | Implemented for cleanup partial failure |
+| `HW-CLI-005` | Local file I/O failed. | Implemented for `init` writes, stack-file import reads, diagnostics paths |
+| `HW-COMPAT-001` | Unsupported CPU architecture. | Implemented in compatibility/doctor model |
+| `HW-COMPAT-002` | Unsupported macOS version. | Implemented in compatibility/doctor model |
+| `HW-RUNTIME-001` | Runtime adapter unavailable. | Modelled |
+| `HW-RUNTIME-002` | Runtime mutation not implemented. | Modelled |
+| `HW-MANIFEST-001` | Manifest parsing failed. | Implemented |
+| `HW-MANIFEST-002` | Manifest validation failed. | Implemented, incl. invalid version shape, unsafe env/volume values, failed import output |
+| `HW-MANIFEST-003` | Unsupported manifest/YAML feature. | Implemented, incl. unsupported fields, older/newer versions, unsupported import fields |
+| `HW-MANIFEST-004` | Manifest file I/O failed. | Implemented for validate, plan, status, apply, logs, cleanup |
+| `HW-STATE-001` | State store unavailable. | Implemented for invalid paths, migration failure, incompatible/future schema, corrupt or locked database, read/write failures |
+| `HW-SECURITY-001` | Unsafe exposure. | Modelled |
+| `HW-TEAM-001` | Team profile malformed, unsupported, or violates required gates. | Implemented |
+| `HW-TEAM-002` | Approval record malformed, rejected, unsupported, or incomplete. | Implemented for profile-aware apply and confirmed cleanup |
+| `HW-TEAM-003` | Approval scope or profile/manifest/plan binding mismatch. | Implemented as confirmation mismatch before mutation |
+| `HW-BENCH-001` | Benchmark options or report contract invalid. | Implemented before file or runtime access |
+| `HW-BENCH-002` | Benchmark evidence blocked by missing capability or unmeasured dimension. | Implemented, exit 69, blocked report written |
+| `HW-BENCH-003` | Benchmark command, version, identity, ownership, report, or cleanup evidence failed. | Implemented, exit 72, failed report written when possible |
+
+"Modelled" means the code exists in the error model but the triggering surface
+is narrower than the general description.
+
+## Exit codes
+
+| Exit code | Category | Used for |
+| ---: | --- | --- |
+| `0` | Success | Completed command. |
+| `64` | Usage | Invalid arguments, unsupported flags, missing required confirmation/state arguments, refused overwrite, local non-manifest file I/O failure. |
+| `65` | Validation | Missing/unreadable manifest, manifest/profile/approval validation failure, unsupported manifest/import feature, compatibility failure. |
+| `66` | State unavailable | Explicit state database path failed validation, migration, schema compatibility, locking, corruption, or read/write. |
+| `69` | Runtime unavailable / evidence blocked | Runtime access failed, or a benchmark prerequisite remains blocked. |
+| `70` | Confirmation mismatch | Plan hash, cleanup token, approval scope, or approval hash binding does not match. |
+| `71` | Unsafe operation | Planner or apply safety policy blocked mutation. |
+| `72` | Partial failure | Mixed cleanup outcome or failed benchmark evidence. |
+
+One special case: `doctor --output json` reports compatibility failures as a
+normal doctor document on stdout with `hasFailures: true` and exit code 65 —
+not as an error envelope.
