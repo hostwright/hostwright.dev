@@ -1,0 +1,64 @@
+---
+title: Source install and doctor
+description: "Read-only walkthrough: build from source, run the test suite, and check your host with doctor."
+---
+
+**This task is read-only.** Nothing here touches the container runtime or
+writes state.
+
+## 1. Build from source
+
+```bash
+git clone https://github.com/hostwright/hostwright.git
+cd hostwright
+git checkout v0.1.0-alpha.1
+swift build
+```
+
+Hostwright is a dependency-free Swift package: no external SPM packages, SQLite
+via the system library.
+
+## 2. Run the tests
+
+```bash
+swift test
+```
+
+You can list what exists first with `swift test list`, or use the repository's
+`scripts/test.sh` helper. Passing tests on your machine are the same evidence
+the project itself uses for its support claims — see
+[Testing evidence](/docs/reference/testing-evidence/).
+
+## 3. Confirm the binary answers
+
+```bash
+swift run hostwright --version
+```
+
+```text
+0.1.0-alpha.1
+```
+
+## 4. Check the host
+
+```bash
+swift run hostwright doctor
+swift run hostwright doctor --output json
+```
+
+`doctor` runs safe local checks only: OS version, Apple silicon and macOS 26+
+gate, Swift toolchain version, `container` executable lookup (presence only —
+it never runs Apple container commands), `hostwright.yaml` presence, state-path
+policy, telemetry policy, and a local resource-intelligence report.
+
+A missing `container` executable is reported as a warning, not a crash. In the
+JSON report, benchmark dimensions that were not measured are reported
+explicitly as `unmeasured` — doctor never fabricates capacity numbers. The full
+check list is in [Doctor checks](/docs/reference/doctor-checks/).
+
+## Where this leaves you
+
+You have a built CLI and a verdict on host compatibility. This alpha is
+source-only — there is no binary install path to compare against. See the
+[release process](/docs/release/process/) for the artifact policy, and continue with
+[Plan a single service](/docs/tasks/single-service-plan/).

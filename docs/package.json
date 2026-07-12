@@ -1,0 +1,25 @@
+{
+  "name": "hostwright-docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Documentation site for Hostwright — hostwright.dev/docs",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.36.0",
+    "@fontsource/ibm-plex-mono": "^5.1.0",
+    "astro": "^5.5.0",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "starlight-links-validator": "^0.18.0",
+    "typescript": "^5.7.0"
+  }
+}

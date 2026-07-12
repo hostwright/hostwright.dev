@@ -1,0 +1,78 @@
+---
+title: Daemon
+description: hostwrightd is a foreground reconciliation loop — it observes, probes, plans, and records, and it never mutates the runtime.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+`hostwrightd` is a **foreground development loop**. It is not an installed
+launch agent, background service, privileged helper, or unattended mutation
+engine, and it runs only when you start it:
+
+```bash
+hostwrightd --foreground --config hostwright.yaml --state-db /tmp/hostwright.sqlite
+```
+
+Required: `--foreground`, `--config <path>`, `--state-db <path>`. Optional:
+
+| Flag | Default | Purpose |
+| --- | ---: | --- |
+| `--interval <seconds>` | 30 | Base reconciliation cadence. |
+| `--jitter <seconds>` | 5 | Deterministic jitter cap. |
+| `--max-backoff <seconds>` | 300 | Repeated-error backoff cap. |
+| `--max-iterations <count>` | — | Stop after a bounded number of iterations. |
+| `--lock-file <path>` | `<state-db>.hostwrightd.lock` | Single-instance lock. |
+
+No default config path, state path, or user-global daemon location exists.
+
+## Loop contract
+
+Each iteration:
+
+1. Reads and validates the explicit manifest path.
+2. Maps the manifest into desired runtime state.
+3. Observes runtime state through the [RuntimeAdapter](/docs/concepts/runtime-adapter/).
+4. Runs bounded in-process loopback health checks for configured running
+   services (the allowlisted `curl`/`wget`/`true`/`false` probe shapes — see
+   the [manifest reference](/docs/reference/manifest/)).
+5. Persists health results and restart policy state.
+6. Computes a deterministic plan with restart-state blocking.
+7. Persists desired/observed snapshots, a daemon operation record, and events.
+8. Sleeps according to cadence, jitter, and backoff.
+
+Failed iterations persist a failed operation and a `daemon.reconcile.failed`
+event with a redacted diagnostic code — they never claim a snapshot was
+recorded.
+
+Recorded events include `daemon.started`, `daemon.reconcile.succeeded`,
+`daemon.reconcile.failed`, `daemon.backoff`, `daemon.sleep_wake_resumed`,
+`daemon.stopped`, `health.check.*`, and `restart.policy.state` — all readable
+with [`hostwright events`](/docs/operations/events-and-diagnostics/).
+
+<Aside type="caution" title="The daemon never mutates">
+`hostwrightd` uses the read-only adapter and does not call the mutation hook.
+It may observe, probe, persist, and plan — it does not create, start, stop,
+restart, delete, repair, or clean up anything. Confirmed mutation remains
+exclusively behind `hostwright apply --confirm-plan` and
+`hostwright cleanup --confirm-cleanup`.
+</Aside>
+
+## Locking and shutdown
+
+A non-blocking single-instance file lock is taken before state is opened or
+migrated; if another instance holds it, the new process exits before running
+the loop. SIGINT and SIGTERM request shutdown, checked between iterations and
+during sleep.
+
+## Sleep/wake
+
+Sleep/wake is treated as a scheduler event: a wake-aware clock reports that
+sleep resumed, the daemon records `daemon.sleep_wake_resumed`, and continues.
+No macOS power notifications or launchd keepalive are installed.
+
+## Non-goals
+
+Launch agent installation, installers, privileged helpers, default state
+paths, unattended runtime mutation, aggressive crash-loop enforcement, broad
+lifecycle management, and image/volume/unmanaged cleanup. See
+[Limitations](/docs/reference/limitations/).

@@ -1,0 +1,90 @@
+---
+title: Review an app suite
+description: "Validate and plan a multi-service manifest, and understand health, restart policy, and the one-action-per-apply rule."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+**This task is read-only** — it validates and plans; it does not apply.
+
+## The example manifest
+
+`examples/app-suite/hostwright.yaml` declares a web service and a worker:
+
+```yaml
+version: 1
+project: app-suite
+
+services:
+  web:
+    image: ghcr.io/example/web:latest
+    command: ["serve"]
+    ports:
+      - "8080:8080"
+    env:
+      APP_ENV: development
+      API_BASE_URL: http://localhost:8081
+    health:
+      command: ["curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+    restart:
+      policy: on-failure
+
+  worker:
+    image: ghcr.io/example/worker:latest
+    env:
+      QUEUE_NAME: default
+    restart:
+      policy: no
+```
+
+## 1. Validate and plan
+
+```bash
+hostwright validate examples/app-suite/hostwright.yaml
+hostwright plan examples/app-suite/hostwright.yaml --output json
+```
+
+The plan covers both services: typed issues from the
+[policy checks](/docs/concepts/policy-engine/) (duplicate host ports, broad bind
+addresses, unsafe mounts, secret-like env values), drift records per service if
+observed state is available, and one deterministic hash for the whole plan.
+
+## 2. What health and restart declarations do
+
+- `health.command` is executed by the [daemon](/docs/operations/daemon/) as an
+  in-process loopback probe for allowlisted command shapes — results are
+  persisted and feed drift detection ("unhealthy where policy requires
+  health"). Container-exec health checks are not implemented.
+- `restart.policy` gates the *managed start* and *managed restart* actions.
+  `policy: no` (as on `worker`) is a manual hold: Hostwright will never mark a
+  start or restart of that service executable. Restart state also tracks max
+  attempts, backoff, and crash-loop blocking.
+
+## 3. One action per apply
+
+<Aside type="caution" title="Not Compose parity">
+If both services are missing, the plan contains two create actions — and
+`apply` refuses, because more than one executable action exists. Converging a
+multi-service suite means multiple explicit plan-confirm-apply rounds, one
+action each. This is deliberate: Hostwright is a control plane with a narrow
+mutation gate, not a Compose-style up command.
+</Aside>
+
+Bring the suite up one gated step at a time:
+
+```bash
+hostwright plan examples/app-suite/hostwright.yaml --output json   # note the hash
+hostwright apply examples/app-suite/hostwright.yaml \
+  --state-db /tmp/hostwright.sqlite --confirm-plan <hash>          # one action
+hostwright plan examples/app-suite/hostwright.yaml --output json   # re-plan: new hash
+```
+
+Each apply changes observed reality, so each subsequent apply needs a freshly
+observed hash. A stale hash is refused with a confirmation-mismatch error
+(exit code 70).
+
+## Next
+
+- [Operations and recovery](/docs/tasks/operations-and-recovery/) — watching the suite after it runs.
+- [hostwright.yaml reference](/docs/reference/manifest/) — every supported field.

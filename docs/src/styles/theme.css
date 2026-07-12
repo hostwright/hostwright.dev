@@ -1,0 +1,135 @@
+/* Hostwright docs theme — maps the hostwright.dev design tokens ("The Seam":
+   warm paper, charcoal ink, one restrained ink-navy accent) onto Starlight's
+   --sl-* custom properties. Light values come from site/src/styles/tokens.css
+   verbatim; dark values are derived warm-neutral, not blue-black. */
+
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/docs/fonts/GeneralSans-Variable.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --sl-font: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "Menlo", monospace;
+  --sl-content-width: 46rem;
+
+  /* Dark (Starlight default scheme) */
+  --sl-color-white: #e9e7e1;
+  --sl-color-gray-1: #d4d2cb;
+  --sl-color-gray-2: #a8acb3;
+  --sl-color-gray-3: #8b9098;
+  --sl-color-gray-4: #666b73;
+  --sl-color-gray-5: #33363d;
+  --sl-color-gray-6: #24262c;
+  --sl-color-gray-7: #1c1e22;
+  --sl-color-black: #16171b;
+
+  --sl-color-accent-low: #1c2b40;
+  --sl-color-accent: #5c81ad;
+  --sl-color-accent-high: #a9c4e6;
+  --sl-color-text-accent: #a9c4e6;
+
+  --sl-color-bg: #16171b;
+  --sl-color-bg-nav: #16171b;
+  --sl-color-bg-sidebar: #1c1e22;
+  --sl-color-bg-inline-code: #26282e;
+  --sl-color-hairline: #2b2e34;
+  --sl-color-hairline-light: #2b2e34;
+  --sl-color-hairline-shade: #383c44;
+
+  /* Status chips (Hostwright roadmap palette, dark variants) */
+  --hw-status-implemented: #8fc4aa;
+  --hw-status-implemented-bg: #21332b;
+  --hw-status-planned: #b3b8c0;
+  --hw-status-planned-bg: #2a2c31;
+  --hw-status-progress: #a9c4e6;
+  --hw-status-progress-bg: #1c2b40;
+  --hw-status-blocked: #dfa08a;
+  --hw-status-blocked-bg: #3a271f;
+}
+
+:root[data-theme="light"] {
+  --sl-color-white: #1c1e22; /* charcoal ink */
+  --sl-color-gray-1: #2c2f34;
+  --sl-color-gray-2: #565b61; /* muted */
+  --sl-color-gray-3: #666b73; /* faint */
+  --sl-color-gray-4: #8b9098;
+  --sl-color-gray-5: #d7d3c8; /* border-strong */
+  --sl-color-gray-6: #ebe8e0; /* surface-2 */
+  --sl-color-gray-7: #f4f2ec; /* surface */
+  --sl-color-black: #faf9f6; /* warm paper */
+
+  --sl-color-accent-low: #edf0f4; /* accent-soft */
+  --sl-color-accent: #1f3a5f; /* ink-navy */
+  --sl-color-accent-high: #16304f; /* accent-hover */
+  --sl-color-text-accent: #1f3a5f;
+
+  --sl-color-bg: #faf9f6;
+  --sl-color-bg-nav: #faf9f6;
+  --sl-color-bg-sidebar: #f4f2ec;
+  --sl-color-bg-inline-code: #ebe8e0;
+  --sl-color-hairline: #e7e4dc;
+  --sl-color-hairline-light: #e7e4dc;
+  --sl-color-hairline-shade: #d7d3c8;
+
+  --hw-status-implemented: #2f6b4f;
+  --hw-status-implemented-bg: #e8f1ec;
+  --hw-status-planned: #5a5f67;
+  --hw-status-planned-bg: #f0efeb;
+  --hw-status-progress: #1f3a5f;
+  --hw-status-progress-bg: #eaf0f6;
+  --hw-status-blocked: #9a4a32;
+  --hw-status-blocked-bg: #f6ece7;
+}
+
+/* Type refinements to match hostwright.dev's voice. */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.site-title {
+  letter-spacing: -0.01em;
+}
+
+.sl-markdown-content code:not(:where(.expressive-code *)) {
+  border-radius: 4px;
+}
+
+/* Status badge component (see src/components/Status.astro). */
+.hw-status {
+  display: inline-block;
+  font-family: var(--sl-font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.hw-status--implemented {
+  color: var(--hw-status-implemented);
+  background: var(--hw-status-implemented-bg);
+}
+
+.hw-status--planned,
+.hw-status--research-only {
+  color: var(--hw-status-planned);
+  background: var(--hw-status-planned-bg);
+}
+
+.hw-status--deferred {
+  color: var(--hw-status-progress);
+  background: var(--hw-status-progress-bg);
+}
+
+.hw-status--rejected {
+  color: var(--hw-status-blocked);
+  background: var(--hw-status-blocked-bg);
+}

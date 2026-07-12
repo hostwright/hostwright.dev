@@ -1,0 +1,120 @@
+---
+title: hostwright.yaml reference
+description: The restricted manifest format — every supported field, the version policy, validation rules, and the fail-closed parser boundary.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The manifest filename is `hostwright.yaml`. A JSON Schema is checked in at
+`schemas/hostwright-yaml.schema.json` in the core repository.
+
+## Current shape
+
+```yaml
+version: 1
+project: api-local
+imagePolicy: allow-tags
+
+services:
+  api:
+    image: ghcr.io/example/api:latest
+    ports:
+      - "8080:8080"
+    env:
+      APP_ENV: development
+    secretEnv:
+      API_TOKEN: keychain://hostwright.api/api-token
+    health:
+      command: ["curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+    restart:
+      policy: on-failure
+```
+
+Do not use Kubernetes-style `apiVersion`, `kind`, or `metadata`.
+
+## Version policy
+
+`version: 1` is the current manifest version. Versionless manifests are
+accepted during this alpha as legacy version 1 input. Versions older or newer
+than 1 fail closed. There is no automatic upgrade, downgrade, or compatibility
+conversion.
+
+## Fields
+
+| Field | Form | Rules |
+| --- | --- | --- |
+| `version` | optional scalar | Exactly `1` if present. |
+| `project` | scalar | Required, DNS-like name. |
+| `imagePolicy` | optional scalar | `allow-tags` (default) or `require-digest`. |
+| `services.<name>` | map | Service names are DNS-like; two-space indentation. |
+| `image` | scalar | Required per service. No whitespace, must not begin with `-`; digests must be `@sha256:<64 lowercase hex>`. |
+| `command` | inline array | Tokens non-empty and must not begin with `-`. |
+| `ports` | string list | `"host:container"`, values 1–65535. |
+| `env` | string map | Keys shell-safe (`[A-Za-z_][A-Za-z0-9_]*`). Plaintext credential-like keys are rejected — use `secretEnv`. |
+| `secretEnv` | string map | Values must be `keychain://<service>/<account>`. A key cannot appear in both `env` and `secretEnv`. |
+| `volumes` | string list | `source:/absolute/container/path[:ro|rw]`. Host-root and parent-traversal sources are rejected. |
+| `health.command` | inline array | Non-empty when `health` is present. Bounded probe shapes only (see below). |
+| `health.interval` | scalar | Seconds form, like `10s`. |
+| `restart.policy` | scalar | `no`, `on-failure`, or `unless-stopped`. |
+
+## Parser limitation
+
+<Aside type="caution" title="Not a general YAML parser">
+Hostwright uses a restricted manifest subset parser. Unsupported YAML features
+fail closed: anchors, aliases, tags, merge keys, block scalars, document
+markers, flow maps, tabs, and arbitrary indentation. Unsupported orchestrator
+fields fail closed too, including `apiVersion`, `kind`, `metadata`, `build`,
+`depends_on`, `deploy`, `networks`, `network_mode`, `dns`, `hostname`,
+`extra_hosts`, `aliases`, `expose`, `configs`, and `secrets`.
+</Aside>
+
+[`hostwright import-stack`](/docs/tasks/stack-import/) can convert a smaller
+stack-file subset into this shape — conversion only, with the normal validator
+run on the output.
+
+## Image policy
+
+`imagePolicy` is a **local string policy only**. The default `allow-tags`
+accepts tag-based references. `require-digest` rejects mutable tag-only
+references and requires digest pinning:
+
+```yaml
+imagePolicy: require-digest
+
+services:
+  api:
+    image: ghcr.io/example/api@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+```
+
+Hostwright does not verify a digest exists in a registry, resolve tags,
+pull images, verify signatures or SBOMs, or scan vulnerabilities.
+
+## Health probes are bounded, not shell
+
+Health checks are not shell commands and are not container `exec`, and
+Hostwright does not execute host `curl` or `wget` binaries. Current bounded
+probes parse `curl`, `wget`, `true`, and `false` shaped commands:
+
+- `curl`: no-output status flags plus one loopback HTTP(S) URL;
+- `wget`: quiet spider mode plus one loopback HTTP(S) URL;
+- `true` / `false`: no arguments, evaluated directly.
+
+URL-shaped probes run through Hostwright's in-process URL fetcher in the
+[daemon](/docs/operations/daemon/).
+
+## Ports and networking
+
+Port syntax has no bind-address field in this alpha. Hostwright-created
+runtime port publishes default to `127.0.0.1`. DNS, service discovery, network
+aliases, and reverse proxy settings are not manifest features.
+
+## Untrusted manifests
+
+Treat third-party manifests as untrusted input. `validate` and `plan` are
+non-mutating gates, but an accepted manifest still describes images, ports,
+environment values, paths, and probe commands an operator should review before
+any confirmed apply or daemon run.
+
+Never place plaintext credentials in manifests. `secretEnv` stores a local
+reference, not a value; see [Secrets and Keychain](/docs/concepts/secrets-and-keychain/).

@@ -1,0 +1,80 @@
+---
+title: Roadmap
+description: What is next for Hostwright, with every item labeled implemented, planned, deferred, rejected, or research-only — never presented as current support.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import Status from "../../../components/Status.astro";
+
+Hostwright advances in numbered engineering phases, each landing with tests,
+docs, and an explicit boundary. This page labels forward-looking work
+honestly. If an item is not marked <Status kind="implemented" />, it is not
+current support — see [Limitations](/docs/reference/limitations/) for the
+authoritative boundary.
+
+<Aside type="note" title="Evidence-backed completion">
+Nothing on this roadmap is "done" by being described. Completion requires
+matching tests or evidence in the core repository — see
+[Testing evidence](/docs/reference/testing-evidence/).
+</Aside>
+
+## Direction decision
+
+<Status kind="implemented" /> Hostwright core **remains a single-host Apple
+silicon control plane** through the beta path and first supported release.
+Experimental platform expansion (multi-host, cluster behavior, external API
+compatibility) will not be added to current core; if pursued later, it becomes
+a separate approved prototype or repository with its own threat model, state
+authority, and proof path.
+
+## The path to beta
+
+<Status kind="planned" /> The beta and first supported release path
+prioritizes:
+
+- source install and release evidence;
+- local manifest validation, planning, status, events, diagnostics, and
+  bounded logs;
+- explicit local state paths and migration safety;
+- narrow Hostwright-owned runtime mutation through the RuntimeAdapter;
+- cleanup and recovery hardening;
+- documentation accuracy and operator trust;
+- local policy, redaction, audit, and confirmation gates.
+
+The beta readiness checklist exists ( <Status kind="implemented" /> as
+documentation), but no beta tag, beta compatibility claim, or support promise
+exists until its evidence is complete and a maintainer approves.
+
+## Deferred past beta
+
+<Status kind="deferred" /> These are acknowledged, not scheduled, and remain
+unsupported until separate evidence exists:
+
+- binary archives, installers, Homebrew, signing, notarization, SBOM,
+  provenance — gated by distribution readiness;
+- GUI / local control surface — the API boundary is documented, no
+  implementation exists;
+- automatic rollback, broad lifecycle management, image/volume cleanup,
+  aggressive restart loops, unattended daemon mutation;
+- performance benchmark publication and capacity guidance;
+- shell completion installation;
+- JSON output for `validate`, `apply`, `logs`, and `cleanup` success paths.
+
+## Rejected for current core
+
+<Status kind="rejected" /> Decided against, with reasons recorded:
+
+- Kubernetes-class control plane, CRI shim, kubelet behavior, scheduler API;
+- Docker API shim, full Compose parity, Testcontainers compatibility;
+- multi-host orchestration inside current core;
+- cloud control plane, hosted audit, remote policy distribution;
+- marketing-only support claims and untested tutorial content.
+
+The reasoning is on [Non-goals](/docs/overview/non-goals/).
+
+## Research only
+
+<Status kind="research-only" /> Studied, documented, and explicitly not
+promised: external orchestration compatibility, multi-host platform design,
+secure exposure (tunnels, DNS, reverse proxies), and Apple silicon
+accelerators. See [Research areas](/docs/roadmap/research/).

@@ -1,0 +1,74 @@
+---
+title: Desired state
+description: Hostwright separates the state you declare from the state that is actually running, and computes the difference deterministically.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Hostwright is a **desired-state** system. You declare what should run; Hostwright
+observes what is running, computes the difference, and reports it as drift with
+a deterministic plan.
+
+![Desired state and observed runtime state compared by a comparator to produce a drift report.](/docs/diagrams/05-desired-observed-drift.svg)
+
+## Two kinds of state
+
+- **Desired state** — what you declared in [`hostwright.yaml`](/docs/reference/manifest/).
+  Persisted as a snapshot to the explicit SQLite database you pass with
+  `--state-db`.
+- **Observed state** — what is actually running, read back from the runtime
+  through the [RuntimeAdapter](/docs/concepts/runtime-adapter/) at a point in time.
+  `hostwright status --state-db <path>` records it as an observed snapshot.
+
+The [reconciler](/docs/concepts/reconciliation/) compares the two, emits typed drift
+records and issues, and produces a plan with a deterministic hash. Convergence
+is never automatic: mutation happens only through the confirmed
+[apply gate](/docs/concepts/safety-model/), one action at a time.
+
+## Why declare instead of command
+
+Imperative commands describe *how*; a manifest describes *what*. A declarative
+model gives you properties that are hard to get from a pile of shell commands:
+
+- **Idempotency** — apply recomputes the plan and refuses to run when the
+  confirmed hash no longer matches reality, so a stale intent cannot re-execute.
+- **Drift detection** — with desired and observed snapshots both recorded,
+  Hostwright notices when reality diverges instead of you discovering it by
+  surprise.
+- **Reviewable change** — the difference is shown as a plan, with a hash, before
+  anything mutates.
+- **Recovery** — operation intent, checkpoints, and recovery records are
+  persisted before mutation, so an interrupted operation is diagnosable with
+  [`hostwright recovery`](/docs/operations/events-and-diagnostics/).
+
+## The unit of declaration
+
+A manifest declares a **project** that contains one or more **services**. A
+service references an image and the runtime details needed to run it — ports,
+environment, secret references, health checks, and restart policy.
+
+```yaml
+version: 1
+project: api-local
+
+services:
+  api:
+    image: ghcr.io/example/api:latest
+    ports:
+      - "8080:8080"
+```
+
+<Aside type="note" title="Single host by design">
+Desired state in Hostwright is scoped to one Mac. There is no cluster, no shared
+control plane, and no cross-machine scheduling. This is a deliberate boundary,
+not a missing feature — see [Why Hostwright](/docs/overview/why-hostwright/) and
+[Non-goals](/docs/overview/non-goals/).
+</Aside>
+
+## What convergence is not
+
+Hostwright does not run an aggressive convergence loop. The foreground
+[daemon](/docs/operations/daemon/) observes, plans, and records events — it never
+mutates. `apply` executes exactly one confirmed action per invocation. Automatic
+rollback and multi-action apply are not implemented; see
+[Limitations](/docs/reference/limitations/).

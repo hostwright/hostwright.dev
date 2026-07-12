@@ -1,0 +1,108 @@
+---
+title: Quick start
+description: The safe core loop — init, validate, plan, doctor — and how confirmed apply fits in after it.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+This page walks the safe core loop. Every command here is **read-only or
+local-file-only** — nothing touches the container runtime until you opt into the
+confirmed apply gate at the end.
+
+## Requirements
+
+Hostwright targets one environment deeply rather than many shallowly:
+
+- An **Apple silicon** Mac (arm64).
+- **macOS 26 or later.**
+- **Apple container** installed and working, for runtime-backed commands.
+- Container images that provide a **`linux/arm64`** variant.
+
+Check your host first:
+
+```bash
+hostwright doctor
+```
+
+`doctor` runs safe local checks only: OS version, architecture gate, Swift
+toolchain, whether a `container` executable is on `PATH`, manifest presence, and
+local resource facts. It never runs Apple container commands. See
+[Doctor checks](/docs/reference/doctor-checks/).
+
+## The core loop
+
+```bash
+# 1. Create a starter manifest in the current directory.
+#    Never overwrites an existing file; there is no --force.
+hostwright init
+
+# 2. Validate the restricted manifest shape. No registry or runtime contact.
+hostwright validate
+
+# 3. Compute the deterministic, non-mutating plan.
+#    Prints a plan hash, typed issues, and planned actions.
+hostwright plan
+
+# 4. Machine-readable output for scripts, if you want it.
+hostwright plan --output json
+```
+
+`plan` does not inspect Apple container by default and does not claim any
+resource is running or healthy. It is a manifest-level dry run with a
+deterministic hash. See [Reconciliation](/docs/concepts/reconciliation/).
+
+## A minimal manifest
+
+The checked-in example at `examples/single-service/hostwright.yaml`:
+
+```yaml
+version: 1
+project: single-service
+
+services:
+  web:
+    image: docker.io/library/nginx:1.27
+    ports:
+      - "8080:80"
+    health:
+      command: ["curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+    restart:
+      policy: on-failure
+```
+
+Every field is described in the [`hostwright.yaml` reference](/docs/reference/manifest/).
+
+## Observing the runtime
+
+Runtime observation and state persistence require an **explicit** state
+database path — Hostwright never picks one for you:
+
+```bash
+hostwright status --state-db /tmp/hostwright.sqlite
+hostwright logs web --state-db /tmp/hostwright.sqlite
+```
+
+`status` observes Apple container through the RuntimeAdapter, persists a status
+event and snapshot, and renders desired services against observed facts. It
+does not mutate anything.
+
+## Mutation is a separate, gated step
+
+<Aside type="caution" title="The only mutating paths">
+Runtime mutation happens only through `hostwright apply --state-db <path>
+--confirm-plan <hash>` and `hostwright cleanup --state-db <path>
+--confirm-cleanup <token>`. Apply executes exactly **one** confirmed action per
+invocation and refuses to run if the plan hash does not match the currently
+observed plan. There is no multi-action apply.
+</Aside>
+
+The apply flow is covered step by step in
+[Plan a single service](/docs/tasks/single-service-plan/), and the safety reasoning
+in the [Safety model](/docs/concepts/safety-model/).
+
+## Next
+
+- [Desired state](/docs/concepts/desired-state/) — the model behind the manifest.
+- [Operations and recovery](/docs/tasks/operations-and-recovery/) — status, logs, events, diagnostics, cleanup.
+- [Limitations](/docs/reference/limitations/) — what to expect, stated plainly.

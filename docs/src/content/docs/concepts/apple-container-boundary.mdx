@@ -1,0 +1,83 @@
+---
+title: Apple container boundary
+description: Apple container is the execution substrate. Hostwright sits above it and is careful about what it does and does not own.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Hostwright does not run containers. **Apple container** runs containers;
+Hostwright validates what *should* run, observes what is running, and mutates
+only through narrow confirmed gates. Every one of those interactions crosses
+the [RuntimeAdapter](/docs/concepts/runtime-adapter/). Understanding where that line
+sits is essential to understanding the project.
+
+![Responsibility split between what Hostwright owns and what Apple's container runtime owns.](/docs/diagrams/07-apple-container-boundary.svg)
+
+## What Apple container provides
+
+Apple container is a Mac-native runtime built for Apple silicon. The properties
+that matter for Hostwright:
+
+- A **VM-per-container** model — each container runs in its own lightweight
+  Linux VM rather than a single shared VM.
+- An **OCI image** flow, so standard container images work.
+- A command surface and helper services managed under macOS, with `vmnet`-based
+  networking.
+
+The VM-per-container model is a defining constraint: replicas and large stacks
+carry real per-VM memory overhead, which shapes Hostwright's conservative
+resource posture. See [Limitations](/docs/reference/limitations/).
+
+## The path of a runtime operation
+
+```text
+hostwright CLI / hostwrightd
+  → RuntimeAdapter
+    → Apple container CLI (today) / Containerization APIs (later)
+      → Apple container services
+        → lightweight Linux VM
+          → your container process
+```
+
+Everything above the adapter is Hostwright. Everything below it is Apple's.
+
+## What Hostwright owns
+
+- Manifest parsing, validation, and deterministic planning.
+- Drift detection, health probes, restart policy, and the event ledger.
+- The ownership ledger and conservative, token-confirmed cleanup.
+- The four narrow mutations: create-missing-service, managed start, managed
+  restart, exact owned-container delete.
+
+## What Apple container owns
+
+- The container and VM lifecycle internals.
+- The image store and registry interactions.
+- The networking stack and system helpers.
+
+## Verified, not assumed
+
+Hostwright adapts **documented, locally verified** Apple container CLI behavior
+only. The current command shapes are based on verified Apple container 1.0.0
+output; they are not a broad Apple CLI compatibility claim. If local output
+does not match a reviewed parser shape, Hostwright fails closed with a parse
+error rather than guessing.
+
+<Aside type="note" title="No reaching past the seam">
+Hostwright does not reimplement, patch, or assume the internals of Apple
+container, and it must not depend on private helper internals or undocumented
+behavior. When the runtime cannot do something, Hostwright reports it as a
+[limitation](/docs/reference/limitations/) rather than hiding it behind a vague
+error.
+</Aside>
+
+## Open questions at the boundary
+
+These depend on Apple container behavior and are tracked, not assumed:
+
+- The boundaries of `exec` and interactive attach (not implemented, research-only).
+- Port-forwarding semantics and equivalents.
+- Log streaming for short-lived containers (`logs` is bounded tail-only today).
+- Localhost HTTP reachability evidence — on the current proof host, the Apple
+  container listener accepts then resets while macOS Local Network access for
+  `container-runtime-linux` is disabled.

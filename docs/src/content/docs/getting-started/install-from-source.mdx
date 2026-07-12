@@ -1,0 +1,78 @@
+---
+title: Install from source
+description: Build Hostwright v0.1.0-alpha.1 from source with SwiftPM. There are no binaries, installers, or Homebrew formulae for this alpha.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Hostwright `v0.1.0-alpha.1` is a **source-only** alpha. It is not production ready.
+
+<Aside type="caution" title="Artifact policy">
+This alpha provides source only. Hostwright does not provide binary downloads,
+installer packages, a Homebrew formula, signed or notarized artifacts, or
+packaged launch agents. Those require separate signing, notarization, checksum,
+SBOM, provenance, and installer decisions that have not been made. See the
+[release process](/docs/release/process/).
+</Aside>
+
+## Requirements
+
+- Apple silicon Mac.
+- macOS 26 or newer.
+- Full Xcode developer tools, or a Swift toolchain capable of SwiftPM builds.
+- Apple container CLI, for runtime observation and mutation behavior.
+- Git.
+
+## Build
+
+```bash
+git clone https://github.com/hostwright/hostwright.git
+cd hostwright
+git checkout v0.1.0-alpha.1
+swift build
+swift test
+```
+
+Run the CLI through SwiftPM:
+
+```bash
+swift run hostwright --version
+swift run hostwright doctor
+swift run hostwright validate
+swift run hostwright plan
+swift run hostwright plan --output json
+```
+
+## Runtime-backed commands
+
+Commands that observe the runtime or persist state require Apple container and
+an **explicit** state database path. Hostwright never chooses a database path
+implicitly:
+
+```bash
+swift run hostwright status --state-db /tmp/hostwright.sqlite
+swift run hostwright logs api --state-db /tmp/hostwright.sqlite
+swift run hostwright events --state-db /tmp/hostwright.sqlite
+swift run hostwright diagnostics --state-db /tmp/hostwright.sqlite --bundle /tmp/hostwright-diagnostics.json
+swift run hostwright cleanup --state-db /tmp/hostwright.sqlite --dry-run
+swift run hostwrightd --foreground --config hostwright.yaml --state-db /tmp/hostwright.sqlite --max-iterations 1
+```
+
+`status`, `logs`, `apply`, `cleanup`, and `hostwrightd --foreground` can run
+explicit migrations before writing state. `events` and `recovery` and
+`diagnostics` read an already-migrated database and fail rather than creating or
+migrating one as a side effect. See [State store](/docs/concepts/state-store/).
+
+## Backup
+
+For backup or restore, stop Hostwright commands that use the database and copy
+the explicit SQLite file plus sidecar files such as `state.sqlite-wal` and
+`state.sqlite-shm` if they exist. `hostwright diagnostics` can write a local
+redacted JSON bundle for review. Hostwright does not provide online backup,
+restore, repair, hosted diagnostics, or automatic upload commands.
+
+## Next
+
+- [Quick start](/docs/getting-started/quick-start/) — the safe core loop.
+- [Source install and doctor](/docs/tasks/source-install-and-doctor/) — the same flow as a checked task walkthrough.
+- [Compatibility](/docs/reference/compatibility/) — the exact supported environment.

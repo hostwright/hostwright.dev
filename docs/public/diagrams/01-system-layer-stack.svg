@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="648" viewBox="0 0 1040 648" role="img" aria-labelledby="title desc">
+  <title id="title">Hostwright system layer stack</title>
+  <desc id="desc">Layered architecture showing CLI, planned daemon, planner/reconciler/state store, RuntimeAdapter boundary, Apple container, and Linux VMs.</desc>
+  <defs>
+    <style>
+      .bg { fill: #faf9f6; }
+      .card { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box { fill: #f3f1ec; stroke: #202327; stroke-width: 1.8; }
+      .box-light { fill: #faf9f6; stroke: #e4e1da; stroke-width: 1.5; }
+      .box-planned { fill: #faf9f6; stroke: #5a5f67; stroke-width: 1.8; stroke-dasharray: 8 7; }
+      .accent { fill: #1f3a5f; stroke: #1f3a5f; }
+      .text { fill: #202327; font-family: Arial, Helvetica, sans-serif; }
+      .muted { fill: #646973; font-family: Arial, Helvetica, sans-serif; }
+      .white { fill: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+      .mono { fill: #202327; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+      .line { stroke: #202327; stroke-width: 1.8; fill: none; }
+      .line-muted { stroke: #e4e1da; stroke-width: 1.2; fill: none; }
+      .line-planned { stroke: #5a5f67; stroke-width: 1.8; fill: none; stroke-dasharray: 8 7; }
+      .arrow { stroke: #202327; stroke-width: 1.8; fill: none; marker-end: url(#arrow); }
+      .arrow-accent { stroke: #1f3a5f; stroke-width: 2.2; fill: none; marker-end: url(#arrowAccent); }
+      .arrow-planned { stroke: #5a5f67; stroke-width: 1.8; fill: none; stroke-dasharray: 8 7; marker-end: url(#arrowPlanned); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202327"/>
+    </marker>
+    <marker id="arrowAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f3a5f"/>
+    </marker>
+    <marker id="arrowPlanned" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a5f67"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1040" height="648"/>
+
+  <rect class="card" x="24" y="24" width="992" height="560" rx="14"/>
+
+  <rect class="box-light" x="72" y="54" width="896" height="54" rx="8"/>
+  <text class="text" x="520" y="88" text-anchor="middle" font-size="22" font-weight="700">hostwright CLI</text>
+
+  <path class="arrow" d="M520 108 V134"/>
+  <rect class="box-planned" x="72" y="138" width="896" height="72" rx="8"/>
+  <text class="text" x="520" y="174" text-anchor="middle" font-size="22" font-weight="700">hostwrightd</text>
+  <text class="muted" x="520" y="199" text-anchor="middle" font-size="14" font-weight="500">Planned</text>
+
+  <path class="arrow" d="M520 210 V236"/>
+  <rect class="box-light" x="72" y="240" width="896" height="106" rx="8"/>
+  <rect class="box-light" x="132" y="266" width="244" height="54" rx="8"/>
+  <text class="text" x="254" y="300" text-anchor="middle" font-size="20" font-weight="700">Planner</text>
+  <rect class="box-planned" x="398" y="266" width="244" height="54" rx="8"/>
+  <text class="text" x="520" y="292" text-anchor="middle" font-size="20" font-weight="700">Reconciler</text>
+  <text class="muted" x="520" y="315" text-anchor="middle" font-size="13" font-weight="500">Planned</text>
+  <rect class="box-planned" x="664" y="266" width="244" height="54" rx="8"/>
+  <text class="text" x="786" y="292" text-anchor="middle" font-size="20" font-weight="700">State Store</text>
+  <text class="muted" x="786" y="315" text-anchor="middle" font-size="13" font-weight="500">Planned</text>
+
+  <path class="arrow-accent" d="M520 346 V382"/>
+  <rect x="72" y="386" width="896" height="72" rx="8" fill="#1f3a5f" stroke="#1f3a5f" stroke-width="1.8"/>
+  <text class="white" x="520" y="430" text-anchor="middle" font-size="24" font-weight="700">RuntimeAdapter boundary</text>
+
+  <path class="arrow" d="M520 458 V486"/>
+  <rect class="box-light" x="72" y="490" width="896" height="58" rx="8"/>
+  <text class="text" x="520" y="526" text-anchor="middle" font-size="22" font-weight="700">Apple `container` CLI / Containerization</text>
+
+  <path class="arrow" d="M520 548 V566"/>
+  <rect class="box-light" x="72" y="570" width="896" height="70" rx="8"/>
+
+  <rect class="box-light" x="135" y="590" width="110" height="34" rx="6"/>
+  <text class="muted" x="190" y="612" text-anchor="middle" font-size="13" font-weight="500">Linux VM</text>
+  <rect class="box-light" x="300" y="590" width="110" height="34" rx="6"/>
+  <text class="muted" x="355" y="612" text-anchor="middle" font-size="13" font-weight="500">Linux VM</text>
+  <rect class="box-light" x="465" y="590" width="110" height="34" rx="6"/>
+  <text class="muted" x="520" y="612" text-anchor="middle" font-size="13" font-weight="500">Linux VM</text>
+  <rect class="box-light" x="630" y="590" width="110" height="34" rx="6"/>
+  <text class="muted" x="685" y="612" text-anchor="middle" font-size="13" font-weight="500">Linux VM</text>
+  <rect class="box-light" x="795" y="590" width="110" height="34" rx="6"/>
+  <text class="muted" x="850" y="612" text-anchor="middle" font-size="13" font-weight="500">Linux VM</text>
+</svg>

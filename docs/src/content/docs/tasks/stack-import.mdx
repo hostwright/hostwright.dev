@@ -1,0 +1,64 @@
+---
+title: Import a stack file
+description: "Convert a narrow, safe Compose-like subset into hostwright.yaml text for review. Conversion only — no Compose compatibility claim."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+**This task is read-only.** `import-stack` prints converted manifest text to
+stdout. It does not write files, create state, observe Apple container,
+contact registries, or pull images.
+
+## Convert
+
+```bash
+hostwright import-stack compose.yaml
+hostwright import-stack compose.yaml --output json
+```
+
+Text mode prints the converted manifest; warnings go to stderr, so you can
+redirect stdout safely. JSON mode returns the manifest and structured warnings,
+or a validation-style error envelope on failure.
+
+## What converts
+
+The accepted subset is intentionally small:
+
+- top-level `name` or `project`, and `services`;
+- service `image`;
+- `command` as an inline array;
+- `environment` as a key-value map of scalars;
+- `ports` as string entries like `"8080:8080"`;
+- `volumes` only with explicit host-path sources (`./data`, `/tmp/data`);
+- `healthcheck.test` only as `["CMD", ...]`, plus `healthcheck.interval`;
+- `restart` as a scalar policy or `restart.policy`.
+
+Converted output still runs through Hostwright manifest validation — invalid
+names, missing images, unsafe ports, unsafe mounts, and plaintext
+credential-like environment keys fail closed.
+
+## What is rejected, on purpose
+
+<Aside type="caution" title="Not Compose compatibility">
+The importer rejects unsupported semantics instead of silently dropping them:
+`build`, `depends_on`, `deploy`, `networks`/`network_mode`, DNS/aliases/
+`extra_hosts`/`expose`, `secrets` and `configs`, `env_file`, named volumes,
+shell health checks (`CMD-SHELL`), container names, labels, profiles, and pull
+policy. Import output does not imply Docker Compose, scheduler, networking, or
+runtime compatibility — see [Limitations](/docs/reference/limitations/).
+</Aside>
+
+## Safe review flow
+
+1. `hostwright import-stack compose.yaml > hostwright.yaml`
+2. Review every converted image, port, volume, environment value, health
+   check, and restart policy yourself.
+3. `hostwright validate`
+4. `hostwright plan`
+5. Apply only through the explicit state path and plan-hash confirmation gate —
+   `import-stack` never performs this step.
+
+## Next
+
+- [hostwright.yaml reference](/docs/reference/manifest/) — the target format in full.
+- [Plan a single service](/docs/tasks/single-service-plan/) — what to do with the converted manifest.
