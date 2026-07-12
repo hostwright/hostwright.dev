@@ -99,7 +99,7 @@ documented subset and fails closed on unsupported YAML features, unsupported
 versions, unknown orchestrator fields, unsafe env keys, and unsafe mount
 sources. The stack importer converts only the reviewed import subset and fails
 closed on everything else. External orchestration compatibility and multi-host
-platform work are **research-only** — see [Research areas](/roadmap/research/).
+platform work are **research-only** — see [Research areas](/docs/roadmap/research/).
 
 ## Runtime truth
 
@@ -109,7 +109,7 @@ reachability or application-level health beyond observed runtime state. The
 observation parser accepts only reviewed shapes and fails closed otherwise.
 Apply uses `container create` / `start` / internal `stop`+`start` /
 `delete` only under the gates described in the
-[safety model](/concepts/safety-model/). Recovery is diagnostic and manual;
+[safety model](/docs/concepts/safety-model/). Recovery is diagnostic and manual;
 diagnostics are local and manual; doctor's resource intelligence records
 explicit `unmeasured` dimensions; `benchmark` records local evidence only.
 

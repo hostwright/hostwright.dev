@@ -4,7 +4,7 @@ export const hero = {
   title: "Desired-state container control for Apple silicon Macs.",
   subtitle:
     "Hostwright is a Mac-native control plane for Apple container workloads. Today it can initialize, validate, plan without mutation, show manifest-level status, and run safe doctor checks while the runtime control loop is built.",
-  ctaPrimary: { label: "Read the docs", href: "https://docs.hostwright.dev/" },
+  ctaPrimary: { label: "Read the docs", href: "/docs/" },
   ctaSecondary: {
     label: "View on GitHub",
     href: "https://github.com/hostwright",

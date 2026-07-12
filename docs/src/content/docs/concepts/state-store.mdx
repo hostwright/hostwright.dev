@@ -11,7 +11,7 @@ snapshots, the event ledger, operation records, ownership records, health
 results, restart policy state, restart recovery records, and operation recovery
 groups with step-level checkpoints.
 
-![An explicit SQLite state database feeding a ledger of desired, observed, events, operations, ownership, health, and recovery records, read back by the read-only events, recovery, and diagnostics commands.](/diagrams/15-state-ledger.png)
+![An explicit SQLite state database feeding a ledger of desired, observed, events, operations, ownership, health, and recovery records, read back by the read-only events, recovery, and diagnostics commands.](/docs/diagrams/15-state-ledger.png)
 
 ## Explicit paths only
 
@@ -48,7 +48,7 @@ Migrations are explicit and checksummed:
 Schema version 6 added exact observed resource identifiers, observed network
 metadata, and ownership identity versions; legacy rows are backfilled as
 identity version 1, new labeled resources are written as version 2. See
-[Runtime adapter — identity and ownership](/concepts/runtime-adapter/).
+[Runtime adapter — identity and ownership](/docs/concepts/runtime-adapter/).
 
 ## What is (and is not) stored
 
@@ -62,7 +62,7 @@ all **redacted before persistence**.
 Desired environment snapshots never store resolved secret values. `secretEnv`
 entries persist only redacted markers; raw `keychain://` labels and resolved
 values are not stored in desired-state rows. See
-[Secrets and Keychain](/concepts/secrets-and-keychain/).
+[Secrets and Keychain](/docs/concepts/secrets-and-keychain/).
 </Aside>
 
 ## Concurrency

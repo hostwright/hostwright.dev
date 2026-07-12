@@ -6,7 +6,7 @@ description: The motivation — a new Mac-native runtime surface, the value of l
 Hostwright exists because of a specific change in the Mac development landscape,
 and because of a gap that change leaves open.
 
-![Hostwright as a control layer between your services and Apple's container runtime on macOS.](/diagrams/13-hostwright-local-dev-stack.svg)
+![Hostwright as a control layer between your services and Apple's container runtime on macOS.](/docs/diagrams/13-hostwright-local-dev-stack.svg)
 
 ## Apple container is a new runtime surface
 
@@ -54,7 +54,7 @@ dependencies.
 
 Apple container is young and will change. The single most important design
 decision is to route every runtime operation through one typed boundary — the
-[RuntimeAdapter](/concepts/runtime-adapter/) — so that runtime change is
+[RuntimeAdapter](/docs/concepts/runtime-adapter/) — so that runtime change is
 contained to one place. It is what lets Hostwright start on the Apple container CLI
 today and move to a native API later without rewriting the reconciler. The
 boundary is the project's insurance policy against a moving substrate.

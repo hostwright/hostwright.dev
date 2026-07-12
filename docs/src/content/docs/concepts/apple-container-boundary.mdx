@@ -8,10 +8,10 @@ import { Aside } from "@astrojs/starlight/components";
 Hostwright does not run containers. **Apple container** runs containers;
 Hostwright validates what *should* run, observes what is running, and mutates
 only through narrow confirmed gates. Every one of those interactions crosses
-the [RuntimeAdapter](/concepts/runtime-adapter/). Understanding where that line
+the [RuntimeAdapter](/docs/concepts/runtime-adapter/). Understanding where that line
 sits is essential to understanding the project.
 
-![Responsibility split between what Hostwright owns and what Apple's container runtime owns.](/diagrams/07-apple-container-boundary.svg)
+![Responsibility split between what Hostwright owns and what Apple's container runtime owns.](/docs/diagrams/07-apple-container-boundary.svg)
 
 ## What Apple container provides
 
@@ -26,7 +26,7 @@ that matter for Hostwright:
 
 The VM-per-container model is a defining constraint: replicas and large stacks
 carry real per-VM memory overhead, which shapes Hostwright's conservative
-resource posture. See [Limitations](/reference/limitations/).
+resource posture. See [Limitations](/docs/reference/limitations/).
 
 ## The path of a runtime operation
 
@@ -67,7 +67,7 @@ error rather than guessing.
 Hostwright does not reimplement, patch, or assume the internals of Apple
 container, and it must not depend on private helper internals or undocumented
 behavior. When the runtime cannot do something, Hostwright reports it as a
-[limitation](/reference/limitations/) rather than hiding it behind a vague
+[limitation](/docs/reference/limitations/) rather than hiding it behind a vague
 error.
 </Aside>
 

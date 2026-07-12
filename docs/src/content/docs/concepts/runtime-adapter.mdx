@@ -10,7 +10,7 @@ Nothing else — not the reconciler, not the CLI, not the state store — calls
 Apple container directly. This single boundary is the most important
 architectural decision in the project.
 
-![Hostwright core talks only through the RuntimeAdapter interface to a CLI adapter today and a planned native adapter later.](/diagrams/06-runtime-adapter-boundary.svg)
+![Hostwright core talks only through the RuntimeAdapter interface to a CLI adapter today and a planned native adapter later.](/docs/diagrams/06-runtime-adapter-boundary.svg)
 
 ## Why a single boundary
 
@@ -84,7 +84,7 @@ The adapter does not own Apple container's internals — its helpers, its VM
 lifecycle, or its networking stack. It rejects mounts, DNS, custom networks,
 Rosetta, `run`, pull, build, exec, attach, `--all`, `--force`, image deletes,
 and volume deletes outright. See the
-[Apple container boundary](/concepts/apple-container-boundary/).
+[Apple container boundary](/docs/concepts/apple-container-boundary/).
 </Aside>
 
 ## CLI adapter first, native adapter later

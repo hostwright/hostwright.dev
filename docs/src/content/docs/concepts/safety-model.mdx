@@ -10,7 +10,7 @@ Hostwright's safety posture is deliberately conservative, and unlike an
 aspiration, it is enforced by the command surface itself: there is no way to
 mutate the runtime except through two explicit, confirmed gates.
 
-![Safety flow: validate the manifest, compute a plan, confirm destructive actions, then apply; dry-run exits before any mutation.](/diagrams/08-safety-plan-before-mutation.svg)
+![Safety flow: validate the manifest, compute a plan, confirm destructive actions, then apply; dry-run exits before any mutation.](/docs/diagrams/08-safety-plan-before-mutation.svg)
 
 ## Principles
 
@@ -26,7 +26,7 @@ mutate the runtime except through two explicit, confirmed gates.
   checkpoints are persisted to the explicit state database *before* the runtime
   is touched.
 - **Conservative validation.** Unsafe or ambiguous manifests are refused, not
-  guessed at — see the [policy engine](/concepts/policy-engine/).
+  guessed at — see the [policy engine](/docs/concepts/policy-engine/).
 - **Ownership-tracked cleanup.** No broad garbage collection. Cleanup touches
   only resources Hostwright can prove it owns.
 - **No secret leakage.** Plans, events, logs, state rows, and errors carry
@@ -45,14 +45,14 @@ and a *fresh persisted unhealthy* health result.
 
 An interrupted operation can reuse its plan only when the persisted checkpoint
 proves runtime execution never began. Anything ambiguous stays blocked and is
-reported by [`hostwright recovery`](/operations/events-and-diagnostics/).
+reported by [`hostwright recovery`](/docs/operations/events-and-diagnostics/).
 
 ## Ownership
 
 Hostwright distinguishes resources it created from resources you created by
 hand. Hostwright-created containers carry versioned identifiers and exact
 ownership labels, mirrored by ownership records in the
-[state store](/concepts/state-store/). The rule is strict: cleanup never
+[state store](/docs/concepts/state-store/). The rule is strict: cleanup never
 deletes a resource it cannot prove Hostwright owns.
 
 Cleanup classifications from the dry run: `eligible`, `ambiguous`, `stale`,
@@ -66,11 +66,11 @@ unmanaged containers are never touched, and broad flags like `--all` or
 
 Secrets are not committed into manifests. Plaintext sensitive keys under `env`
 fail validation; secret values enter only through
-[`keychain://` references](/concepts/secrets-and-keychain/) resolved at the
+[`keychain://` references](/docs/concepts/secrets-and-keychain/) resolved at the
 last moment before a confirmed create.
 
 <Aside type="note" title="User-space first">
 Hostwright does not install privileged helpers, launch agents, or services.
 Any future operation that would require elevated privilege needs a threat
-model first — see [Security and safety](/operations/security-and-safety/).
+model first — see [Security and safety](/docs/operations/security-and-safety/).
 </Aside>

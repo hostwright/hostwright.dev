@@ -6,7 +6,7 @@ description: The operational security posture — mutation boundaries, redaction
 import { Aside } from "@astrojs/starlight/components";
 
 Hostwright `v0.1.0-alpha.1` is not production ready. This page is the
-operational counterpart to the [safety model](/concepts/safety-model/): what
+operational counterpart to the [safety model](/docs/concepts/safety-model/): what
 the boundaries mean when you run the tool.
 
 ## Mutation boundaries
@@ -42,7 +42,7 @@ runtime command construction receives the manifest value, while output, logs,
 state payloads, events, plans, and failure messages are redacted.
 
 - Plaintext credential-like keys in `env` are rejected — use
-  [`secretEnv` with `keychain://` references](/concepts/secrets-and-keychain/).
+  [`secretEnv` with `keychain://` references](/docs/concepts/secrets-and-keychain/).
 - Keychain reference labels are themselves redacted, because service/account
   names reveal local context.
 - The live macOS Keychain is not used by default; the opt-in backend is
@@ -80,7 +80,7 @@ same host port block mutation planning.
 
 ## Team, extension, and control-surface boundaries
 
-- [Team workflow](/operations/team-workflow/) is explicit local profile and
+- [Team workflow](/docs/operations/team-workflow/) is explicit local profile and
   approval data only — profiles can only get stricter, never weaker.
 - Extensions are declaration-only: Hostwright evaluates typed declarations but
   does not load, install, distribute, or execute plugins.
@@ -95,6 +95,6 @@ mutation, DNS or tunnel management, cloud control plane, Kubernetes/CRI/Docker
 API/Compose compatibility, accelerator support, plugin loader, cloud team
 service, signing/notarization/SBOM/provenance, external telemetry, hosted
 diagnostics, or support SLA. The full list is in
-[Limitations](/reference/limitations/).
+[Limitations](/docs/reference/limitations/).
 
 Report security issues per `SECURITY.md` in the core repository.

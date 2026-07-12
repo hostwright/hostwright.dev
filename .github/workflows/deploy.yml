@@ -3,8 +3,6 @@ name: Deploy
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "docs/**"
   workflow_dispatch:
 
 permissions:
@@ -24,14 +22,30 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            docs/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build site
         run: npm run build
+
+      - name: Install docs dependencies
+        run: npm ci
+        working-directory: docs
+
+      - name: Build docs
+        run: npm run build
+        working-directory: docs
+
+      - name: Merge docs into site output
+        run: |
+          rm -rf dist/docs
+          cp -R docs/dist dist/docs
 
       - uses: actions/configure-pages@v5
 

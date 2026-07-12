@@ -12,7 +12,7 @@ This alpha provides source only. Hostwright does not provide binary downloads,
 installer packages, a Homebrew formula, signed or notarized artifacts, or
 packaged launch agents. Those require separate signing, notarization, checksum,
 SBOM, provenance, and installer decisions that have not been made. See the
-[release process](/release/process/).
+[release process](/docs/release/process/).
 </Aside>
 
 ## Requirements
@@ -61,7 +61,7 @@ swift run hostwrightd --foreground --config hostwright.yaml --state-db /tmp/host
 `status`, `logs`, `apply`, `cleanup`, and `hostwrightd --foreground` can run
 explicit migrations before writing state. `events` and `recovery` and
 `diagnostics` read an already-migrated database and fail rather than creating or
-migrating one as a side effect. See [State store](/concepts/state-store/).
+migrating one as a side effect. See [State store](/docs/concepts/state-store/).
 
 ## Backup
 
@@ -73,6 +73,6 @@ restore, repair, hosted diagnostics, or automatic upload commands.
 
 ## Next
 
-- [Quick start](/getting-started/quick-start/) — the safe core loop.
-- [Source install and doctor](/tasks/source-install-and-doctor/) — the same flow as a checked task walkthrough.
-- [Compatibility](/reference/compatibility/) — the exact supported environment.
+- [Quick start](/docs/getting-started/quick-start/) — the safe core loop.
+- [Source install and doctor](/docs/tasks/source-install-and-doctor/) — the same flow as a checked task walkthrough.
+- [Compatibility](/docs/reference/compatibility/) — the exact supported environment.

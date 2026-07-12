@@ -7,10 +7,10 @@ import { Aside } from "@astrojs/starlight/components";
 
 A project is defined as much by what it refuses to do as by what it builds.
 Hostwright's non-goals are deliberate, and each has a reason. The authoritative,
-exhaustive list lives in [Limitations](/reference/limitations/); this page
+exhaustive list lives in [Limitations](/docs/reference/limitations/); this page
 explains the reasoning.
 
-![Copy, adapt, reject framing for which container-tooling ideas Hostwright keeps, reshapes, or refuses.](/diagrams/12-copy-adapt-reject.svg)
+![Copy, adapt, reject framing for which container-tooling ideas Hostwright keeps, reshapes, or refuses.](/docs/diagrams/12-copy-adapt-reject.svg)
 
 ## Copy, adapt, reject
 
@@ -29,7 +29,7 @@ Hostwright studies prior art and decides explicitly what to take:
 ## Why CRI is research-only
 
 CRI is a strong design reference for a runtime boundary, which is exactly how
-Hostwright uses it — as inspiration for the [RuntimeAdapter](/concepts/runtime-adapter/).
+Hostwright uses it — as inspiration for the [RuntimeAdapter](/docs/concepts/runtime-adapter/).
 Implementing CRI itself would mean committing to Kubernetes' contract and node-agent
 semantics that single-host Hostwright does not need. External orchestration
 compatibility (CRI shims, Kubernetes node behavior, Docker API shims,
@@ -40,7 +40,7 @@ Testcontainers targets) is research-only and rejected for the current core.
 Compose is large. Chasing 100% parity would turn Hostwright into a compatibility
 project instead of a control plane. Hostwright takes the readable-local-stack idea
 and stops there, deliberately narrower than Compose. The
-[stack importer](/tasks/stack-import/) converts a narrow reviewed subset and
+[stack importer](/docs/tasks/stack-import/) converts a narrow reviewed subset and
 fails closed on everything else.
 
 ## Why a cloud control plane is out
@@ -61,8 +61,8 @@ has not built and tested.
 <Aside type="caution" title="Research is not a promise">
 Networking, tunnels, DNS, cloud exposure, multi-host, and accelerator support all
 have research behind them in the project's design materials. Research informs the
-[roadmap](/roadmap/); it does not become a claim until there is working, tested
-code. See [Research areas](/roadmap/research/).
+[roadmap](/docs/roadmap/); it does not become a claim until there is working, tested
+code. See [Research areas](/docs/roadmap/research/).
 </Aside>
 
 ## Why destructive cleanup must be conservative
@@ -70,4 +70,4 @@ code. See [Research areas](/roadmap/research/).
 A tool that deletes the wrong thing once loses trust permanently. So cleanup is
 ownership-aware, dry-run first, token-confirmed, and never touches resources
 Hostwright cannot prove it owns. This is covered in the
-[safety model](/concepts/safety-model/).
+[safety model](/docs/concepts/safety-model/).

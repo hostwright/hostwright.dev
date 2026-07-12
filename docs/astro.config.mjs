@@ -4,7 +4,8 @@ import starlight from "@astrojs/starlight";
 import starlightLinksValidator from "starlight-links-validator";
 
 export default defineConfig({
-  site: "https://docs.hostwright.dev",
+  site: "https://hostwright.dev",
+  base: "/docs",
   integrations: [
     starlight({
       title: "Hostwright",
@@ -18,7 +19,7 @@ export default defineConfig({
           tag: "meta",
           attrs: {
             property: "og:image",
-            content: "https://docs.hostwright.dev/og.png",
+            content: "https://hostwright.dev/docs/og.png",
           },
         },
         {
@@ -32,7 +33,7 @@ export default defineConfig({
           tag: "meta",
           attrs: {
             name: "twitter:image",
-            content: "https://docs.hostwright.dev/og.png",
+            content: "https://hostwright.dev/docs/og.png",
           },
         },
       ],

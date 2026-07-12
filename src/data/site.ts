@@ -18,7 +18,7 @@ export const site = {
     github: "https://github.com/hostwright",
     x: "https://x.com/hostwrightdev",
     reddit: "https://www.reddit.com/r/hostwright/",
-    docs: "https://docs.hostwright.dev/",
+    docs: "/docs/",
   },
 } as const;
 

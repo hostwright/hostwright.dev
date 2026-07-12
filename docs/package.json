@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Documentation site for Hostwright — docs.hostwright.dev",
+  "description": "Documentation site for Hostwright — hostwright.dev/docs",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
