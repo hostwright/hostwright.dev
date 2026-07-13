@@ -1,6 +1,6 @@
 ---
 import HostwrightLogo from "./HostwrightLogo.astro";
-import { site } from "../data/site.ts";
+import SocialLinks from "./SocialLinks.astro";
 
 const navLinks = [
   { label: "Docs", href: "/docs/" },
@@ -20,7 +20,7 @@ const navLinks = [
          regardless of author `display`). -->
     <nav class="nav-desktop" aria-label="Primary">
       {navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
-      <a class="nav-github" href={site.links.github} rel="noopener">GitHub ↗</a>
+      <SocialLinks />
     </nav>
 
     <!-- Mobile nav: disclosure menu, hidden on desktop. -->
@@ -32,7 +32,7 @@ const navLinks = [
       </summary>
       <nav class="nav-menu" aria-label="Menu">
         {navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
-        <a class="nav-github" href={site.links.github} rel="noopener">GitHub ↗</a>
+        <SocialLinks />
       </nav>
     </details>
   </div>
@@ -120,10 +120,6 @@ const navLinks = [
     background: var(--color-surface);
     color: var(--color-text);
   }
-  .nav-github {
-    color: var(--color-accent) !important;
-  }
-
   /* Mobile: reveal the dropdown only when the disclosure is open. */
   .nav-mobile[open] .nav-menu {
     display: flex;

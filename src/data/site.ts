@@ -18,6 +18,8 @@ export const site = {
     github: "https://github.com/hostwright",
     x: "https://x.com/hostwrightdev",
     reddit: "https://www.reddit.com/r/hostwright/",
+    linkedin: "https://www.linkedin.com/company/hostwright",
+    instagram: "https://www.instagram.com/hostwright.dev",
     docs: "/docs/",
   },
 } as const;
