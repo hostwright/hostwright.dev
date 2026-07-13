@@ -5,5 +5,5 @@ import type { StarlightRouteData } from "@astrojs/starlight/route-data";
 // landing page rather than the docs root.
 export const onRequest = defineRouteMiddleware(({ locals }) => {
   const { starlightRoute } = locals as { starlightRoute: StarlightRouteData };
-  starlightRoute.siteTitleHref = "/";
+  starlightRoute.siteTitleHref = "https://hostwright.dev/";
 });

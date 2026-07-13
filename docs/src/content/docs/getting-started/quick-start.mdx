@@ -27,7 +27,7 @@ hostwright doctor
 `doctor` runs safe local checks only: OS version, architecture gate, Swift
 toolchain, whether a `container` executable is on `PATH`, manifest presence, and
 local resource facts. It never runs Apple container commands. See
-[Doctor checks](/docs/reference/doctor-checks/).
+[Doctor checks](/reference/doctor-checks/).
 
 ## The core loop
 
@@ -49,7 +49,7 @@ hostwright plan --output json
 
 `plan` does not inspect Apple container by default and does not claim any
 resource is running or healthy. It is a manifest-level dry run with a
-deterministic hash. See [Reconciliation](/docs/concepts/reconciliation/).
+deterministic hash. See [Reconciliation](/concepts/reconciliation/).
 
 ## A minimal manifest
 
@@ -71,7 +71,7 @@ services:
       policy: on-failure
 ```
 
-Every field is described in the [`hostwright.yaml` reference](/docs/reference/manifest/).
+Every field is described in the [`hostwright.yaml` reference](/reference/manifest/).
 
 ## Observing the runtime
 
@@ -98,11 +98,11 @@ observed plan. There is no multi-action apply.
 </Aside>
 
 The apply flow is covered step by step in
-[Plan a single service](/docs/tasks/single-service-plan/), and the safety reasoning
-in the [Safety model](/docs/concepts/safety-model/).
+[Plan a single service](/tasks/single-service-plan/), and the safety reasoning
+in the [Safety model](/concepts/safety-model/).
 
 ## Next
 
-- [Desired state](/docs/concepts/desired-state/) — the model behind the manifest.
-- [Operations and recovery](/docs/tasks/operations-and-recovery/) — status, logs, events, diagnostics, cleanup.
-- [Limitations](/docs/reference/limitations/) — what to expect, stated plainly.
+- [Desired state](/concepts/desired-state/) — the model behind the manifest.
+- [Operations and recovery](/tasks/operations-and-recovery/) — status, logs, events, diagnostics, cleanup.
+- [Limitations](/reference/limitations/) — what to expect, stated plainly.

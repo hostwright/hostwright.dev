@@ -1,0 +1,3 @@
+# Docs moved to the dedicated subdomain. Cloudflare Pages serves these as 301s.
+/docs https://docs.hostwright.dev/ 301
+/docs/* https://docs.hostwright.dev/:splat 301

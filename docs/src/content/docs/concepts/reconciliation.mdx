@@ -8,12 +8,12 @@ import { Aside } from "@astrojs/starlight/components";
 Reconciliation is the heart of Hostwright, and it is deliberately boring:
 deterministic, observable, and hard to corrupt.
 
-![Reconciliation cycle: observe actual state, diff against desired, plan actions, then the confirmed apply step, looping back to observe; dry-run stops after plan.](/docs/diagrams/04-reconcile-loop.svg)
+![Reconciliation cycle: observe actual state, diff against desired, plan actions, then the confirmed apply step, looping back to observe; dry-run stops after plan.](/diagrams/04-reconcile-loop.svg)
 
 ## The loop
 
 1. Load desired state from the manifest.
-2. Observe runtime state through the [RuntimeAdapter](/docs/concepts/runtime-adapter/).
+2. Observe runtime state through the [RuntimeAdapter](/concepts/runtime-adapter/).
 3. Compute drift.
 4. Produce a dry-run plan with a deterministic hash.
 5. Apply only through the confirmed single-action persistence gate.
@@ -21,7 +21,7 @@ deterministic, observable, and hard to corrupt.
 
 The planner maps the supported manifest subset to runtime-shaped desired state,
 accepts optional adapter-shaped observed state, runs
-[policy checks](/docs/concepts/policy-engine/), and emits typed drift records, typed
+[policy checks](/concepts/policy-engine/), and emits typed drift records, typed
 issues, typed planned actions, and a deterministic plan hash.
 
 ## Plan and apply are separate commands
@@ -35,9 +35,9 @@ issues, typed planned actions, and a deterministic plan hash.
   `createMissingService`, a restart-policy-allowed `startManagedService`, or a
   restart-policy-allowed `restartManagedService`.
 - **`hostwright cleanup`** is separate from apply, with its own dry-run token
-  gate. See the [safety model](/docs/concepts/safety-model/).
+  gate. See the [safety model](/concepts/safety-model/).
 - **`hostwrightd --foreground`** runs the loop continuously — observe, plan,
-  record — but never calls the mutation hook. See [Daemon](/docs/operations/daemon/).
+  record — but never calls the mutation hook. See [Daemon](/operations/daemon/).
 
 ## Drift cases
 
@@ -64,7 +64,7 @@ unavailable — visible in the plan, but not runnable.
 - Plan rendering must not expose raw secrets.
 - Mutation must require plan-hash confirmation.
 - Operation intent must be persisted before mutation.
-- Failures must be observable through [events](/docs/operations/events-and-diagnostics/).
+- Failures must be observable through [events](/operations/events-and-diagnostics/).
 - Managed restart requires Hostwright ownership, live observed running state,
   a fresh persisted unhealthy health result, and recovery records.
 

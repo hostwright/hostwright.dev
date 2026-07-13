@@ -31,10 +31,10 @@ Each iteration:
 
 1. Reads and validates the explicit manifest path.
 2. Maps the manifest into desired runtime state.
-3. Observes runtime state through the [RuntimeAdapter](/docs/concepts/runtime-adapter/).
+3. Observes runtime state through the [RuntimeAdapter](/concepts/runtime-adapter/).
 4. Runs bounded in-process loopback health checks for configured running
    services (the allowlisted `curl`/`wget`/`true`/`false` probe shapes — see
-   the [manifest reference](/docs/reference/manifest/)).
+   the [manifest reference](/reference/manifest/)).
 5. Persists health results and restart policy state.
 6. Computes a deterministic plan with restart-state blocking.
 7. Persists desired/observed snapshots, a daemon operation record, and events.
@@ -47,7 +47,7 @@ recorded.
 Recorded events include `daemon.started`, `daemon.reconcile.succeeded`,
 `daemon.reconcile.failed`, `daemon.backoff`, `daemon.sleep_wake_resumed`,
 `daemon.stopped`, `health.check.*`, and `restart.policy.state` — all readable
-with [`hostwright events`](/docs/operations/events-and-diagnostics/).
+with [`hostwright events`](/operations/events-and-diagnostics/).
 
 <Aside type="caution" title="The daemon never mutates">
 `hostwrightd` uses the read-only adapter and does not call the mutation hook.
@@ -77,4 +77,4 @@ paths, unattended runtime mutation, aggressive crash-loop enforcement, broad
 lifecycle management, and image/volume cleanup are not implemented today.
 Trusted installation/defaults belong to Phase 02, lifecycle to Phase 04, and
 autonomous daemon/recovery/finalizers/GC to Phase 08. Unmanaged cleanup remains
-permanently prohibited. See [Limitations](/docs/reference/limitations/).
+permanently prohibited. See [Limitations](/reference/limitations/).

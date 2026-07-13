@@ -4,7 +4,7 @@ export const hero = {
   title: "Desired-state container control for Apple silicon Macs.",
   subtitle:
     "Hostwright is a Mac-native container platform on the 0.0.2-dev line. Today it exposes Manifest v2, deterministic plans, exact capability truth, durable local ledgers, and narrow confirmation-gated Apple container operations while the 15-phase v0.0.2 platform is built.",
-  ctaPrimary: { label: "Read the docs", href: "/docs/" },
+  ctaPrimary: { label: "Read the docs", href: "https://docs.hostwright.dev/" },
   ctaSecondary: {
     label: "View on GitHub",
     href: "https://github.com/hostwright",

@@ -71,7 +71,7 @@ fields fail closed too, including `apiVersion`, `kind`, `metadata`, `build`,
 `extra_hosts`, `aliases`, `expose`, `configs`, and `secrets`.
 </Aside>
 
-[`hostwright import-stack`](/docs/tasks/stack-import/) can convert a smaller
+[`hostwright import-stack`](/tasks/stack-import/) can convert a smaller
 stack-file subset into this shape — conversion only, with the normal validator
 run on the output.
 
@@ -103,7 +103,7 @@ probes parse `curl`, `wget`, `true`, and `false` shaped commands:
 - `true` / `false`: no arguments, evaluated directly.
 
 URL-shaped probes run through Hostwright's in-process URL fetcher in the
-[daemon](/docs/operations/daemon/).
+[daemon](/operations/daemon/).
 
 ## Ports and networking
 
@@ -119,4 +119,4 @@ environment values, paths, and probe commands an operator should review before
 any confirmed apply or daemon run.
 
 Never place plaintext credentials in manifests. `secretEnv` stores a local
-reference, not a value; see [Secrets and Keychain](/docs/concepts/secrets-and-keychain/).
+reference, not a value; see [Secrets and Keychain](/concepts/secrets-and-keychain/).

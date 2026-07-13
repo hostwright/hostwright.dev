@@ -64,7 +64,7 @@ with `hasFailures: true` and exit code 65, not as an error envelope.
 | `72` | Partial failure — mixed cleanup outcome or failed benchmark evidence |
 
 The stable `HW-*` diagnostic codes are on the
-[error codes page](/docs/reference/error-codes/).
+[error codes page](/reference/error-codes/).
 
 ## `hostwright --version`
 
@@ -93,7 +93,7 @@ Converts a narrow safe stack-file subset and prints `hostwright.yaml` text to
 stdout. Writes nothing, observes nothing, contacts nothing. Unsupported fields
 (build contexts, named volumes, `secrets`, `configs`, `env_file`,
 `depends_on`, `deploy`, networking/DNS fields, shell health checks) fail
-closed with stable diagnostics. See [Import a stack file](/docs/tasks/stack-import/).
+closed with stable diagnostics. See [Import a stack file](/tasks/stack-import/).
 
 ## `hostwright validate [path]`
 
@@ -126,7 +126,7 @@ actions, create actions with mounts/privileged ports/broad bind
 addresses/flag-like values, unconfirmed local image, non-matching
 start/restart preconditions, an active operation lease, or a missing/mismatched
 team approval. Ports are published to `127.0.0.1` by default. See the
-[safety model](/docs/concepts/safety-model/).
+[safety model](/concepts/safety-model/).
 
 ## `hostwright status [path] [--state-db <path>]`
 
@@ -197,7 +197,7 @@ Safe local checks only: OS version, architecture/macOS gate, Swift toolchain
 version, `container` executable lookup, manifest presence, state-path policy,
 telemetry policy, and a local resource-intelligence report with explicit
 `unmeasured` dimensions. Never runs Apple container commands. See
-[Doctor checks](/docs/reference/doctor-checks/).
+[Doctor checks](/reference/doctor-checks/).
 
 ## `hostwrightd --foreground --config <path> --state-db <path>`
 
@@ -206,4 +206,4 @@ The foreground development daemon loop. Options: `--interval <seconds>`
 (default 300), `--max-iterations <count>`, `--lock-file <path>` (default
 `<state-db>.hostwrightd.lock`). Each iteration validates, observes, plans, and
 records events — it never calls the mutation hook, installs no launch agent,
-and performs no unattended mutation. See [Daemon](/docs/operations/daemon/).
+and performs no unattended mutation. See [Daemon](/operations/daemon/).
