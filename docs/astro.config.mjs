@@ -14,6 +14,7 @@ export default defineConfig({
       logo: { src: "./src/assets/hostwright-mark.png", alt: "Hostwright" },
       favicon: "/favicon.ico",
       customCss: ["./src/styles/theme.css"],
+      routeMiddleware: "./src/routeData.ts",
       head: [
         {
           tag: "meta",
