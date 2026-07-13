@@ -45,6 +45,22 @@ export default defineConfig({
           label: "GitHub",
           href: "https://github.com/hostwright/hostwright",
         },
+        { icon: "x.com", label: "X", href: "https://x.com/hostwrightdev" },
+        {
+          icon: "reddit",
+          label: "Reddit",
+          href: "https://www.reddit.com/r/hostwright/",
+        },
+        {
+          icon: "linkedin",
+          label: "LinkedIn",
+          href: "https://www.linkedin.com/company/hostwright",
+        },
+        {
+          icon: "instagram",
+          label: "Instagram",
+          href: "https://www.instagram.com/hostwright.dev",
+        },
       ],
       editLink: {
         baseUrl: "https://github.com/hostwright/hostwright.dev/edit/main/docs/",
