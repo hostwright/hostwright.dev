@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "node scripts/render-og.mjs && astro build",
+    "build": "node scripts/render-og.mjs && astro build && npm run build:docs",
+    "build:docs": "npm --prefix docs ci && npm --prefix docs run build && rm -rf dist/docs && cp -R docs/dist dist/docs",
     "preview": "astro preview",
     "check": "astro check",
     "og": "node scripts/render-og.mjs"
