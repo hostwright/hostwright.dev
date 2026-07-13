@@ -1,73 +1,66 @@
 ---
-title: Non-goals
-description: What Hostwright refuses to do, and why each refusal makes the project stronger rather than weaker.
+title: Limits, fallbacks, and safety boundaries
+description: Every current Hostwright limitation has an implementation owner, a safe fallback, or a narrow permanent safety reason.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-A project is defined as much by what it refuses to do as by what it builds.
-Hostwright's non-goals are deliberate, and each has a reason. The authoritative,
-exhaustive list lives in [Limitations](/docs/reference/limitations/); this page
-explains the reasoning.
+The old roadmap called major platform capabilities “non-goals.” The `v0.0.2`
+truth reset removes that escape hatch. Missing, partial, blocked, and
+research-only work is now owned by one of 15 implementation phases.
 
-![Copy, adapt, reject framing for which container-tooling ideas Hostwright keeps, reshapes, or refuses.](/docs/diagrams/12-copy-adapt-reject.svg)
+## Limitations that are being implemented
 
-## Copy, adapt, reject
+| Capability | Current truth | Owning phase |
+| --- | --- | ---: |
+| Trusted Homebrew/archive/`.pkg` install | Does not exist; source development only. | 02 and 15 |
+| Apple `container` + Containerization parity | Apple provider is narrow; direct helper absent. | 03 |
+| Complete Manifest/lifecycle/rollback | Restricted v2 subset and narrow apply only. | 04 |
+| OCI/registry/Keychain/supply chain | Local reference and policy fragments only. | 05 |
+| Persistent storage/data protection | Scaffolding and guarded mounts only. | 06 |
+| Networks/DNS/ingress/TLS/tunnels | Metadata/research; no complete implementation. | 07 |
+| Autonomous daemon/observability/GC | Foreground loop and local events/diagnostics only. | 08 |
+| API/auth/RBAC/admission/audit/plugins | One-shot API and reviewed-local handshake only. | 09 |
+| Scheduler/optimization/accelerators | Advisory models/research only. | 10 |
+| Multi-Mac consensus/HA | Research only. | 11 |
+| Kubernetes/CRI/CNI/CSI/Helm | Not implemented. | 12 |
+| Docker/Compose/Podman/Testcontainers/IDE | Narrow import only; no Docker API. | 13 |
+| GUI/team/MDM/optional cloud | Requirements/local profiles only. | 14 |
+| Security/fuzz/soak/conformance/signed GA | Not qualified. | 15 |
 
-Hostwright studies prior art and decides explicitly what to take:
+## Fallbacks for external constraints
 
-| Source idea | Decision | What Hostwright does |
-| --- | --- | --- |
-| Kubernetes controllers | **Adapt** | A local observe–diff–plan–apply–observe loop. |
-| Kubernetes API server | **Reject (for now)** | Single-host control needs no distributed API server. |
-| Container Runtime Interface (CRI) | **Study, don't implement** | Inspiration for the adapter boundary, not a shim. |
-| Docker Compose | **Adapt lightly** | A readable local stack format, not full parity. |
-| Docker API compatibility | **Reject as core** | Already covered elsewhere; distracts from controller-first design. |
-| Apple container CLI | **Adopt initially** | Structured output behind the adapter while native APIs settle. |
-| Containerization APIs | **Adopt when stable** | A Swift-native runtime path, later. |
+- Homebrew-core acceptance is external. Hostwright guarantees a vendor tap once
+  Phase 02 passes; the unqualified formula is submitted in Phase 15.
+- Direct guest GPU/ANE passthrough waits for a supported public Apple API.
+  Phase 10 implements a signed authenticated host-native Metal/Core ML/MLX
+  service instead of fabricating passthrough.
+- Multi-Mac mutation becomes read-only without etcd quorum rather than
+  acknowledging unsafe conflicting writes.
+- Third-party tunnels are optional providers; Hostwright-to-Hostwright secure
+  tunnels remain a first-party Phase 07 outcome.
 
-## Why CRI is research-only
+## Permanent boundaries
 
-CRI is a strong design reference for a runtime boundary, which is exactly how
-Hostwright uses it — as inspiration for the [RuntimeAdapter](/docs/concepts/runtime-adapter/).
-Implementing CRI itself would mean committing to Kubernetes' contract and node-agent
-semantics that single-host Hostwright does not need. External orchestration
-compatibility (CRI shims, Kubernetes node behavior, Docker API shims,
-Testcontainers targets) is research-only and rejected for the current core.
+Only the unsafe mechanism is excluded:
 
-## Why full Compose parity is rejected
+- private or undocumented Apple APIs;
+- Intel or old-macOS emulation outside the Apple-silicon platform;
+- cluster mutation without quorum;
+- silent telemetry or automatic diagnostics upload;
+- unauthenticated public control;
+- deletion of resources Hostwright cannot prove it owns.
 
-Compose is large. Chasing 100% parity would turn Hostwright into a compatibility
-project instead of a control plane. Hostwright takes the readable-local-stack idea
-and stops there, deliberately narrower than Compose. The
-[stack importer](/docs/tasks/stack-import/) converts a narrow reviewed subset and
-fails closed on everything else.
-
-## Why a cloud control plane is out
-
-Hostwright is single-host by design. A hosted control plane, multi-Mac
-orchestration, and remote state are a different product with different failure
-modes. Multi-host platform work is research-only: remote host agents, membership,
-peer discovery, state replication, remote mutation, and scheduler APIs are all
-rejected for the current core.
-
-## Why GPU and accelerator claims are research-only
-
-Apple silicon acceleration — GPU/ANE scheduling, Metal, Core ML, MLX, PyTorch MPS
-in containers — is genuinely interesting and genuinely hard. It is treated as
-research, not as a feature. Hostwright will not claim accelerator capabilities it
-has not built and tested.
-
-<Aside type="caution" title="Research is not a promise">
-Networking, tunnels, DNS, cloud exposure, multi-host, and accelerator support all
-have research behind them in the project's design materials. Research informs the
-[roadmap](/docs/roadmap/); it does not become a claim until there is working, tested
-code. See [Research areas](/docs/roadmap/research/).
+<Aside type="caution" title="Planned does not mean supported">
+Moving a limitation into the roadmap does not make it current support.
+Implementation requires runnable behavior and clean unit, integration, live,
+security, recovery, migration, performance, interoperability, and cleanup
+evidence declared by the owning issue.
 </Aside>
 
-## Why destructive cleanup must be conservative
+## Conservative cleanup stays permanent
 
-A tool that deletes the wrong thing once loses trust permanently. So cleanup is
-ownership-aware, dry-run first, token-confirmed, and never touches resources
-Hostwright cannot prove it owns. This is covered in the
-[safety model](/docs/concepts/safety-model/).
+A tool that deletes the wrong resource once loses trust. Names and similarity
+never prove ownership. Hostwright can discover or quarantine an unmanaged
+resource, but adoption and deletion require explicit identity and authorization.
+See the [safety model](/docs/concepts/safety-model/).

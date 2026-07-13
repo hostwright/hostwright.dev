@@ -1,50 +1,60 @@
 ---
 title: What Hostwright is
-description: Hostwright is a Mac-native desired-state control plane for Apple container workloads. Start here.
+description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Current 0.0.2-dev truth and the v0.0.2 roadmap start here.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright is a **Mac-native desired-state control plane** for [Apple container](/docs/concepts/apple-container-boundary/) workloads.
+Hostwright is a **Mac-native desired-state container platform** for [Apple container](/docs/concepts/apple-container-boundary/) workloads.
 
-You declare local services in a restricted [`hostwright.yaml`](/docs/reference/manifest/) manifest. Hostwright validates it, computes a deterministic non-mutating [plan](/docs/concepts/reconciliation/), observes the runtime through a single typed [adapter boundary](/docs/concepts/runtime-adapter/), persists state to an explicit SQLite path you choose, and mutates the runtime only through narrow, hash-confirmed gates.
+You declare services in a versioned [`hostwright.yaml`](/docs/reference/manifest/) manifest. Hostwright validates intent, computes a deterministic plan, persists exact desired/observed/operation identity, and crosses a typed runtime-provider boundary for every runtime action.
 
-It is built for one machine: an Apple silicon Mac running macOS 26 or newer with Apple container installed. It is not a cluster orchestrator, and it does not try to be.
-
-<Aside type="caution" title="Source-only alpha">
-Hostwright `v0.1.0-alpha.1` is a source-only alpha. It is not production ready.
-There are no binary downloads, installers, Homebrew formulae, signed or notarized
-artifacts. You [build it from source](/docs/getting-started/install-from-source/).
-Read [Limitations](/docs/reference/limitations/) before relying on any behavior.
+<Aside type="caution" title="0.0.2 development build">
+Hostwright is on the `0.0.2-dev` line. The release target is `v0.0.2`; it has
+not passed GA qualification and is not production ready. `brew install
+hostwright` does not exist today. Build from source and read
+[Limitations](/docs/reference/limitations/) before relying on behavior.
 </Aside>
 
 ## What works today
 
-- `hostwright init`, `validate`, and `plan` — restricted manifest parsing, fail-closed validation, and deterministic non-mutating planning with a plan hash.
-- `hostwright status --state-db <path>` — live runtime observation through the RuntimeAdapter with event and snapshot persistence.
-- `hostwright apply --state-db <path> --confirm-plan <hash>` — exactly **one** confirmed action per invocation: create a missing service, or a restart-policy-allowed managed start or managed restart.
-- `hostwright logs`, `events`, `recovery`, `diagnostics` — bounded, redacted, local-only observability from the explicit state database.
-- `hostwright cleanup` — dry-run classification first, then token-confirmed deletion of exact Hostwright-owned stopped/created/exited containers only.
-- `hostwrightd --foreground` — a foreground reconciliation loop that observes, plans, runs loopback health probes, and records events. It never mutates the runtime.
-- `keychain://` [secret references](/docs/concepts/secrets-and-keychain/) in `secretEnv`, backed by an opt-in noninteractive read-only macOS Keychain reader.
-- `hostwright doctor` — safe local checks and resource intelligence, with unmeasured dimensions reported as unmeasured.
+- `hostwright --version` and `hostwright capabilities --json` expose build and capability truth.
+- `hostwright init`, `validate`, and `plan` provide explicit Manifest v2, restricted fail-closed parsing, and deterministic planning.
+- `hostwright migrate preview` produces a deterministic non-writing preview for legacy v1/versionless manifests.
+- `status`, bounded `logs`, `events`, `recovery`, and local redacted `diagnostics` use explicit state paths.
+- Confirmation-gated `apply` supports only the currently declared narrow create/start/restart surface.
+- `cleanup` classifies first and deletes only exact cleanup-eligible Hostwright-owned non-running containers after token confirmation.
+- `hostwrightd --foreground` observes, plans, checks bounded loopback health, and records events; it is not the autonomous Phase 08 daemon.
+- SQLite schema v7 establishes UUID identity, provider binding, fencing, saga intent, compensation, and verification records.
+- Secret references, local policy/team profiles, a one-shot Control API v2 process, advisory scheduler models, and unsigned developer distribution evidence exist within their documented narrow boundaries.
 
-Everything else — general lifecycle management, multi-action apply, unattended daemon mutation, DNS, tunnels, Kubernetes or Docker API compatibility, Compose parity — is a non-goal or not implemented. The [Limitations](/docs/reference/limitations/) page is the authoritative list.
+Everything else is a **current limitation with an owner**, not a discarded non-goal. The 15-phase `v0.0.2` program covers trusted install, both Apple providers, complete lifecycle, images/registries/secrets, storage, networking, autonomous recovery, security/extensions, scheduling/accelerators, multi-Mac HA, Kubernetes, Docker ecosystem, GUI/team/cloud, and GA qualification.
+
+## Locked contracts
+
+| Contract | Version |
+| --- | ---: |
+| Manifest | 2 |
+| Control API | 2 |
+| Runtime Provider API | 2 |
+| Plugin ABI | 1 |
+| State schema | 7 |
 
 ## How these docs are organized
 
 | Section | Answers |
 | --- | --- |
-| **Getting started** | Build from source, run the safe core loop. |
-| **Concepts** | How Hostwright thinks: desired state, the adapter, reconciliation, state, policy, safety, secrets. |
-| **Tasks** | Step-by-step walkthroughs, each labeled read-only, state-writing, or mutating. |
-| **Reference** | Exact surfaces: CLI, manifest, error codes, policy, doctor checks, limitations, compatibility. |
-| **Operations** | Security and safety, team workflow, the daemon, events and diagnostics. |
-| **Release** | The release process and release notes, source-only artifact policy included. |
-| **Roadmap and research** | What is planned, deferred, rejected, or research-only — clearly labeled, never presented as current support. |
+| **Getting started** | Honest source setup and the currently runnable safe loop. |
+| **Concepts** | Desired state, providers, reconciliation, identity/state, policy, safety, and secrets. |
+| **Tasks** | Walkthroughs labeled non-mutating, state-writing, or runtime-mutating. |
+| **Reference** | Exact CLI, manifest, compatibility, limitations, error, policy, and evidence contracts. |
+| **Operations** | Security, team workflow, daemon, events, diagnostics, and recovery. |
+| **Release** | The v0.0.2 RC/GA process plus immutable historical notes. |
+| **Roadmap** | All 15 phases and 167 workstreams; planned behavior is never current support. |
 
 ## Where to start
 
-- New here? Read [Why Hostwright](/docs/overview/why-hostwright/), then [Desired state](/docs/concepts/desired-state/).
-- Want the boundaries first? Read [Non-goals](/docs/overview/non-goals/) and [Limitations](/docs/reference/limitations/).
-- Ready to try it? [Install from source](/docs/getting-started/install-from-source/), then the [Quick start](/docs/getting-started/quick-start/).
+- Read [Why Hostwright](/docs/overview/why-hostwright/) and [Desired state](/docs/concepts/desired-state/).
+- Read [Limits, fallbacks, and safety boundaries](/docs/overview/non-goals/) plus the exhaustive [Limitations](/docs/reference/limitations/).
+- Follow [Install from source](/docs/getting-started/install-from-source/) and the [Quick start](/docs/getting-started/quick-start/).
+- Inspect the [v0.0.2 roadmap](/docs/roadmap/) before interpreting research or historical pages as current scope.

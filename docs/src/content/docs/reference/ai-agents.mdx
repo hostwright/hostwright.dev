@@ -5,17 +5,17 @@ description: The exact prompt to give an AI assistant so it sets up Hostwright c
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright has no packaged release — no Homebrew formula, no curl-to-shell
-installer, no binary download. The only way to run it is from source. That is
-exactly the kind of gap an AI assistant tends to paper over: it will
-confidently suggest `brew install hostwright` (doesn't exist) or invent a
+Hostwright has no trusted packaged release yet — no available Homebrew formula,
+`.pkg`, or signed/notarized binary. The current way to run it is from source.
+That is exactly the kind of gap an assistant tends to paper over: it may
+confidently suggest `brew install hostwright` (doesn't exist today) or invent a
 `hostwright down` command (not implemented). This page is one prompt that
 fixes both.
 
-<Aside type="caution" title="No installer">
-Hostwright ships as Swift Package Manager source only. Getting it running
-means cloning the repository and using `swift build` / `swift run` — there is
-nothing to `brew install` or `curl | sh`.
+<Aside type="caution" title="No installer today">
+The `0.0.2-dev` line runs from Swift Package Manager source. Phase 02 owns the
+trusted vendor tap/archive/`.pkg`; Phase 15 owns Homebrew-core submission.
+Those roadmap outcomes are not current installation commands.
 </Aside>
 
 ## The prompt
@@ -23,21 +23,20 @@ nothing to `brew install` or `curl | sh`.
 Paste this into your assistant before asking it to help with Hostwright:
 
 ```text
-I want to try Hostwright, a Mac-native desired-state control plane for Apple
-container workloads, currently a source-only alpha (v0.1.0-alpha.1). It has
-no packaged release — do not suggest brew, npm, curl-to-shell, or any
+I want to try Hostwright, a Mac-native desired-state container platform for
+Apple silicon, currently on 0.0.2-dev with a v0.0.2 target. It has no trusted
+packaged release yet — do not suggest brew, npm, curl-to-shell, or any
 installer. The only way to run it is from source:
 
 git clone https://github.com/hostwright/hostwright
 cd hostwright
-git checkout v0.1.0-alpha.1
 swift build
 swift test
 
 Run commands with `swift run hostwright ...`, not a bare binary.
 
-Safe commands (no runtime mutation): --version, init, import-stack,
-validate, plan, status, logs, events, recovery, diagnostics,
+Safe commands (no runtime mutation): --version, capabilities, migrate preview,
+init, import-stack, validate, plan, status, logs, events, recovery, diagnostics,
 cleanup --dry-run, doctor. Stateful commands require an explicit
 --state-db <path>; there is no default database path.
 
@@ -48,7 +47,7 @@ Never suggest running apply or confirmed cleanup automatically, never
 invent flags, and never suggest stop/restart/down/rm commands — they do
 not exist.
 
-The manifest (hostwright.yaml) supports only: version: 1, project,
+The currently executable manifest (hostwright.yaml) requires: version: 2, project,
 imagePolicy (allow-tags|require-digest), and per service: image, command,
 ports, env, secretEnv (keychain://<service>/<account> references only),
 volumes, health.command, health.interval, restart.policy
@@ -76,8 +75,8 @@ Drop the same constraints into a rules file the agent reads automatically —
 ```md
 # Hostwright — agent ground rules
 
-Source-only alpha; run via `swift run hostwright ...`. Safe commands:
---version, init, import-stack, validate, plan, status, logs, events,
+0.0.2-dev source workflow; run via `swift run hostwright ...`. Safe commands:
+--version, capabilities, migrate preview, init, import-stack, validate, plan, status, logs, events,
 recovery, diagnostics, cleanup --dry-run, doctor. Stateful commands need
 an explicit --state-db path. Mutation only via apply --confirm-plan <hash>
 (one action) or cleanup --confirm-cleanup <token> — never run these

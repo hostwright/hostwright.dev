@@ -1,6 +1,6 @@
 ---
 title: Testing and evidence
-description: The five evidence classes behind every Hostwright support claim, and the rules that stop blocked work from being reported as passed.
+description: The eleven evidence classes behind every Hostwright support claim, and the rules that stop blocked work from being reported as passed.
 ---
 
 Hostwright separates deterministic test coverage from evidence that exercises
@@ -14,6 +14,12 @@ these classes — a report uses exactly one:
 | `live-runtime` | Real runtime behavior against uniquely named disposable Hostwright-owned resources with exact cleanup. | Unmeasured hardware efficiency, provider behavior, distribution trust. |
 | `hardware-benchmark` | Measured work on the recorded physical hardware with raw samples and exact tool versions. | Capacity guarantees, other hardware, unmeasured accelerator behavior. |
 | `distribution-artifact` | Actual build, checksum, SBOM/provenance, signing, notarization, install/upgrade/uninstall stages that ran. | Any stage recorded as blocked or failed. |
+| `migration-upgrade` | Real forward migration, upgrade, rollback window, backup, restore, and mixed-version behavior. | A schema unit test or invented prior artifact alone. |
+| `security-assessment` | Threat/adversarial tests, fuzzing, scans, penetration work, and remediation for the reviewed boundary. | A blanket claim for an unreviewed deployment. |
+| `resilience-chaos` | Recovery under injected process/storage/network/timing/checkpoint faults with exact cleanup. | Faults or soak time that were not exercised. |
+| `multi-host` | Physical Mac cluster quorum, fencing, failover, partitions, identity, upgrade, and cleanup behavior. | Multiple local processes or simulation alone. |
+| `interop-conformance` | Named upstream suite and exact protocol/client/version results. | Untested endpoints, versions, clients, or silently dropped fields. |
+| `ux-accessibility` | Completed workflows, API parity, accessibility and assistive-technology results. | Visual review alone. |
 
 Reports conform to `schemas/hostwright-evidence.schema.json` in the core
 repository. Status is `passed`, `failed`, or `blocked` — **there is no
@@ -47,12 +53,13 @@ development diagnosis but cannot satisfy a release gate.
   other prerequisite makes the report `blocked`.
 - Blocked work may **not** be converted to passed with a fixture, no-op
   implementation, conditional early return, or silently skipped test.
-- Exact cleanup failure makes live-runtime or hardware evidence fail even when
+- Exact cleanup failure makes live-runtime, hardware, resilience, multi-host,
+  or interoperability evidence fail even when
   the measured operation succeeded.
 
 ## Why this matters for these docs
 
-The [Phase-37 documentation rules](/docs/roadmap/) require every current-support
+The [v0.0.2 Phase 01 documentation rules](/docs/roadmap/) require every current-support
 claim on this site to trace to reference docs or tests in the core repository.
 When a page here says "implemented", that means covered by passing evidence in
 one of these classes for the reviewed commit — not "should work".

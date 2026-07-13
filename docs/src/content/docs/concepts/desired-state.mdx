@@ -48,7 +48,7 @@ service references an image and the runtime details needed to run it — ports,
 environment, secret references, health checks, and restart policy.
 
 ```yaml
-version: 1
+version: 2
 project: api-local
 
 services:
@@ -58,11 +58,11 @@ services:
       - "8080:8080"
 ```
 
-<Aside type="note" title="Single host by design">
-Desired state in Hostwright is scoped to one Mac. There is no cluster, no shared
-control plane, and no cross-machine scheduling. This is a deliberate boundary,
-not a missing feature — see [Why Hostwright](/docs/overview/why-hostwright/) and
-[Non-goals](/docs/overview/non-goals/).
+<Aside type="note" title="Single-host authority today">
+Current desired state is scoped to one Mac. Phase 11 extends the same UUID,
+fencing, recovery, and policy model to managed-etcd multi-Mac authority; it is
+planned, not current support. See [Why Hostwright](/docs/overview/why-hostwright/)
+and [Limits and fallbacks](/docs/overview/non-goals/).
 </Aside>
 
 ## What convergence is not

@@ -11,7 +11,7 @@ The manifest filename is `hostwright.yaml`. A JSON Schema is checked in at
 ## Current shape
 
 ```yaml
-version: 1
+version: 2
 project: api-local
 imagePolicy: allow-tags
 
@@ -31,20 +31,22 @@ services:
       policy: on-failure
 ```
 
-Do not use Kubernetes-style `apiVersion`, `kind`, or `metadata`.
+Canonical Hostwright manifests use this contract. Phase 12 translates supported Kubernetes resources rather than overloading this file with Kubernetes `apiVersion`, `kind`, or `metadata` fields.
 
 ## Version policy
 
-`version: 1` is the current manifest version. Versionless manifests are
-accepted during this alpha as legacy version 1 input. Versions older or newer
-than 1 fail closed. There is no automatic upgrade, downgrade, or compatibility
-conversion.
+`version: 2` is required for execution. Versionless and explicit v1 manifests
+are legacy input. Preview a deterministic non-writing conversion with
+`hostwright migrate preview hostwright.yaml` (or `--json`). The current preview
+inserts/replaces the version contract and is idempotent for v2; Phase 04 owns
+complete semantic migration. Future versions fail closed and Hostwright never
+silently downgrades input.
 
 ## Fields
 
 | Field | Form | Rules |
 | --- | --- | --- |
-| `version` | optional scalar | Exactly `1` if present. |
+| `version` | required scalar | Exactly `2`. |
 | `project` | scalar | Required, DNS-like name. |
 | `imagePolicy` | optional scalar | `allow-tags` (default) or `require-digest`. |
 | `services.<name>` | map | Service names are DNS-like; two-space indentation. |
@@ -105,7 +107,7 @@ URL-shaped probes run through Hostwright's in-process URL fetcher in the
 
 ## Ports and networking
 
-Port syntax has no bind-address field in this alpha. Hostwright-created
+The currently executable v2 subset has no bind-address field. Hostwright-created
 runtime port publishes default to `127.0.0.1`. DNS, service discovery, network
 aliases, and reverse proxy settings are not manifest features.
 
