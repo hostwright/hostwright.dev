@@ -1,6 +1,3 @@
-// Current state. Honest by default: nothing is marked "implemented" except the
-// design itself. The source design record places the project at the start of the
-// Foundation track — repository creation and build work are still ahead.
 export type Status = "planned" | "in-progress" | "implemented" | "blocked";
 
 export const statusLabel: Record<Status, string> = {
@@ -18,53 +15,78 @@ export interface RoadmapItem {
 
 export const roadmap: RoadmapItem[] = [
   {
-    title: "Design locked",
-    status: "implemented",
-    detail: "Architecture, boundaries, and the first-release contract are written down.",
+    title: "01 · Truth and contracts",
+    status: "in-progress",
+    detail: "Manifest/API/provider/plugin/state versions, UUID identity, saga state, migration, capability truth, and governance.",
   },
   {
-    title: "Repo scaffold",
+    title: "02 · Trusted foundation",
     status: "planned",
-    detail: "Swift package layout, module boundaries, tests, CI, and decision records.",
+    detail: "Vendor tap, signed/notarized packages, secure state/defaults, doctor, upgrade, rollback, uninstall, SBOM/provenance.",
   },
   {
-    title: "CLI skeleton",
+    title: "03 · Apple providers",
     status: "planned",
-    detail: "Argument parsing and command dispatch for the hostwright command surface.",
+    detail: "Conformant Apple CLI and pinned Containerization providers with capability negotiation and safe migration.",
   },
   {
-    title: "Manifest validation",
+    title: "04 · Complete local lifecycle",
     status: "planned",
-    detail: "Schema and semantic checks for hostwright.yaml before any runtime action.",
+    detail: "Maintained YAML, full Manifest v2, durable operation DAG, dependencies, probes, updates, rollback, and lifecycle commands.",
   },
   {
-    title: "RuntimeAdapter",
+    title: "05 · Images and trust",
     status: "planned",
-    detail: "The typed runtime boundary plus a mock adapter for testing the reconciler.",
+    detail: "OCI lifecycle, registries, Keychain/providers, signatures, SBOM, vulnerability policy, provenance, and cache GC.",
   },
   {
-    title: "Apple container adapter",
+    title: "06 · Persistent storage",
     status: "planned",
-    detail: "First concrete adapter over the Apple container CLI with structured output.",
+    detail: "Volumes, snapshots, online backup/restore, quotas, fencing, reclaim, and orphan garbage collection.",
   },
   {
-    title: "Reconciler",
+    title: "07 · Networking",
     status: "planned",
-    detail: "Observe, diff, plan, apply, observe — idempotent and deterministic.",
+    detail: "Networks, DNS, dual stack, ingress, TLS/mTLS, policy, secure tunnels, and provider SPI.",
   },
   {
-    title: "State store",
+    title: "08 · Autonomous operations",
     status: "planned",
-    detail: "Durable desired state, events, and ownership ledger in SQLite.",
+    detail: "LaunchAgent, reconciliation, rollout/recovery, finalizers/GC, OSLog, events, metrics, traces, and support bundles.",
   },
   {
-    title: "Doctor checks",
+    title: "09 · Secure control and plugins",
     status: "planned",
-    detail: "Host, macOS, architecture, and Apple container readiness diagnostics.",
+    detail: "Persistent API, identity, RBAC, admission, tamper-evident audit, workload profiles, WASI, and signed XPC.",
   },
   {
-    title: "Safe cleanup",
+    title: "10 · Scheduling and accelerators",
     status: "planned",
-    detail: "Ownership-aware teardown with dry-run and explicit destructive confirmation.",
+    detail: "Fair deterministic placement, topology/disruption/hysteresis, pressure/energy, and host-native Metal/Core ML/MLX.",
+  },
+  {
+    title: "11 · Multi-Mac HA",
+    status: "planned",
+    detail: "Cluster CA, managed etcd, node agents, fencing, remote placement/storage/discovery, failover, upgrades, and DR.",
+  },
+  {
+    title: "12 · Kubernetes",
+    status: "planned",
+    detail: "Real pod-sandbox VM, CRI/CNI/CSI, kubelet, resource/Helm translation, scheduler/device integration, and conformance.",
+  },
+  {
+    title: "13 · Docker ecosystem",
+    status: "planned",
+    detail: "Docker API/context, Compose, Podman, Testcontainers, GitHub Actions, Xcode, VS Code, and JetBrains.",
+  },
+  {
+    title: "14 · Native and team control",
+    status: "planned",
+    detail: "Accessible SwiftUI app, parity, team/MDM, optional offline-safe cloud, OIDC, outbound agents, and remote audit.",
+  },
+  {
+    title: "15 · GA qualification",
+    status: "planned",
+    detail: "Security, fuzzing, sanitizers, soaks, conformance, performance, DR, docs, support, signed v0.0.2, and Homebrew core.",
   },
 ];

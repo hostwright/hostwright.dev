@@ -1,80 +1,62 @@
 ---
-title: Roadmap
-description: What is next for Hostwright, with every item labeled implemented, planned, deferred, rejected, or research-only — never presented as current support.
+title: v0.0.2 roadmap
+description: The active 15-phase Hostwright v0.0.2 implementation program, backed by 167 workstreams and executable evidence gates.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 import Status from "../../../components/Status.astro";
 
-Hostwright advances in numbered engineering phases, each landing with tests,
-docs, and an explicit boundary. This page labels forward-looking work
-honestly. If an item is not marked <Status kind="implemented" />, it is not
-current support — see [Limitations](/docs/reference/limitations/) for the
-authoritative boundary.
+<Status kind="in-progress" /> Hostwright is executing the `v0.0.2` all-in
+roadmap: one master release issue, 15 phase epics, and 167 child workstreams.
+Execution targets one phase per day from Phase 01 on 2026-07-13 through the
+Phase 15 and `v0.0.2` GA gate on 2026-07-27.
 
 <Aside type="note" title="Evidence-backed completion">
-Nothing on this roadmap is "done" by being described. Completion requires
-matching tests or evidence in the core repository — see
-[Testing evidence](/docs/reference/testing-evidence/).
+A design, document, model, mock, fixture, blocked report, or dirty run cannot
+close an implementation issue. Every phase ends in runnable behavior and clean
+evidence, and the complete regression baseline runs at each gate.
 </Aside>
 
-## Direction decision
+| Phase | Target | Outcome |
+| ---: | --- | --- |
+| 01 | 2026-07-13 | Truth reset, UUID/provider/saga architecture, Manifest/API/provider/plugin/state contracts, migration preview, capability truth, docs and GitHub governance. |
+| 02 | 2026-07-14 | Vendor Homebrew tap, signed/notarized archive and `.pkg`, secure defaults/state, doctor, upgrade/rollback/uninstall, SBOM/provenance. |
+| 03 | 2026-07-15 | Conformant Apple `container` and pinned out-of-process Containerization providers, capability negotiation, binding, migration, upgrade recovery. |
+| 04 | 2026-07-16 | Maintained YAML, complete Manifest v2, durable operation DAG/saga, multi-service lifecycle, probes, updates, rollback, examples. |
+| 05 | 2026-07-17 | OCI lifecycle, registries, production Keychain/providers, digest locks, signatures, SBOM, vulnerability policy, provenance, cache GC. |
+| 06 | 2026-07-18 | Named volumes, guarded mounts, provider SPI, snapshots, online backup/restore, quotas, fencing, reclaim, orphan GC. |
+| 07 | 2026-07-19 | Project networks, DNS, TCP/UDP, dual stack, ports/sockets, ingress, TLS/mTLS, policy, first/third-party secure tunnels. |
+| 08 | 2026-07-20 | LaunchAgent, unattended reconciliation, health rollout/rollback/recovery, finalizers/leases/GC, OSLog, events, metrics, traces, support bundles. |
+| 09 | 2026-07-21 | Persistent API, parity/streams, identity, RBAC, admission, tamper-evident audit, workload profiles, WASI and signed XPC plugins. |
+| 10 | 2026-07-22 | Requests/limits, filters, best-fit packing, dominant-resource fairness, topology, disruption, hysteresis, pressure/energy, host-native accelerators. |
+| 11 | 2026-07-23 | Cluster CA, managed etcd, replicated intent, node agents, fencing, remote placement/storage/discovery, failover, upgrades, DR. |
+| 12 | 2026-07-24 | Real pod-sandbox VM/agent, CRI Runtime/Image/streaming, CNI, CSI, kubelet, Kubernetes/Helm translation and conformance. |
+| 13 | 2026-07-25 | Docker Engine API/context, Compose/Podman/Testcontainers, GitHub Actions, Xcode, VS Code, JetBrains matrices. |
+| 14 | 2026-07-26 | Signed accessible SwiftUI app, CLI/GUI parity, team roles/MDM, optional offline-safe cloud, tenant/OIDC/outbound-agent/audit lifecycle. |
+| 15 | 2026-07-27 | Version matrices, independent security, fuzz/sanitizers/scans, performance/density/energy, DR/upgrade lineage, docs, signed GA and Homebrew-core submission. |
 
-<Status kind="implemented" /> Hostwright core **remains a single-host Apple
-silicon control plane** through the beta path and first supported release.
-Experimental platform expansion (multi-host, cluster behavior, external API
-compatibility) will not be added to current core; if pursued later, it becomes
-a separate approved prototype or repository with its own threat model, state
-authority, and proof path.
+## Locked foundations
 
-## The path to beta
+- Manifest v2, Control API v2, Runtime Provider API v2, plugin ABI v1, state schema v7.
+- Hostwright UUIDs are primary identity; Apple names are attributes.
+- One project generation binds to one mutation provider.
+- Every mutation uses durable intent, fencing, checkpoints, verification, and safe compensation.
+- SQLite is standalone/node-local state; managed etcd supplies cluster consensus.
+- Kubernetes pods use a real Hostwright pod-sandbox VM/guest-agent boundary.
+- WASI is the default plugin model; signed XPC is reserved for native Apple capabilities.
+- Host-native Metal/Core ML/MLX is the accelerator fallback when public guest passthrough is absent.
 
-<Status kind="planned" /> The beta and first supported release path
-prioritizes:
+## Qualification targets
 
-- source install and release evidence;
-- local manifest validation, planning, status, events, diagnostics, and
-  bounded logs;
-- explicit local state paths and migration safety;
-- narrow Hostwright-owned runtime mutation through the RuntimeAdapter;
-- cleanup and recovery hardening;
-- documentation accuracy and operator trust;
-- local policy, redaction, audit, and confirmation gates.
+- 100 Macs and 10,000 declared workloads per cluster.
+- 1,000 pending workloads across 100 nodes scheduled under one second p95.
+- 10,000 local lifecycle cycles and a 72-hour single-host soak.
+- Physical three/five-Mac fault matrices and seven-day mixed-fault soak.
+- 24 aggregate fuzz CPU-hours for every critical parser/protocol.
+- Two complete clean release-candidate runs and zero unresolved P0/P1 defects.
 
-The beta readiness checklist exists ( <Status kind="implemented" /> as
-documentation), but no beta tag, beta compatibility claim, or support promise
-exists until its evidence is complete and a maintainer approves.
-
-## Deferred past beta
-
-<Status kind="deferred" /> These are acknowledged, not scheduled, and remain
-unsupported until separate evidence exists:
-
-- binary archives, installers, Homebrew, signing, notarization, SBOM,
-  provenance — gated by distribution readiness;
-- GUI / local control surface — the API boundary is documented, no
-  implementation exists;
-- automatic rollback, broad lifecycle management, image/volume cleanup,
-  aggressive restart loops, unattended daemon mutation;
-- performance benchmark publication and capacity guidance;
-- shell completion installation;
-- JSON output for `validate`, `apply`, `logs`, and `cleanup` success paths.
-
-## Rejected for current core
-
-<Status kind="rejected" /> Decided against, with reasons recorded:
-
-- Kubernetes-class control plane, CRI shim, kubelet behavior, scheduler API;
-- Docker API shim, full Compose parity, Testcontainers compatibility;
-- multi-host orchestration inside current core;
-- cloud control plane, hosted audit, remote policy distribution;
-- marketing-only support claims and untested tutorial content.
-
-The reasoning is on [Non-goals](/docs/overview/non-goals/).
-
-## Research only
-
-<Status kind="research-only" /> Studied, documented, and explicitly not
-promised: external orchestration compatibility, multi-host platform design,
-secure exposure (tunnels, DNS, reverse proxies), and Apple silicon
-accelerators. See [Research areas](/docs/roadmap/research/).
+The core repository’s
+[`docs/roadmap/v0.0.2/IMPLEMENTATION_PLAN.md`](https://github.com/hostwright/hostwright/blob/main/docs/roadmap/v0.0.2/IMPLEMENTATION_PLAN.md)
+is canonical. GitHub issue
+[#284](https://github.com/hostwright/hostwright/issues/284) links every epic and
+workstream.

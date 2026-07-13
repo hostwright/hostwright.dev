@@ -4,7 +4,7 @@ import { nonGoals, underResearch } from "../data/nonGoals.ts";
 
 <div class="nongoals-groups">
   <div class="nongoals-group">
-    <p class="nongoals-label">Architectural — not changing</p>
+    <p class="nongoals-label">Permanent safety boundaries</p>
     <ul class="nongoals">
       {
         nonGoals.map((item) => (
@@ -24,7 +24,7 @@ import { nonGoals, underResearch } from "../data/nonGoals.ts";
   </div>
 
   <div class="nongoals-group">
-    <p class="nongoals-label">Under research — not committed</p>
+    <p class="nongoals-label">External constraints with required fallbacks</p>
     <ul class="nongoals">
       {
         underResearch.map((item) => (
@@ -43,7 +43,7 @@ import { nonGoals, underResearch } from "../data/nonGoals.ts";
   </div>
 
   <p class="nongoals-maturity">
-    Separately: this is an early infrastructure project under active design — nothing here is production-ready yet. That one changes as the project matures, not by design decision.
+    Every other missing capability belongs to one of the 15 v0.0.2 implementation phases. Planned work becomes support only after runnable behavior and clean evidence pass.
   </p>
 </div>
 

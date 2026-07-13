@@ -20,7 +20,7 @@ export const site = {
     reddit: "https://www.reddit.com/r/hostwright/",
     linkedin: "https://www.linkedin.com/company/hostwright",
     instagram: "https://www.instagram.com/hostwright.dev",
-    docs: "/docs/",
+    docs: "https://docs.hostwright.dev/",
   },
 } as const;
 

@@ -4,8 +4,7 @@ import starlight from "@astrojs/starlight";
 import starlightLinksValidator from "starlight-links-validator";
 
 export default defineConfig({
-  site: "https://hostwright.dev",
-  base: "/docs",
+  site: "https://docs.hostwright.dev",
   integrations: [
     starlight({
       title: "Hostwright",
@@ -20,7 +19,7 @@ export default defineConfig({
           tag: "meta",
           attrs: {
             property: "og:image",
-            content: "https://hostwright.dev/docs/og.png",
+            content: "https://docs.hostwright.dev/og.png",
           },
         },
         {
@@ -34,7 +33,7 @@ export default defineConfig({
           tag: "meta",
           attrs: {
             name: "twitter:image",
-            content: "https://hostwright.dev/docs/og.png",
+            content: "https://docs.hostwright.dev/og.png",
           },
         },
       ],
@@ -75,7 +74,7 @@ export default defineConfig({
           items: [
             { label: "What Hostwright is", link: "/" },
             { label: "Why Hostwright", slug: "overview/why-hostwright" },
-            { label: "Non-goals", slug: "overview/non-goals" },
+            { label: "Limits and fallbacks", slug: "overview/non-goals" },
           ],
         },
         {
@@ -159,7 +158,7 @@ export default defineConfig({
           label: "Release",
           items: [
             { label: "Release process", slug: "release/process" },
-            { label: "v0.1.0-alpha.1", slug: "release/v0-1-0-alpha-1" },
+            { label: "Historical v0.1.0-alpha.1", slug: "release/v0-1-0-alpha-1" },
           ],
         },
         {

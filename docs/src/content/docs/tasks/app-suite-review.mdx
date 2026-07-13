@@ -12,7 +12,7 @@ import { Aside } from "@astrojs/starlight/components";
 `examples/app-suite/hostwright.yaml` declares a web service and a worker:
 
 ```yaml
-version: 1
+version: 2
 project: app-suite
 
 services:
@@ -46,13 +46,13 @@ hostwright plan examples/app-suite/hostwright.yaml --output json
 ```
 
 The plan covers both services: typed issues from the
-[policy checks](/docs/concepts/policy-engine/) (duplicate host ports, broad bind
+[policy checks](/concepts/policy-engine/) (duplicate host ports, broad bind
 addresses, unsafe mounts, secret-like env values), drift records per service if
 observed state is available, and one deterministic hash for the whole plan.
 
 ## 2. What health and restart declarations do
 
-- `health.command` is executed by the [daemon](/docs/operations/daemon/) as an
+- `health.command` is executed by the [daemon](/operations/daemon/) as an
   in-process loopback probe for allowlisted command shapes — results are
   persisted and feed drift detection ("unhealthy where policy requires
   health"). Container-exec health checks are not implemented.
@@ -86,5 +86,5 @@ observed hash. A stale hash is refused with a confirmation-mismatch error
 
 ## Next
 
-- [Operations and recovery](/docs/tasks/operations-and-recovery/) — watching the suite after it runs.
-- [hostwright.yaml reference](/docs/reference/manifest/) — every supported field.
+- [Operations and recovery](/tasks/operations-and-recovery/) — watching the suite after it runs.
+- [hostwright.yaml reference](/reference/manifest/) — every supported field.

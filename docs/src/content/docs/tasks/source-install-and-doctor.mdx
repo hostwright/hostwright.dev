@@ -11,7 +11,6 @@ writes state.
 ```bash
 git clone https://github.com/hostwright/hostwright.git
 cd hostwright
-git checkout v0.1.0-alpha.1
 swift build
 ```
 
@@ -27,7 +26,7 @@ swift test
 You can list what exists first with `swift test list`, or use the repository's
 `scripts/test.sh` helper. Passing tests on your machine are the same evidence
 the project itself uses for its support claims — see
-[Testing evidence](/docs/reference/testing-evidence/).
+[Testing evidence](/reference/testing-evidence/).
 
 ## 3. Confirm the binary answers
 
@@ -36,7 +35,7 @@ swift run hostwright --version
 ```
 
 ```text
-0.1.0-alpha.1
+0.0.2-dev
 ```
 
 ## 4. Check the host
@@ -54,11 +53,11 @@ policy, telemetry policy, and a local resource-intelligence report.
 A missing `container` executable is reported as a warning, not a crash. In the
 JSON report, benchmark dimensions that were not measured are reported
 explicitly as `unmeasured` — doctor never fabricates capacity numbers. The full
-check list is in [Doctor checks](/docs/reference/doctor-checks/).
+check list is in [Doctor checks](/reference/doctor-checks/).
 
 ## Where this leaves you
 
-You have a built CLI and a verdict on host compatibility. This alpha is
-source-only — there is no binary install path to compare against. See the
-[release process](/docs/release/process/) for the artifact policy, and continue with
-[Plan a single service](/docs/tasks/single-service-plan/).
+You have a built CLI and a verdict on current host compatibility. The trusted
+v0.0.2 package path is still Phase 02/15 work; `brew install hostwright` does
+not exist today. See the [release process](/release/process/) and continue with
+[Plan a single service](/tasks/single-service-plan/).

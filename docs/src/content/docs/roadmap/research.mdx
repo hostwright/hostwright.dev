@@ -1,68 +1,69 @@
 ---
-title: Research areas
-description: Work that has design research behind it but no implementation, no promise, and no timeline — external orchestration, multi-host, secure exposure, accelerators.
+title: Research promoted into implementation
+description: Earlier Hostwright research is historical input to named v0.0.2 phases, not a substitute for implementation or a permanent rejection.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 import Status from "../../../components/Status.astro";
 
-<Aside type="caution" title="Research is not a promise">
-Everything on this page is <strong>research-only</strong>. It informs
-decisions; it does not become a claim until working, tested code exists and a
-maintainer approves the support boundary. None of it is current support.
+<Aside type="caution" title="Research is not implementation">
+Earlier investigations remain useful evidence and threat-model input, but they
+cannot close a v0.0.2 issue. Each area below now has runnable outcomes and
+strict evidence requirements.
 </Aside>
 
-## External orchestration compatibility
+## External orchestration
 
-<Status kind="research-only" /> CRI shims, Kubernetes node behavior, Docker
-API shims, Testcontainers targets, full Compose parity, and
-attach/exec/log-follow/port-forward compatibility were studied and **rejected
-for current core**: those contracts require protocol, stream, lifecycle,
-state-authority, identity, networking, logging, and scheduler behavior outside
-Hostwright's local RuntimeAdapter scope. Any prototype requires a separate
-maintainer-approved issue with an exact-version conformance target.
+<Status kind="planned" /> Phase 12 owns a real pod-sandbox VM/guest agent,
+CRI v1 RuntimeService/ImageService/streams, CNI, CSI, kubelet,
+Kubernetes/Helm translation, scheduler/devices, and conformance. Phase 13 owns
+the negotiated Docker Engine API, authenticated context, Compose, Podman,
+Testcontainers, CI, and IDE matrices.
 
-## Multi-host platform
+The earlier protocol research explains why unsupported fields/endpoints must
+fail explicitly and why Kubernetes pod semantics require a real shared guest
+boundary.
 
-<Status kind="research-only" /> Remote host agents, membership services, peer
-discovery, state replication, remote mutation, remote placement, and scheduler
-APIs were studied and **kept out of current core**: they require host
-identity, enrollment, transport trust, state authority, quorum or replication
-semantics, failure recovery, audit, and revocation models the local state
-design deliberately does not have. Any future work would live in a separate
-prototype or repository.
+## Multi-Mac platform
+
+<Status kind="planned" /> Phase 11 owns cluster CA, managed pinned etcd,
+replicated desired state, node agents, remote execution, fencing, placement,
+drain, discovery, remote volumes, leader leases, failover, mixed-version
+upgrades, and disaster recovery. Quorum loss stops mutation.
 
 ## Secure exposure
 
-<Status kind="research-only" /> Tunnels (Cloudflare, Tailscale, WireGuard),
-local DNS, reverse proxies, mTLS provisioning, and public exposure management
-have research records and fail-closed policy blockers today. Hostwright-created
-port publishes stay on `127.0.0.1`; anything broader is refused rather than
-half-supported.
+<Status kind="planned" /> Phase 07 owns project networks, DNS, TCP/UDP, dual
+stack, ports/sockets, guarded host/LAN access, ingress, TLS/mTLS, ingress/egress
+policy, first-party Hostwright tunnels, and third-party provider SPI.
+
+Local Network permission, PF loss, Private Relay, sleep/wake, network switching,
+certificate rotation/revocation, asymmetric connectivity, conflicts, and
+cleanup are test inputs rather than documentation caveats.
 
 ## Apple silicon accelerators
 
-<Status kind="research-only" /> The accelerator investigation found **no
-supported Apple-container path** for GPU, ANE, Metal, Core ML, MLX, or PyTorch
-MPS acceleration inside managed Linux containers. Hostwright therefore ships
-fail-closed accelerator policy decisions and makes no accelerator claims. Any
-change requires an official supported access path, a local disposable proof, a
-threat model, a policy gate, and maintainer approval.
+<Status kind="planned" /> Phase 10 owns accelerator inventory/reservations and
+a signed authenticated host-native Metal/Core ML/MLX service. Direct guest
+GPU/ANE passthrough is added only if Apple provides a supported public API; the
+host-native service is the required fallback.
 
-## Advisory scheduling — the deliberate exception
+## Scheduler and optimization
 
-<Status kind="implemented" /> Local **advisory** scheduling exists precisely
-because it stops short of the research areas above: it produces deterministic
-in-memory recommendations, scores, and reason codes from declared inputs and
-existing policy decisions. It does not reserve capacity, place workloads,
-expose a scheduler API, or schedule accelerators — and it stays advisory until
-separate placement evidence exists.
+<Status kind="planned" /> The current advisory model is retained as narrow
+evidence. Phase 10 implements requests/limits/reservations, hard filters,
+multi-resource best-fit-decreasing packing, dominant-resource fairness,
+topology, preemption/disruption budgets, anti-churn hysteresis, explainability,
+thermal/battery/sleep/pressure policy, and memory reclamation.
 
-## What would change these statuses
+Qualification uses one million seeded cases and at least 10,000 exact-oracle
+comparisons with zero invalid placement, starvation, nondeterminism, or
+unbounded churn.
 
-Every research area has the same reconsideration gate: a separate
-maintainer-approved issue defining product placement (core, plugin, prototype,
-or separate repository), an explicit behavior contract with non-goals, a state
-and trust model, a disposable proof path, and documentation rules that keep
-claims scoped to evidence. Until then, these remain research — documented so
-you know they were considered, labeled so you never mistake them for features.
+## How status changes
+
+Status changes only when the linked workstream’s executable behavior and clean
+unit, integration, live, migration, security, resilience, performance,
+multi-host, interoperability, accessibility, and cleanup evidence pass as
+declared. A mock, fixture, document, research result, or blocker never upgrades
+the support claim.

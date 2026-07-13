@@ -9,21 +9,21 @@ Hostwright is a **desired-state** system. You declare what should run; Hostwrigh
 observes what is running, computes the difference, and reports it as drift with
 a deterministic plan.
 
-![Desired state and observed runtime state compared by a comparator to produce a drift report.](/docs/diagrams/05-desired-observed-drift.svg)
+![Desired state and observed runtime state compared by a comparator to produce a drift report.](/diagrams/05-desired-observed-drift.svg)
 
 ## Two kinds of state
 
-- **Desired state** — what you declared in [`hostwright.yaml`](/docs/reference/manifest/).
+- **Desired state** — what you declared in [`hostwright.yaml`](/reference/manifest/).
   Persisted as a snapshot to the explicit SQLite database you pass with
   `--state-db`.
 - **Observed state** — what is actually running, read back from the runtime
-  through the [RuntimeAdapter](/docs/concepts/runtime-adapter/) at a point in time.
+  through the [RuntimeAdapter](/concepts/runtime-adapter/) at a point in time.
   `hostwright status --state-db <path>` records it as an observed snapshot.
 
-The [reconciler](/docs/concepts/reconciliation/) compares the two, emits typed drift
+The [reconciler](/concepts/reconciliation/) compares the two, emits typed drift
 records and issues, and produces a plan with a deterministic hash. Convergence
 is never automatic: mutation happens only through the confirmed
-[apply gate](/docs/concepts/safety-model/), one action at a time.
+[apply gate](/concepts/safety-model/), one action at a time.
 
 ## Why declare instead of command
 
@@ -39,7 +39,7 @@ model gives you properties that are hard to get from a pile of shell commands:
   anything mutates.
 - **Recovery** — operation intent, checkpoints, and recovery records are
   persisted before mutation, so an interrupted operation is diagnosable with
-  [`hostwright recovery`](/docs/operations/events-and-diagnostics/).
+  [`hostwright recovery`](/operations/events-and-diagnostics/).
 
 ## The unit of declaration
 
@@ -48,7 +48,7 @@ service references an image and the runtime details needed to run it — ports,
 environment, secret references, health checks, and restart policy.
 
 ```yaml
-version: 1
+version: 2
 project: api-local
 
 services:
@@ -58,17 +58,17 @@ services:
       - "8080:8080"
 ```
 
-<Aside type="note" title="Single host by design">
-Desired state in Hostwright is scoped to one Mac. There is no cluster, no shared
-control plane, and no cross-machine scheduling. This is a deliberate boundary,
-not a missing feature — see [Why Hostwright](/docs/overview/why-hostwright/) and
-[Non-goals](/docs/overview/non-goals/).
+<Aside type="note" title="Single-host authority today">
+Current desired state is scoped to one Mac. Phase 11 extends the same UUID,
+fencing, recovery, and policy model to managed-etcd multi-Mac authority; it is
+planned, not current support. See [Why Hostwright](/overview/why-hostwright/)
+and [Limits and fallbacks](/overview/non-goals/).
 </Aside>
 
 ## What convergence is not
 
 Hostwright does not run an aggressive convergence loop. The foreground
-[daemon](/docs/operations/daemon/) observes, plans, and records events — it never
+[daemon](/operations/daemon/) observes, plans, and records events — it never
 mutates. `apply` executes exactly one confirmed action per invocation. Automatic
 rollback and multi-action apply are not implemented; see
-[Limitations](/docs/reference/limitations/).
+[Limitations](/reference/limitations/).

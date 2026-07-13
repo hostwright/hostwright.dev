@@ -1,15 +1,15 @@
-// Homepage copy. Conservative by design: nothing here claims a finished feature.
+// Homepage copy follows the executable 0.0.2-dev capability boundary.
 
 export const hero = {
   title: "Desired-state container control for Apple silicon Macs.",
   subtitle:
-    "Hostwright is a Mac-native control plane for Apple container workloads. Today it can initialize, validate, plan without mutation, show manifest-level status, and run safe doctor checks while the runtime control loop is built.",
-  ctaPrimary: { label: "Read the docs", href: "/docs/" },
+    "Hostwright is a Mac-native container platform on the 0.0.2-dev line. Today it exposes Manifest v2, deterministic plans, exact capability truth, durable local ledgers, and narrow confirmation-gated Apple container operations while the 15-phase v0.0.2 platform is built.",
+  ctaPrimary: { label: "Read the docs", href: "https://docs.hostwright.dev/" },
   ctaSecondary: {
     label: "View on GitHub",
     href: "https://github.com/hostwright",
   },
-  status: "Early design and implementation",
+  status: "v0.0.2 · Phase 01 in progress",
 };
 
 export const problem = {
@@ -18,7 +18,7 @@ export const problem = {
   body: [
     "Apple container gives the Mac a real, native container runtime surface — lightweight Linux VMs, an OCI image flow, and a command surface built for Apple silicon.",
     "But running a local multi-service stack is more than starting containers. You still need declared state, validation, health checks, restart policy, drift detection between what you asked for and what is actually running, and cleanup you can trust.",
-    "Hostwright is the disciplined layer that sits above the runtime and owns that responsibility on a single Mac.",
+    "Hostwright is the disciplined layer above the runtime. It proves the complete local path first, then extends the same identity, fencing, recovery, and policy model across Macs.",
   ],
 };
 
@@ -30,32 +30,32 @@ export interface Capability {
 export const whatItIs = {
   heading: "What Hostwright does",
   intro:
-    "A narrow, well-defined release direction: declare a stack, see the plan, then later converge to it through a single runtime boundary.",
+    "Current behavior stays explicit while every missing platform capability has a v0.0.2 implementation owner.",
   capabilities: [
     {
       title: "Declares services in hostwright.yaml",
       detail:
-        "A readable manifest describes the local stack you want to exist.",
+        "An explicit Manifest v2 subset describes local desired state; legacy v1/versionless input has a deterministic migration preview.",
     },
     {
       title: "Plans changes before mutation",
       detail:
-        "The current plan command is non-mutating and manifest-level. Runtime action planning comes after observation exists.",
+        "Plans are deterministic and reviewable; live mutation remains bound to exact confirmation, identity, provider, and state gates.",
     },
     {
       title: "Routes operations through a RuntimeAdapter",
       detail:
-        "The boundary exists now. Real runtime calls are planned and must cross this typed boundary.",
+        "Existing Apple container observation and narrow lifecycle calls cross the typed boundary; Phase 03 completes both providers.",
     },
     {
       title: "Tracks local state",
       detail:
-        "Durable desired state, events, and ownership are planned for the SQLite phase.",
+        "SQLite schema v7 records desired/observed state, events, operations, ownership UUIDs, provider binding, fencing, and recovery.",
     },
     {
       title: "Detects drift",
       detail:
-        "Drift detection is planned after read-only runtime observation exists.",
+        "Typed deterministic drift and plan actions compare declared and observed state without guessing unsupported runtime shapes.",
     },
     {
       title: "Runs doctor checks",
@@ -65,7 +65,7 @@ export const whatItIs = {
     {
       title: "Treats destruction as explicit",
       detail:
-        "Cleanup and teardown are not implemented yet; the release design requires dry-run and ownership checks first.",
+        "Current cleanup is dry-run and token-confirmed for exact owned eligible containers; broad lifecycle/GC remains phase-gated.",
     },
   ] satisfies Capability[],
 };
@@ -73,16 +73,20 @@ export const whatItIs = {
 // Exact command surface from the brief. The CLI is in design; these are the
 // intended shapes, split into a core set and a clearly-planned set.
 export const cliCore = `hostwright init
+hostwright capabilities --json
+hostwright migrate preview hostwright.yaml
 hostwright validate
 hostwright plan
-hostwright status
+hostwright status --state-db /tmp/hostwright.sqlite
 hostwright doctor`;
 
-export const cliPlanned = `hostwright apply
-hostwright down --dry-run`;
+export const cliPlanned = `hostwright up
+hostwright down --dry-run
+hostwright cluster status`;
 
 // Manifest example — kept verbatim. Document only the fields shown here.
-export const manifestExample = `project: api-local
+export const manifestExample = `version: 2
+project: api-local
 
 services:
   api:
@@ -114,7 +118,7 @@ export const safety = {
     {
       title: "Dry-run for cleanup",
       detail:
-        "Cleanup is planned to preview exactly what it would remove before it can remove anything.",
+        "Cleanup previews exact identity and eligibility before a separately confirmed owned-resource deletion.",
     },
     {
       title: "Explicit destructive confirmation",
@@ -128,12 +132,12 @@ export const safety = {
     {
       title: "No hidden runtime mutation",
       detail:
-        "Current commands do not mutate runtime state. Future mutation must use the planned, recorded path.",
+        "Mutation exists only behind explicit plan/cleanup confirmation and the typed, recorded provider path.",
     },
     {
       title: "Ownership-tracked cleanup",
       detail:
-        "Cleanup is planned to touch only resources Hostwright can prove it owns.",
+        "Cleanup can touch only resources Hostwright can prove it owns; unmanaged resources are never inferred from names.",
     },
     {
       title: "No secret leakage in logs",
@@ -145,5 +149,5 @@ export const safety = {
 export const architecture = {
   heading: "Architecture",
   intro:
-    "Hostwright currently owns manifest parsing, validation, non-mutating planning, and architecture boundaries. Apple container owns the runtime. The RuntimeAdapter is the boundary future runtime behavior must cross.",
+    "Hostwright owns versioned intent, UUID identity, SQLite ledgers, planning, policy, and recovery state. Apple container owns execution. Runtime Provider API v2 is the only mutation boundary, with a pinned Containerization helper joining the Apple CLI provider in Phase 03.",
 };

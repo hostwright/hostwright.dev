@@ -1,49 +1,41 @@
-// What Hostwright deliberately does not do, shown openly rather than buried
-// — split by how permanent the boundary actually is.
 export interface NonGoal {
   title: string;
   detail: string;
 }
 
-// Hard architectural boundaries. These define what Hostwright is — a
-// single-host, controller-first tool — not gaps expected to close later.
+// The name is retained for component compatibility; these are the narrow
+// permanent safety/platform boundaries, not unowned product gaps.
 export const nonGoals: NonGoal[] = [
   {
-    title: "Not a CRI shim",
-    detail:
-      "The Container Runtime Interface is studied as design inspiration for the adapter boundary, not implemented.",
+    title: "No private Apple APIs",
+    detail: "Hostwright uses supported public APIs and versioned helpers, never unstable undocumented interfaces.",
   },
   {
-    title: "Not a Kubernetes replacement",
-    detail:
-      "No scheduler, no API server, no kubelet. Single-host desired state, not cluster orchestration.",
+    title: "No unsafe quorum writes",
+    detail: "A cluster without quorum remains useful for reads and recovery but stops mutation.",
   },
   {
-    title: "Not full Docker Compose parity",
-    detail:
-      "A readable local stack format, deliberately narrower than Compose — not a drop-in clone.",
+    title: "No silent telemetry",
+    detail: "Observability is local by default; remote data requires explicit informed consent.",
   },
   {
-    title: "Not a Docker API shim",
-    detail:
-      "Existing projects already cover Docker API emulation. Hostwright stays controller-first.",
+    title: "No unmanaged deletion",
+    detail: "Names and similarity never prove ownership. Unknown resources are reported or quarantined, not destroyed.",
   },
   {
-    title: "Not a cloud control plane",
-    detail:
-      "No remote control plane, no multi-Mac orchestration, no hosted service.",
+    title: "Apple silicon only",
+    detail: "Intel and old-macOS emulation are outside the public Apple container platform Hostwright qualifies.",
   },
 ];
 
-// Open questions under active research — not ruled out, just not committed.
-// These could become real scope later.
+// External constraints receive product fallbacks instead of becoming excuses.
 export const underResearch: NonGoal[] = [
   {
-    title: "Tunnel and DNS integration",
-    detail: "Cloudflare, Tailscale, or WireGuard integration. Research-only — no commitment yet.",
+    title: "Homebrew-core fallback",
+    detail: "Core acceptance is external; a maintained Hostwright vendor tap is the guaranteed Phase 02 path.",
   },
   {
-    title: "GPU-aware scheduling",
-    detail: "Apple GPU/ANE scheduling, plus Metal, Core ML, or MLX container support. Research-only.",
+    title: "Accelerator fallback",
+    detail: "Until Apple exposes public guest passthrough, Phase 10 delivers signed host-native Metal, Core ML, and MLX.",
   },
 ];

@@ -19,7 +19,7 @@ const community = [
   { label: "GitHub", detail: "Source, issues, and design records.", href: site.links.github, external: true },
   { label: "X", detail: "Project updates and release notes.", href: site.links.x, external: true },
   { label: "Reddit", detail: "Discussion and questions.", href: site.links.reddit, external: true },
-  { label: "Documentation", detail: "Concepts, tasks, reference, and operations.", href: "/docs/", external: false },
+  { label: "Documentation", detail: "Concepts, tasks, reference, and operations.", href: site.links.docs, external: true },
 ];
 ---
 
@@ -33,9 +33,9 @@ const community = [
       <div class="demo-copy">
         <h2 class="demo-title">See the change before it happens.</h2>
         <p class="demo-lead">
-          Every run computes a reviewable plan from your manifest. Today
-          <code>plan</code> is non-mutating — it shows the diff and applies
-          nothing. Mutation, when it lands, must cross the same recorded path.
+          Every run computes a reviewable plan from your manifest.
+          <code>plan</code> is non-mutating; the current narrow mutation paths
+          require exact confirmation and cross the same identity, provider, and ledger boundaries.
         </p>
       </div>
       <CliTerminal />
@@ -84,7 +84,7 @@ const community = [
       <Figure
         src="/diagrams/01-system-layer-stack.svg"
         alt="Layered architecture: the hostwright CLI and planned daemon sit above the RuntimeAdapter boundary, which drives Apple's container runtime and Linux VMs."
-        caption="Apple container is the execution substrate. Hostwright currently owns manifest validation and non-mutating planning; runtime reconciliation, health, drift, and cleanup are planned behind the RuntimeAdapter boundary."
+        caption="Apple container is the execution substrate. Hostwright owns versioned intent, planning, policy, identity, recovery state, and narrow confirmed runtime paths behind Runtime Provider API v2."
         dense
       />
     </div>
@@ -120,18 +120,18 @@ const community = [
     <div class="container reveal">
       <SectionHeading
         title="Roadmap"
-        lead="Honest status. The design is locked; the build is just beginning."
+        lead="Fifteen evidence-gated phases. Phase 01 is in progress; planned work is never presented as current support."
       />
       <RoadmapGrid />
     </div>
   </section>
 
-  <!-- Non-goals -->
+  <!-- Boundaries and fallbacks -->
   <section class="section">
     <div class="container reveal">
       <SectionHeading
-        title="What it deliberately does not do yet"
-        lead="Stated openly. A narrow, defensible first release matters more than a broad one."
+        title="Permanent boundaries and real fallbacks"
+        lead="Product gaps have phase owners. Only unsafe mechanisms stay excluded, and external constraints get an implementable fallback."
       />
       <NonGoalsList />
     </div>
