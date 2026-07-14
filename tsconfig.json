@@ -1,14 +1,31 @@
 {
-  "extends": "astro/tsconfigs/strict",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  // Inlined from astro/tsconfigs/strict — a package-path `extends` here breaks
+  // the docs Cloudflare Pages build: Vite's workspace scan parses this file
+  // from the repo root, where node_modules is absent in that build.
   "include": [
     ".astro/types.d.ts",
     "**/*"
   ],
   "exclude": [
     "dist",
-    "docs/dist"
+    "docs",
+    "node_modules"
   ],
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react"
   }
