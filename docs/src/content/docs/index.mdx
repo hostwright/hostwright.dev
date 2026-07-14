@@ -1,6 +1,6 @@
 ---
 title: What Hostwright is
-description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Current 0.0.2-dev truth and the v0.0.2 roadmap start here.
+description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Current capabilities and the v0.0.2 roadmap start here.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -18,7 +18,7 @@ hostwright` does not exist today. Build from source and read
 
 ## What works today
 
-- `hostwright --version` and `hostwright capabilities --json` expose build and capability truth.
+- `hostwright --version` and `hostwright capabilities --json` report the build version and the exact capability set.
 - `hostwright init`, `validate`, and `plan` provide explicit Manifest v2, restricted fail-closed parsing, and deterministic planning.
 - `hostwright migrate preview` produces a deterministic non-writing preview for legacy v1/versionless manifests.
 - `status`, bounded `logs`, `events`, `recovery`, and local redacted `diagnostics` use explicit state paths.
@@ -44,7 +44,7 @@ Everything else is a **current limitation with an owner**, not a discarded non-g
 
 | Section | Answers |
 | --- | --- |
-| **Getting started** | Honest source setup and the currently runnable safe loop. |
+| **Getting started** | Source setup and the runnable safe loop. |
 | **Concepts** | Desired state, providers, reconciliation, identity/state, policy, safety, and secrets. |
 | **Tasks** | Walkthroughs labeled non-mutating, state-writing, or runtime-mutating. |
 | **Reference** | Exact CLI, manifest, compatibility, limitations, error, policy, and evidence contracts. |

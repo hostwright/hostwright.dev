@@ -5,10 +5,9 @@ description: "Conservative defaults, implemented: plan before mutation, dry-run 
 
 import { Aside } from "@astrojs/starlight/components";
 
-Infrastructure tooling earns trust by being predictable when things go wrong.
-Hostwright's safety posture is deliberately conservative, and unlike an
-aspiration, it is enforced by the command surface itself: there is no way to
-mutate the runtime except through two explicit, confirmed gates.
+Hostwright's safety posture is conservative and enforced by the command
+surface: the runtime can be mutated only through two explicit, confirmed
+gates.
 
 ![Safety flow: validate the manifest, compute a plan, confirm destructive actions, then apply; dry-run exits before any mutation.](/diagrams/08-safety-plan-before-mutation.svg)
 

@@ -5,8 +5,8 @@ description: The reconciliation loop observes, diffs, and plans deterministicall
 
 import { Aside } from "@astrojs/starlight/components";
 
-Reconciliation is the heart of Hostwright, and it is deliberately boring:
-deterministic, observable, and hard to corrupt.
+Reconciliation is Hostwright's core loop: deterministic, observable, and
+designed to fail closed.
 
 ![Reconciliation cycle: observe actual state, diff against desired, plan actions, then the confirmed apply step, looping back to observe; dry-run stops after plan.](/diagrams/04-reconcile-loop.svg)
 

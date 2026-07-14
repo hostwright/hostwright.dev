@@ -1,6 +1,6 @@
 ---
 title: Desired state
-description: Hostwright separates the state you declare from the state that is actually running, and computes the difference deterministically.
+description: Hostwright separates declared state from observed runtime state and computes the difference deterministically.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -16,7 +16,7 @@ a deterministic plan.
 - **Desired state** — what you declared in [`hostwright.yaml`](/reference/manifest/).
   Persisted as a snapshot to the explicit SQLite database you pass with
   `--state-db`.
-- **Observed state** — what is actually running, read back from the runtime
+- **Observed state** — what is running, read back from the runtime
   through the [RuntimeAdapter](/concepts/runtime-adapter/) at a point in time.
   `hostwright status --state-db <path>` records it as an observed snapshot.
 
@@ -28,13 +28,12 @@ is never automatic: mutation happens only through the confirmed
 ## Why declare instead of command
 
 Imperative commands describe *how*; a manifest describes *what*. A declarative
-model gives you properties that are hard to get from a pile of shell commands:
+model provides properties that imperative commands do not:
 
 - **Idempotency** — apply recomputes the plan and refuses to run when the
   confirmed hash no longer matches reality, so a stale intent cannot re-execute.
 - **Drift detection** — with desired and observed snapshots both recorded,
-  Hostwright notices when reality diverges instead of you discovering it by
-  surprise.
+  Hostwright reports when observed state diverges from desired state.
 - **Reviewable change** — the difference is shown as a plan, with a hash, before
   anything mutates.
 - **Recovery** — operation intent, checkpoints, and recovery records are

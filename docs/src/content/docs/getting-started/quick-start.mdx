@@ -5,13 +5,13 @@ description: The safe core loop — init, validate, plan, doctor — and how con
 
 import { Aside } from "@astrojs/starlight/components";
 
-This page walks the safe core loop. Every command here is **read-only or
+This page covers the safe core loop. Every command here is **read-only or
 local-file-only** — nothing touches the container runtime until you opt into the
 confirmed apply gate at the end.
 
 ## Requirements
 
-Hostwright targets one environment deeply rather than many shallowly:
+Hostwright targets one environment:
 
 - An **Apple silicon** Mac (arm64).
 - **macOS 26 or later.**

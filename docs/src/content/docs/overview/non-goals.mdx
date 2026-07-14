@@ -5,13 +5,13 @@ description: Every current Hostwright limitation has an implementation owner, a 
 
 import { Aside } from "@astrojs/starlight/components";
 
-The old roadmap called major platform capabilities “non-goals.” The `v0.0.2`
-truth reset removes that escape hatch. Missing, partial, blocked, and
-research-only work is now owned by one of 15 implementation phases.
+Earlier roadmaps listed several platform capabilities as non-goals. In the
+`v0.0.2` program, every missing, partial, blocked, or research-only capability
+is owned by one of 15 implementation phases.
 
 ## Limitations that are being implemented
 
-| Capability | Current truth | Owning phase |
+| Capability | Current state | Owning phase |
 | --- | --- | ---: |
 | Trusted Homebrew/archive/`.pkg` install | Does not exist; source development only. | 02 and 15 |
 | Apple `container` + Containerization parity | Apple provider is narrow; direct helper absent. | 03 |
@@ -60,7 +60,6 @@ evidence declared by the owning issue.
 
 ## Conservative cleanup stays permanent
 
-A tool that deletes the wrong resource once loses trust. Names and similarity
-never prove ownership. Hostwright can discover or quarantine an unmanaged
-resource, but adoption and deletion require explicit identity and authorization.
-See the [safety model](/concepts/safety-model/).
+Names and similarity never prove ownership. Hostwright can discover or
+quarantine an unmanaged resource, but adoption and deletion require explicit
+identity and authorization. See the [safety model](/concepts/safety-model/).

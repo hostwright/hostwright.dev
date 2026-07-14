@@ -14,32 +14,31 @@ For years, running Linux containers on a Mac meant a shared Linux VM managed by 
 third-party tool. Apple container changes the substrate: it is Mac-native, built
 for Apple silicon, and uses a lightweight VM per container with an OCI image flow.
 
-A new runtime surface is worth building on directly rather than wrapping in older
-abstractions. But a runtime is not a workflow. Apple container can start and stop
-containers; it does not, by itself, give you a disciplined way to declare a
-multi-service stack, validate it, converge to it, and notice when reality drifts.
+A runtime is not a workflow. Apple container can start and stop containers; it
+does not, by itself, declare a multi-service stack, validate it, converge to
+it, or report drift.
 
 ## Local desired-state control is the missing layer
 
-Most developers running a local stack end up with a pile of imperative commands
-and a mental model of what *should* be running. That model is fragile. A
-desired-state layer makes it durable:
+Without a control layer, a local stack is a set of imperative commands and an
+operator's memory of what should be running. A desired-state layer records
+that model instead:
 
-- You declare the stack once.
-- Changes are planned before they happen.
-- Drift between declared and observed state is detected, not discovered by surprise.
-- Cleanup is ownership-aware instead of best-effort.
+- The stack is declared once.
+- Changes are planned before they run.
+- Drift between declared and observed state is detected and reported.
+- Cleanup is ownership-checked.
 
 This is the layer Hostwright provides. It borrows the *idea* of a control loop
 from systems like Kubernetes without borrowing their scope.
 
 ## Why single-host first
 
-A single Mac is a complete, honest problem. It is also the problem most developers
-actually have. Trying to be a cluster orchestrator on day one would mean shipping
-a distributed system that is shallow everywhere instead of a local system that is
-deep where it matters. Single-host first is a scope decision that makes the first
-release defensible.
+A single Mac is the environment most developers run. Building a cluster
+orchestrator first would spread the implementation across distributed-systems
+problems before the local model is complete. Single-host first bounds the
+scope of the first release; the identity, fencing, and recovery model is
+designed to extend to multiple Macs later.
 
 ## Why Swift
 
@@ -55,6 +54,6 @@ dependencies.
 Apple container is young and will change. The single most important design
 decision is to route every runtime operation through one typed boundary — the
 [RuntimeAdapter](/concepts/runtime-adapter/) — so that runtime change is
-contained to one place. It is what lets Hostwright start on the Apple container CLI
-today and move to a native API later without rewriting the reconciler. The
-boundary is the project's insurance policy against a moving substrate.
+contained to one place. Hostwright can start on the Apple container CLI today
+and move to a native API later without rewriting the reconciler, because both
+implement the same provider contract.
