@@ -75,9 +75,8 @@ The observation parser accepts only reviewed shapes: the fixture-defined
 observation schema, the verified real empty `container list --all --format
 json` output, Apple builder output (ignored as non-Hostwright state), and exact
 labeled Apple container 1.0.0 rows with network metadata (hostname, IPv4/IPv6,
-gateway, MAC, network name, MTU). Anything else is reported as a parse failure
-instead of being guessed at — unverified CLI output is never turned into
-product truth.
+gateway, MAC, network name, MTU). Anything else is reported as a parse
+failure; unverified CLI output is never converted into observed state.
 
 <Aside type="note" title="What the adapter does not do">
 The adapter does not own Apple container's internals — its helpers, its VM

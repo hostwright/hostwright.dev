@@ -67,8 +67,8 @@ observed state is available, and one deterministic hash for the whole plan.
 If both services are missing, the plan contains two create actions — and
 `apply` refuses, because more than one executable action exists. Converging a
 multi-service suite means multiple explicit plan-confirm-apply rounds, one
-action each. This is deliberate: Hostwright is a control plane with a narrow
-mutation gate, not a Compose-style up command.
+action each. Hostwright has a narrow mutation gate; it is not a Compose-style
+up command.
 </Aside>
 
 Bring the suite up one gated step at a time:

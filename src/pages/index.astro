@@ -31,11 +31,12 @@ const community = [
   <section class="section section-demo">
     <div class="container demo-grid">
       <div class="demo-copy">
-        <h2 class="demo-title">See the change before it happens.</h2>
+        <h2 class="demo-title">Plan before mutation.</h2>
         <p class="demo-lead">
-          Every run computes a reviewable plan from your manifest.
-          <code>plan</code> is non-mutating; the current narrow mutation paths
-          require exact confirmation and cross the same identity, provider, and ledger boundaries.
+          Every run computes a reviewable plan from the manifest.
+          <code>plan</code> is non-mutating; mutation requires exact
+          confirmation and crosses the same identity, provider, and ledger
+          boundaries.
         </p>
       </div>
       <CliTerminal />
@@ -72,7 +73,7 @@ const community = [
   <!-- CLI preview -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading title="A small, honest CLI" />
+      <SectionHeading title="The CLI" />
       <CliPreview />
     </div>
   </section>
@@ -120,7 +121,7 @@ const community = [
     <div class="container reveal">
       <SectionHeading
         title="Roadmap"
-        lead="Fifteen evidence-gated phases. Phase 01 is in progress; planned work is never presented as current support."
+        lead="Fifteen phases. Planned work is not current support."
       />
       <RoadmapGrid />
     </div>
@@ -130,8 +131,8 @@ const community = [
   <section class="section">
     <div class="container reveal">
       <SectionHeading
-        title="Permanent boundaries and real fallbacks"
-        lead="Product gaps have phase owners. Only unsafe mechanisms stay excluded, and external constraints get an implementable fallback."
+        title="Boundaries and fallbacks"
+        lead="Only unsafe mechanisms are excluded. External constraints have implementable fallbacks."
       />
       <NonGoalsList />
     </div>
@@ -140,7 +141,7 @@ const community = [
   <!-- Community -->
   <section class="section">
     <div class="container reveal">
-      <SectionHeading title="Follow along" />
+      <SectionHeading title="Community" />
       <ul class="community-grid">
         {
           community.map((c) => (

@@ -13,7 +13,6 @@ export const site = {
   daemon: "hostwrightd",
   manifest: "hostwright.yaml",
   license: "Apache-2.0",
-  maturity: "Early design and implementation",
   links: {
     github: "https://github.com/hostwright",
     x: "https://x.com/hostwrightdev",

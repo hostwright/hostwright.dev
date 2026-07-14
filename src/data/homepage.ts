@@ -3,22 +3,21 @@
 export const hero = {
   title: "Desired-state container control for Apple silicon Macs.",
   subtitle:
-    "Hostwright is a Mac-native container platform on the 0.0.2-dev line. Today it exposes Manifest v2, deterministic plans, exact capability truth, durable local ledgers, and narrow confirmation-gated Apple container operations while the 15-phase v0.0.2 platform is built.",
+    "Declare services in one manifest. Hostwright validates it, computes a deterministic plan, records state in a local SQLite ledger, and changes the Apple container runtime only through confirmation-gated operations.",
   ctaPrimary: { label: "Read the docs", href: "https://docs.hostwright.dev/" },
   ctaSecondary: {
     label: "View on GitHub",
     href: "https://github.com/hostwright",
   },
-  status: "v0.0.2 · Phase 01 in progress",
 };
 
 export const problem = {
   heading:
     "Apple container is a runtime. Local stacks still need a control plane.",
   body: [
-    "Apple container gives the Mac a real, native container runtime surface — lightweight Linux VMs, an OCI image flow, and a command surface built for Apple silicon.",
-    "But running a local multi-service stack is more than starting containers. You still need declared state, validation, health checks, restart policy, drift detection between what you asked for and what is actually running, and cleanup you can trust.",
-    "Hostwright is the disciplined layer above the runtime. It proves the complete local path first, then extends the same identity, fencing, recovery, and policy model across Macs.",
+    "Apple container gives the Mac a native container runtime: lightweight Linux VMs, an OCI image flow, and a command surface built for Apple silicon.",
+    "Running a multi-service stack requires more than starting containers: declared state, validation, health checks, restart policy, drift detection between declared and observed state, and ownership-checked cleanup.",
+    "Hostwright is that layer. It targets a single Mac first; the same identity, fencing, recovery, and policy model is designed to extend across Macs.",
   ],
 };
 
@@ -29,8 +28,7 @@ export interface Capability {
 
 export const whatItIs = {
   heading: "What Hostwright does",
-  intro:
-    "Current behavior stays explicit while every missing platform capability has a v0.0.2 implementation owner.",
+  intro: "Current capabilities of the CLI and daemon.",
   capabilities: [
     {
       title: "Declares services in hostwright.yaml",
@@ -45,7 +43,7 @@ export const whatItIs = {
     {
       title: "Routes operations through a RuntimeAdapter",
       detail:
-        "Existing Apple container observation and narrow lifecycle calls cross the typed boundary; Phase 03 completes both providers.",
+        "Apple container observation and narrow lifecycle calls cross one typed boundary; no other code path reaches the runtime.",
     },
     {
       title: "Tracks local state",
@@ -65,7 +63,7 @@ export const whatItIs = {
     {
       title: "Treats destruction as explicit",
       detail:
-        "Current cleanup is dry-run and token-confirmed for exact owned eligible containers; broad lifecycle/GC remains phase-gated.",
+        "Cleanup is dry-run first and token-confirmed, limited to exact owned eligible containers. Broad garbage collection is not implemented.",
     },
   ] satisfies Capability[],
 };
@@ -108,8 +106,7 @@ services:
 
 export const safety = {
   heading: "Safety model",
-  intro:
-    "Infrastructure tooling earns trust by being predictable under failure. Hostwright's defaults are conservative.",
+  intro: "Defaults are conservative and mutation is always explicit.",
   principles: [
     {
       title: "Plan before mutation",
@@ -149,5 +146,5 @@ export const safety = {
 export const architecture = {
   heading: "Architecture",
   intro:
-    "Hostwright owns versioned intent, UUID identity, SQLite ledgers, planning, policy, and recovery state. Apple container owns execution. Runtime Provider API v2 is the only mutation boundary, with a pinned Containerization helper joining the Apple CLI provider in Phase 03.",
+    "Hostwright owns versioned intent, UUID identity, SQLite ledgers, planning, policy, and recovery state. Apple container owns execution. The Runtime Provider API is the only mutation boundary.",
 };
