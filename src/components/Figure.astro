@@ -40,6 +40,10 @@ const { src, alt, caption, max, dense } = Astro.props;
     border-radius: var(--radius);
     background: var(--color-bg);
   }
+  /* Diagrams are drawn for the light palette; keep a paper backing in dark. */
+  :global([data-theme="dark"]) .figure img {
+    background: #f4f2ec;
+  }
   .figure figcaption {
     font-size: var(--text-sm);
     color: var(--color-text-muted);

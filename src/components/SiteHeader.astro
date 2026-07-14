@@ -21,6 +21,15 @@ const navLinks = [
     <nav class="nav-desktop" aria-label="Primary">
       {navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
       <SocialLinks />
+      <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+        <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.4" />
+          <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19" />
+        </svg>
+        <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.4 14.2A8.4 8.4 0 0 1 9.8 3.6a8.4 8.4 0 1 0 10.6 10.6Z" />
+        </svg>
+      </button>
     </nav>
 
     <!-- Mobile nav: disclosure menu, hidden on desktop. -->
@@ -33,6 +42,15 @@ const navLinks = [
       <nav class="nav-menu" aria-label="Menu">
         {navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
         <SocialLinks />
+        <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+          <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4.4" />
+            <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19" />
+          </svg>
+          <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.4 14.2A8.4 8.4 0 0 1 9.8 3.6a8.4 8.4 0 1 0 10.6 10.6Z" />
+          </svg>
+        </button>
       </nav>
     </details>
   </div>
@@ -120,6 +138,30 @@ const navLinks = [
     background: var(--color-surface);
     color: var(--color-text);
   }
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+  }
+  .theme-toggle:hover {
+    color: var(--color-text);
+    background: var(--color-surface);
+  }
+  .theme-toggle .icon-moon,
+  :global([data-theme="dark"]) .theme-toggle .icon-sun {
+    display: none;
+  }
+  :global([data-theme="dark"]) .theme-toggle .icon-moon {
+    display: block;
+  }
+
   /* Mobile: reveal the dropdown only when the disclosure is open. */
   .nav-mobile[open] .nav-menu {
     display: flex;
@@ -138,6 +180,16 @@ const navLinks = [
 </style>
 
 <script>
+  // Theme toggle: flips data-theme and persists the choice. The initial
+  // value is set before paint by the inline script in BaseLayout.
+  document.querySelectorAll<HTMLButtonElement>(".theme-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("theme", next);
+    });
+  });
+
   // The logo arrives large — an entrance, not a permanent fixture — then
   // settles to its normal navbar size as the page is scrolled, continuously
   // tied to scroll position. transform-only, so it never shifts layout.

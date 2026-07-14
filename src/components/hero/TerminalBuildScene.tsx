@@ -117,10 +117,10 @@ const LAYERS = [
 ];
 
 const KIND_COLOR: Record<LineKind, string> = {
-  cmd: "#1f3a5f",
-  muted: "#9a978d",
-  add: "#3f7a5c",
-  ok: "#3f7a5c",
+  cmd: "var(--color-accent)",
+  muted: "var(--color-text-faint)",
+  add: "var(--status-implemented)",
+  ok: "var(--status-implemented)",
   blank: "transparent",
 };
 
@@ -337,10 +337,10 @@ function TerminalOverlay({
         transform: "translateY(-50%)",
         width: "27rem",
         maxWidth: "calc(100% - 64px)",
-        border: "1px solid #ddd8cc",
+        border: "1px solid var(--color-border-strong)",
         borderRadius: "12px",
         overflow: "hidden",
-        background: "#fcfbf8",
+        background: "var(--color-card)",
         boxShadow: "0 18px 40px -28px rgba(32,35,39,0.45)",
         pointerEvents: "none",
       }}
@@ -351,8 +351,8 @@ function TerminalOverlay({
           alignItems: "center",
           gap: "10px",
           padding: "10px 14px",
-          background: "#f0ede3",
-          borderBottom: "1px solid #ddd8cc",
+          background: "var(--color-surface-2)",
+          borderBottom: "1px solid var(--color-border-strong)",
         }}
       >
         <span style={{ display: "inline-flex", gap: "6px" }}>
@@ -364,7 +364,7 @@ function TerminalOverlay({
           style={{
             fontFamily: "ui-monospace, monospace",
             fontSize: "11px",
-            color: "#8a8577",
+            color: "var(--color-text-faint)",
           }}
         >
           hostwright apply
@@ -404,7 +404,7 @@ const dotStyle: React.CSSProperties = {
   width: "9px",
   height: "9px",
   borderRadius: "999px",
-  background: "#ccc6b6",
+  background: "var(--color-border-strong)",
   display: "inline-block",
 };
 
