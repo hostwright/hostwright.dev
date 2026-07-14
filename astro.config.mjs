@@ -16,4 +16,22 @@ export default defineConfig({
       wrap: false,
     },
   },
+  vite: {
+    build: {
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              {
+                name: "three-ecosystem",
+                test: /node_modules[\\/](?:three|@react-three|postprocessing)[\\/]/,
+                minSize: 20 * 1024,
+                maxSize: 400 * 1024,
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
 });
