@@ -5,9 +5,7 @@ description: "The operational security posture: mutation boundaries, redaction, 
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright is in active development and not production ready. The roadmap
-assigns every security-sensitive limitation to an implementation/evidence
-phase; that planning does not make it supported today. This page is the
+Hostwright is in active development and not production ready. This page is the
 operational counterpart to the [safety model](/concepts/safety-model/): what
 the boundaries mean when you run the tool.
 
@@ -17,7 +15,8 @@ Supported mutation is intentionally narrow: one plan-hash-confirmed
 create-missing-service, one restart-policy-allowed managed start, one managed
 restart of an exact Hostwright-owned running/unhealthy service, exact
 token-confirmed cleanup deletes, and the explicitly confirmed benchmark path.
-Broader lifecycle operations are tracked on the [roadmap](/roadmap/).
+Broader lifecycle operations are outside the current surface. See
+[Limitations](/reference/limitations/).
 
 Restart policy state can block the managed start/restart paths through
 backoff, operator hold, `restart.policy: no`, and crash-loop protection.
@@ -91,9 +90,9 @@ same host port block mutation planning.
 
 ## Security-sensitive scope
 
-Security-sensitive capabilities on the roadmap include trusted distribution
-(signing, notarization, SBOM, provenance), a launch agent with unattended
-operation, DNS and tunnel management, and plugin execution.
-[Limitations](/reference/limitations/) lists the complete boundary.
+Several security-sensitive capabilities are outside the current surface,
+including trusted distribution (signing, notarization, SBOM, provenance), a
+launch agent with unattended operation, DNS and tunnel management, and plugin
+execution. [Limitations](/reference/limitations/) lists the complete boundary.
 
 Report security issues per `SECURITY.md` in the core repository.

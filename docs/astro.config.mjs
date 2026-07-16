@@ -74,7 +74,7 @@ export default defineConfig({
           items: [
             { label: "What Hostwright is", link: "/" },
             { label: "Why Hostwright", slug: "overview/why-hostwright" },
-            { label: "Limits and fallbacks", slug: "overview/non-goals" },
+            { label: "Non-goals", slug: "overview/non-goals" },
           ],
         },
         {
@@ -135,7 +135,6 @@ export default defineConfig({
             { label: "Doctor checks", slug: "reference/doctor-checks" },
             { label: "Limitations", slug: "reference/limitations" },
             { label: "Compatibility", slug: "reference/compatibility" },
-            { label: "Testing evidence", slug: "reference/testing-evidence" },
             { label: "Using an AI assistant", slug: "reference/ai-agents" },
           ],
         },
@@ -152,20 +151,6 @@ export default defineConfig({
               label: "Events and diagnostics",
               slug: "operations/events-and-diagnostics",
             },
-          ],
-        },
-        {
-          label: "Release",
-          items: [
-            { label: "Release process", slug: "release/process" },
-            { label: "Historical v0.1.0-alpha.1", slug: "release/v0-1-0-alpha-1" },
-          ],
-        },
-        {
-          label: "Roadmap and research",
-          items: [
-            { label: "Roadmap", slug: "roadmap" },
-            { label: "Research areas", slug: "roadmap/research" },
           ],
         },
       ],

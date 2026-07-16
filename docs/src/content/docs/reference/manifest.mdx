@@ -31,16 +31,15 @@ services:
       policy: on-failure
 ```
 
-Canonical Hostwright manifests use this contract. Phase 12 translates supported Kubernetes resources rather than overloading this file with Kubernetes `apiVersion`, `kind`, or `metadata` fields.
+Canonical Hostwright manifests use this contract. Do not add Kubernetes `apiVersion`, `kind`, or `metadata` fields; the parser rejects them.
 
 ## Version policy
 
 `version: 2` is required for execution. Versionless and explicit v1 manifests
 are legacy input. Preview a deterministic non-writing conversion with
 `hostwright migrate preview hostwright.yaml` (or `--json`). The current preview
-inserts/replaces the version contract and is idempotent for v2; Phase 04 owns
-complete semantic migration. Future versions fail closed and Hostwright never
-silently downgrades input.
+inserts or replaces the version contract and is idempotent for v2. Future
+versions fail closed, and input is never silently downgraded.
 
 ## Fields
 

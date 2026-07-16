@@ -1,65 +1,34 @@
 ---
-title: Limits, fallbacks, and safety boundaries
-description: Every current Hostwright limitation has an implementation owner, a safe fallback, or a narrow permanent safety reason.
+title: Non-goals
+description: What Hostwright is deliberately not, and the boundaries it holds by design.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Hostwright is a single-host, desired-state control plane for Apple container
+workloads. The following are outside its design, held as boundaries rather
+than gaps.
 
-Earlier roadmaps listed several platform capabilities as non-goals. On the
-current roadmap, every missing, partial, blocked, or research-only capability
-is owned by one of 15 implementation phases.
+## Scope boundaries
 
-## Limitations that are being implemented
+- **Single host.** Hostwright controls one Mac. Cluster membership, quorum,
+  and cross-host scheduling are outside its model.
+- **Apple silicon only.** Hostwright targets Apple silicon and a supported
+  macOS. Intel hosts and emulation of other platforms are outside scope.
+- **Apple container as the runtime.** Hostwright orchestrates the Apple
+  container runtime through one adapter. It does not reimplement the runtime,
+  a Docker API, or a Kubernetes control plane.
+- **Local by default.** Observability, diagnostics, and state are local.
+  Sending data off the machine requires explicit, informed action.
 
-| Capability | Current state | Owning phase |
-| --- | --- | ---: |
-| Trusted Homebrew/archive/`.pkg` install | Does not exist; source development only. | 02 and 15 |
-| Apple `container` + Containerization parity | Apple provider is narrow; direct helper absent. | 03 |
-| Complete Manifest/lifecycle/rollback | Restricted v2 subset and narrow apply only. | 04 |
-| OCI/registry/Keychain/supply chain | Local reference and policy fragments only. | 05 |
-| Persistent storage/data protection | Scaffolding and guarded mounts only. | 06 |
-| Networks/DNS/ingress/TLS/tunnels | Metadata/research; no complete implementation. | 07 |
-| Autonomous daemon/observability/GC | Foreground loop and local events/diagnostics only. | 08 |
-| API/auth/RBAC/admission/audit/plugins | One-shot API and reviewed-local handshake only. | 09 |
-| Scheduler/optimization/accelerators | Advisory models/research only. | 10 |
-| Multi-Mac consensus/HA | Research only. | 11 |
-| Kubernetes/CRI/CNI/CSI/Helm | Not implemented. | 12 |
-| Docker/Compose/Podman/Testcontainers/IDE | Narrow import only; no Docker API. | 13 |
-| GUI/team/MDM/optional cloud | Requirements/local profiles only. | 14 |
-| Security/fuzz/soak/conformance/signed GA | Not qualified. | 15 |
+## Safety boundaries
 
-## Fallbacks for external constraints
+- **Ownership is proven, not inferred.** Cleanup and mutation act only on
+  resources Hostwright owns by exact identity. Names and similarity carry no
+  authority.
+- **Mutation is confirmed.** Runtime changes cross an explicit,
+  plan-hash-confirmed gate, one action at a time.
+- **Supported public interfaces only.** Hostwright builds on documented Apple
+  interfaces.
 
-- Homebrew-core acceptance is external. Hostwright guarantees a vendor tap once
-  Phase 02 passes; the unqualified formula is submitted in Phase 15.
-- Direct guest GPU/ANE passthrough waits for a supported public Apple API.
-  Phase 10 implements a signed authenticated host-native Metal/Core ML/MLX
-  service instead of fabricating passthrough.
-- Multi-Mac mutation becomes read-only without etcd quorum rather than
-  acknowledging unsafe conflicting writes.
-- Third-party tunnels are optional providers; Hostwright-to-Hostwright secure
-  tunnels remain a first-party Phase 07 outcome.
-
-## Permanent boundaries
-
-Only the unsafe mechanism is excluded:
-
-- private or undocumented Apple APIs;
-- Intel or old-macOS emulation outside the Apple-silicon platform;
-- cluster mutation without quorum;
-- silent telemetry or automatic diagnostics upload;
-- unauthenticated public control;
-- deletion of resources Hostwright cannot prove it owns.
-
-<Aside type="caution" title="Planned does not mean supported">
-Moving a limitation into the roadmap does not make it current support.
-Implementation requires runnable behavior and clean unit, integration, live,
-security, recovery, migration, performance, interoperability, and cleanup
-evidence declared by the owning issue.
-</Aside>
-
-## Conservative cleanup stays permanent
-
-Names and similarity never prove ownership. Hostwright can discover or
-quarantine an unmanaged resource, but adoption and deletion require explicit
-identity and authorization. See the [safety model](/concepts/safety-model/).
+For the current support boundary and the exact set of implemented commands,
+see [Limitations](/reference/limitations/) and the
+[CLI reference](/reference/cli/).

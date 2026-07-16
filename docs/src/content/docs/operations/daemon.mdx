@@ -72,9 +72,7 @@ No macOS power notifications or launchd keepalive are installed.
 
 ## Current limitations and owners
 
-Launch agent installation, installers, privileged helpers, default state
-paths, unattended runtime mutation, aggressive crash-loop enforcement, broad
-lifecycle management, and image/volume cleanup are not implemented today.
-Trusted installation/defaults belong to Phase 02, lifecycle to Phase 04, and
-autonomous daemon/recovery/finalizers/GC to Phase 08. Unmanaged cleanup remains
-permanently prohibited. See [Limitations](/reference/limitations/).
+The foreground daemon performs no launch-agent installation, unattended
+runtime mutation, crash-loop enforcement, or broad lifecycle management. It
+observes, probes, persists, and plans. See
+[Limitations](/reference/limitations/) for the current support boundary.
