@@ -5,10 +5,13 @@ import sitemap from "@astrojs/sitemap";
 
 import react from "@astrojs/react";
 
+import cloudflare from "@astrojs/cloudflare";
+
 // Canonical production URL. Pre-screened, not yet reserved — see site/README.md.
 export default defineConfig({
   site: "https://hostwright.dev",
   integrations: [mdx(), sitemap(), react()],
+
   markdown: {
     // Build-time syntax highlighting. No client JS shipped for code blocks.
     shikiConfig: {
@@ -16,6 +19,7 @@ export default defineConfig({
       wrap: false,
     },
   },
+
   vite: {
     build: {
       rolldownOptions: {
@@ -34,4 +38,6 @@ export default defineConfig({
       },
     },
   },
+
+  adapter: cloudflare(),
 });
