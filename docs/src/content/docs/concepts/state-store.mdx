@@ -5,8 +5,8 @@ description: An explicit-path SQLite ledger for desired state, observed snapshot
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright's local state store is SQLite, using the system `SQLite3` library —
-no external dependencies. It persists desired-state snapshots, observed runtime
+Hostwright's local state store is SQLite, using the system `SQLite3` library
+with zero external dependencies. It persists desired-state snapshots, observed runtime
 snapshots, the event ledger, operation records, ownership records, health
 results, restart policy state, restart recovery records, and operation recovery
 groups with step-level checkpoints.
@@ -41,21 +41,20 @@ Migrations are explicit and checksummed:
   with an unexpected checksum fails before any application reads or writes.
 - Applied migration history must be a **contiguous prefix starting at
   version 1**. A database recording a later migration while omitting an earlier
-  one fails closed — Hostwright does not infer, replay, or silently repair
-  out-of-order history. A valid older contiguous prefix remains eligible for
+  one fails closed. A valid older contiguous prefix remains eligible for
   explicit forward migration.
 
 Schema version 6 added exact observed resource identifiers, observed network
 metadata, and ownership identity versions; legacy rows are backfilled as
 identity version 1, new labeled resources are written as version 2. See
-[Runtime adapter — identity and ownership](/concepts/runtime-adapter/).
+[Runtime adapter: identity and ownership](/concepts/runtime-adapter/).
 
 ## What is (and is not) stored
 
 Normalized columns hold identifiers, project and service names, timestamps,
 lifecycle states, operation status, event severity, restart status, recovery
 checkpoints, lock leases, and hashes. JSON blobs hold ports, networks, mounts,
-environment snapshots, event and operation payloads, and recovery metadata —
+environment snapshots, event and operation payloads, and recovery metadata,
 all **redacted before persistence**.
 
 <Aside type="caution" title="Secrets never touch state">
@@ -72,7 +71,7 @@ database at a time. Hostwright uses SQLite full-mutex mode, a bounded busy
 timeout, and `BEGIN IMMEDIATE` transactions. If another process holds a write
 lock beyond the timeout, Hostwright reports a locked database instead of
 waiting indefinitely. Operation-group acquisition is atomic across concurrent
-stores — exactly one winner.
+stores, with exactly one winner.
 
 No transaction performs runtime mutation. Apply and cleanup write intent first,
 leave the transaction, call the RuntimeAdapter, then record success or failure.

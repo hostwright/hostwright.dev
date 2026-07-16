@@ -1,11 +1,11 @@
 ---
 title: Security and safety
-description: The operational security posture — mutation boundaries, redaction, image trust, network exposure, untrusted input, and unsupported scope.
+description: "The operational security posture: mutation boundaries, redaction, image trust, network exposure, and untrusted input."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright `0.0.2-dev` is not production ready. The active `v0.0.2` roadmap
+Hostwright is in active development and not production ready. The roadmap
 assigns every security-sensitive limitation to an implementation/evidence
 phase; that planning does not make it supported today. This page is the
 operational counterpart to the [safety model](/concepts/safety-model/): what
@@ -17,13 +17,12 @@ Supported mutation is intentionally narrow: one plan-hash-confirmed
 create-missing-service, one restart-policy-allowed managed start, one managed
 restart of an exact Hostwright-owned running/unhealthy service, exact
 token-confirmed cleanup deletes, and the explicitly confirmed benchmark path.
-No broad lifecycle management, no user-facing stop/restart, no image
-replacement, no automatic rollback, no unattended daemon mutation.
+Broader lifecycle operations are tracked on the [roadmap](/roadmap/).
 
 Restart policy state can block the managed start/restart paths through
 backoff, operator hold, `restart.policy: no`, and crash-loop protection.
-Operation recovery records are audit and guidance only — they never authorize
-automatic inverse operations.
+Operation recovery records are audit and guidance only; inverse operations
+always require a new confirmed plan.
 
 New runtime resources use collision-resistant v2 identifiers and exact
 ownership labels. Ownership is **never inferred** from a Hostwright-looking
@@ -34,8 +33,8 @@ name.
 Destructive cleanup requires all of: explicit `--state-db`, a dry run first, a
 matching token, a Hostwright ownership record, live observation, an exact
 owned identifier, matching project/service, and a created/stopped/exited
-lifecycle. It never deletes images, volumes, networks, Apple builder
-resources, base images, or unmanaged containers.
+lifecycle. Images, volumes, networks, Apple builder resources, base images,
+and unmanaged containers remain untouched.
 
 ## Secrets and redaction
 
@@ -43,7 +42,7 @@ Execution values are kept separate from display and persistence values:
 runtime command construction receives the manifest value, while output, logs,
 state payloads, events, plans, and failure messages are redacted.
 
-- Plaintext credential-like keys in `env` are rejected — use
+- Plaintext credential-like keys in `env` are rejected: use
   [`secretEnv` with `keychain://` references](/concepts/secrets-and-keychain/).
 - Keychain reference labels are themselves redacted, because service/account
   names reveal local context.
@@ -53,7 +52,7 @@ state payloads, events, plans, and failure messages are redacted.
 <Aside type="caution" title="Redaction is heuristic">
 Do not place plaintext credentials in manifests, logs, examples, fixtures, or
 issue reports. Diagnostic bundles are local-only and redacted, but can still
-contain project names, paths, hostnames, and identifiers — review before
+contain project names, paths, hostnames, and identifiers. Review before
 sharing.
 </Aside>
 
@@ -61,9 +60,9 @@ sharing.
 
 Treat third-party `hostwright.yaml` files as untrusted. The restricted parser
 rejects unsupported YAML, orchestrator fields, unsafe mount sources, and
-unsafe env keys — but `validate` and `plan` passing does not make a manifest
-trustworthy. Inspect image names, port publishes, environment values, volume
-paths, and health probe commands before any confirmed apply or daemon run.
+unsafe env keys. Trust decisions stay with you after `validate` and `plan`
+pass: inspect image names, port publishes, environment values, volume paths,
+and health probe commands before any confirmed apply or daemon run.
 
 ## Image trust
 
@@ -83,20 +82,18 @@ same host port block mutation planning.
 ## Team, extension, and control-surface boundaries
 
 - [Team workflow](/operations/team-workflow/) is explicit local profile and
-  approval data only — profiles can only get stricter, never weaker.
+  approval data only; profiles can only make requirements stricter.
 - Extensions are declaration-only: Hostwright evaluates typed declarations but
   does not load, install, distribute, or execute plugins.
 - Future GUIs must go through Hostwright command contracts preserving the same
   gates; nothing may call Apple container, SQLite, or the RuntimeAdapter
   directly.
 
-## Unsupported security-sensitive scope
+## Security-sensitive scope
 
-This alpha has no privileged helper, installer, launch agent, unattended
-mutation, DNS or tunnel management, cloud control plane, Kubernetes/CRI/Docker
-API/Compose compatibility, accelerator support, plugin loader, cloud team
-service, signing/notarization/SBOM/provenance, external telemetry, hosted
-diagnostics, or support SLA. The full list is in
-[Limitations](/reference/limitations/).
+Security-sensitive capabilities on the roadmap include trusted distribution
+(signing, notarization, SBOM, provenance), a launch agent with unattended
+operation, DNS and tunnel management, and plugin execution.
+[Limitations](/reference/limitations/) lists the complete boundary.
 
 Report security issues per `SECURITY.md` in the core repository.

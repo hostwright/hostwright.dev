@@ -6,8 +6,8 @@ description: Every runtime operation crosses a single typed boundary, so Apple c
 import { Aside } from "@astrojs/starlight/components";
 
 The **RuntimeAdapter** is the one place in Hostwright that talks to the runtime.
-Nothing else — not the reconciler, not the CLI, not the state store — calls
-Apple container directly. This single boundary is the most important
+Every other module, including the reconciler, the CLI, and the state store,
+reaches the runtime through this boundary. This single boundary is the most important
 architectural decision in the project.
 
 ![Hostwright core talks only through the RuntimeAdapter interface to a CLI adapter today and a planned native adapter later.](/diagrams/06-runtime-adapter-boundary.svg)
@@ -28,12 +28,12 @@ Apple container CLI or by a future Swift-native client.
 
 The adapter exposes:
 
-- `metadata()` — adapter and runtime identity;
-- `capabilities()` — supported capability discovery;
-- `observe(desiredState:)` — read-only runtime snapshots;
-- `plan(desiredState:observedState:)` — adapter-aware planning hooks;
-- `logs(for:tail:)` — bounded read-only log output;
-- `execute(_:confirmation:)` — the mutation hook. It may perform exactly one
+- `metadata()`: adapter and runtime identity;
+- `capabilities()`: supported capability discovery;
+- `observe(desiredState:)`: read-only runtime snapshots;
+- `plan(desiredState:observedState:)`: adapter-aware planning hooks;
+- `logs(for:tail:)`: bounded read-only log output;
+- `execute(_:confirmation:)`: the mutation hook. It may perform exactly one
   supported mutation action, and only after confirmation, plan hash, policy
   validation, and state persistence gates have all passed.
 
@@ -56,7 +56,7 @@ runner is not a general shell-out path:
   **redacted** output.
 
 Redaction applies to command arguments, environment values, stdout, stderr,
-parser errors, and runtime error messages — sensitive key fragments such as
+parser errors, and runtime error messages. Sensitive key fragments such as
 `token`, `password`, `secret`, `credential`, `auth`, and `key` are masked.
 
 ## Identity and ownership
@@ -66,8 +66,8 @@ identifiers and exact ownership labels. Observation binds current-project
 labels to the exact identifier, keeps owned orphans visible, ignores unrelated
 labeled projects, and fails closed on malformed current-project ownership.
 Managed start, managed restart, and cleanup operate on **exact identifiers
-only** — never on recomputed names. This is what lets two projects with
-identical legacy names remain distinct and safely cleanable.
+only**. Exact-identifier targeting lets two projects with identical legacy
+names remain distinct and safely cleanable.
 
 ## Fail-closed parsing
 
@@ -78,11 +78,11 @@ labeled Apple container 1.0.0 rows with network metadata (hostname, IPv4/IPv6,
 gateway, MAC, network name, MTU). Anything else is reported as a parse
 failure; unverified CLI output is never converted into observed state.
 
-<Aside type="note" title="What the adapter does not do">
-The adapter does not own Apple container's internals — its helpers, its VM
-lifecycle, or its networking stack. It rejects mounts, DNS, custom networks,
-Rosetta, `run`, pull, build, exec, attach, `--all`, `--force`, image deletes,
-and volume deletes outright. See the
+<Aside type="note" title="Adapter scope">
+Apple container owns its internals: helpers, VM lifecycle, and the networking
+stack. The adapter rejects command specs outside its reviewed surface,
+including mounts, DNS, custom networks, Rosetta, `run`, pull, build, exec,
+attach, `--all`, `--force`, image deletes, and volume deletes. See the
 [Apple container boundary](/concepts/apple-container-boundary/).
 </Aside>
 
@@ -91,6 +91,6 @@ and volume deletes outright. See the
 The concrete implementations today drive the **Apple container CLI**:
 `AppleContainerReadOnlyAdapter` for observation and `AppleContainerApplyAdapter`
 for the four narrow mutations. A Swift-native adapter built on Apple's
-Containerization APIs is a later option — adopted only when that surface is
-stable enough to depend on. Both would implement the same protocol, so the rest
-of the system is unaffected by the switch.
+Containerization APIs is a later option, adopted when that surface is stable
+enough to depend on. Both would implement the same protocol, so the rest of
+the system is unaffected by the switch.

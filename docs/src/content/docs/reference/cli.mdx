@@ -55,21 +55,20 @@ with `hasFailures: true` and exit code 65, not as an error envelope.
 | Exit code | Category |
 | ---: | --- |
 | `0` | Success |
-| `64` | Usage — unsupported flags, missing arguments, refused overwrite, local non-manifest file I/O failure |
-| `65` | Validation — missing/unreadable manifest, manifest/profile/approval validation, compatibility failure |
-| `66` | State unavailable — explicit SQLite path could not be opened, migrated, verified, locked, or read |
+| `64` | Usage: unsupported flags, missing arguments, refused overwrite, local non-manifest file I/O failure |
+| `65` | Validation: missing/unreadable manifest, manifest/profile/approval validation, compatibility failure |
+| `66` | State unavailable: explicit SQLite path could not be opened, migrated, verified, locked, or read |
 | `69` | Runtime unavailable or evidence blocked |
-| `70` | Confirmation mismatch — plan hash, cleanup token, or approval binding does not match |
-| `71` | Unsafe operation — safety policy blocked mutation |
-| `72` | Partial failure — mixed cleanup outcome or failed benchmark evidence |
+| `70` | Confirmation mismatch: plan hash, cleanup token, or approval binding does not match |
+| `71` | Unsafe operation: safety policy blocked mutation |
+| `72` | Partial failure: mixed cleanup outcome or failed benchmark evidence |
 
 The stable `HW-*` diagnostic codes are on the
 [error codes page](/reference/error-codes/).
 
 ## `hostwright --version`
 
-Prints `0.0.2-dev`. The release target is `v0.0.2`; the binary does not report
-the release version before the GA gate.
+Prints the current development version.
 
 ## `hostwright capabilities`
 
@@ -145,33 +144,30 @@ interactive, or exec. With `--state-db`, persists a `logs.read` event.
 
 Reads the SQLite event ledger in deterministic timestamp/id order, with
 `--project`, `--type`, `--service`, `--severity`, `--limit`, and `--sort`
-filters. Reads an already-migrated database only — never creates or migrates
-one as a side effect.
+filters. Reads an already-migrated database only and leaves the database unmodified.
 
 ## `hostwright recovery --state-db <path>`
 
 Reads operation recovery groups and steps; renders legacy restart recovery
 records for older databases. Distinguishes: no automatic recovery required,
 manual inspection required, and rollback unsupported. Active groups include
-redacted lock owner and lease expiry. Diagnostic only — no retries, no
-rollback, no runtime inspection.
+redacted lock owner and lease expiry. Diagnostic output only; recovery actions stay manual.
 
 ## `hostwright diagnostics --state-db <path> --bundle <path>`
 
 Writes a local redacted JSON bundle: telemetry policy (local-only), schema
 metadata, optional manifest summary, and redacted events, operations, health
 results, restart state, ownership records, and snapshots. Refuses to overwrite
-an existing bundle. Never uploads, never observes runtime, never creates or
-migrates a database.
+an existing bundle. The command reads existing state rows only, and the
+bundle stays on local disk.
 
 ## `hostwright cleanup [path] --state-db <path> --dry-run | --confirm-cleanup <token>`
 
 Exactly one of `--dry-run` or `--confirm-cleanup` is required. The dry run
 classifies candidates (`eligible`, `ambiguous`, `stale`, `running`, `unknown`,
 `blocked`, `never-delete`) and prints an exact confirmation token. Confirmed
-cleanup deletes only `eligible` containers covered by the current token —
-never images, volumes, networks, or unmanaged containers, never `--all` or
-`--force`. Partial failure exits 72 and preserves successful deletions in the
+cleanup deletes only `eligible` containers covered by the current token.
+Images, volumes, networks, and unmanaged containers remain untouched. Partial failure exits 72 and preserves successful deletions in the
 report.
 
 ## `hostwright benchmark ... --confirm-live`
@@ -185,18 +181,19 @@ evidence, and a non-existing report path.
 Writes a schema-v2 JSON hardware report. Each iteration creates one unique
 labeled Hostwright-owned resource through the RuntimeAdapter, records
 boot/poll/stats samples, then deletes exactly that identifier and verifies
-absence. Never pulls images, never writes SQLite, never uploads. Exit 0 only
+absence. It uses a pre-pulled local image, runs without state writes, and keeps the
+report on local disk. Exit 0 only
 when every dimension was measured and exact cleanup succeeded; 69 when
 evidence is blocked; 72 when command/identity/cleanup evidence failed. One
-report is local evidence only — not a capacity, compatibility, or performance
-claim.
+report records local evidence for the exact host and versions measured.
 
 ## `hostwright doctor [--output json]`
 
 Safe local checks only: OS version, architecture/macOS gate, Swift toolchain
 version, `container` executable lookup, manifest presence, state-path policy,
 telemetry policy, and a local resource-intelligence report with explicit
-`unmeasured` dimensions. Never runs Apple container commands. See
+`unmeasured` dimensions. All checks run locally without invoking Apple
+container. See
 [Doctor checks](/reference/doctor-checks/).
 
 ## `hostwrightd --foreground --config <path> --state-db <path>`
@@ -205,5 +202,4 @@ The foreground development daemon loop. Options: `--interval <seconds>`
 (default 30), `--jitter <seconds>` (default 5), `--max-backoff <seconds>`
 (default 300), `--max-iterations <count>`, `--lock-file <path>` (default
 `<state-db>.hostwrightd.lock`). Each iteration validates, observes, plans, and
-records events — it never calls the mutation hook, installs no launch agent,
-and performs no unattended mutation. See [Daemon](/operations/daemon/).
+records events. Runtime mutation stays with the confirmed apply gate. See [Daemon](/operations/daemon/).

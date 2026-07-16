@@ -1,13 +1,13 @@
 ---
 title: Quick start
-description: The safe core loop — init, validate, plan, doctor — and how confirmed apply fits in after it.
+description: "The safe core loop: init, validate, plan, doctor, and how confirmed apply fits in after it."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
 This page covers the safe core loop. Every command here is **read-only or
-local-file-only** — nothing touches the container runtime until you opt into the
-confirmed apply gate at the end.
+local-file-only**. The container runtime stays untouched until you opt into
+the confirmed apply gate at the end.
 
 ## Requirements
 
@@ -76,7 +76,7 @@ Every field is described in the [`hostwright.yaml` reference](/reference/manifes
 ## Observing the runtime
 
 Runtime observation and state persistence require an **explicit** state
-database path — Hostwright never picks one for you:
+database path that you choose:
 
 ```bash
 hostwright status --state-db /tmp/hostwright.sqlite
@@ -103,6 +103,6 @@ in the [Safety model](/concepts/safety-model/).
 
 ## Next
 
-- [Desired state](/concepts/desired-state/) — the model behind the manifest.
-- [Operations and recovery](/tasks/operations-and-recovery/) — status, logs, events, diagnostics, cleanup.
-- [Limitations](/reference/limitations/) — what to expect, stated plainly.
+- [Desired state](/concepts/desired-state/): the model behind the manifest.
+- [Operations and recovery](/tasks/operations-and-recovery/): status, logs, events, diagnostics, cleanup.
+- [Limitations](/reference/limitations/): what to expect, stated plainly.

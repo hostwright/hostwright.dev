@@ -25,7 +25,7 @@ swift test
 
 You can list what exists first with `swift test list`, or use the repository's
 `scripts/test.sh` helper. Passing tests on your machine are the same evidence
-the project itself uses for its support claims — see
+the project itself uses for its support claims. See
 [Testing evidence](/reference/testing-evidence/).
 
 ## 3. Confirm the binary answers
@@ -34,9 +34,7 @@ the project itself uses for its support claims — see
 swift run hostwright --version
 ```
 
-```text
-0.0.2-dev
-```
+This prints the current development version.
 
 ## 4. Check the host
 
@@ -46,18 +44,17 @@ swift run hostwright doctor --output json
 ```
 
 `doctor` runs safe local checks only: OS version, Apple silicon and macOS 26+
-gate, Swift toolchain version, `container` executable lookup (presence only —
-it never runs Apple container commands), `hostwright.yaml` presence, state-path
+gate, Swift toolchain version, `container` executable lookup (presence check only), `hostwright.yaml` presence, state-path
 policy, telemetry policy, and a local resource-intelligence report.
 
 A missing `container` executable is reported as a warning, not a crash. In the
 JSON report, benchmark dimensions that were not measured are reported
-explicitly as `unmeasured` — doctor never fabricates capacity numbers. The full
+explicitly as `unmeasured`; doctor reports only measured values. The full
 check list is in [Doctor checks](/reference/doctor-checks/).
 
 ## Where this leaves you
 
-You have a built CLI and a verdict on current host compatibility. The trusted
-v0.0.2 package path is still Phase 02/15 work; `brew install hostwright` does
-not exist today. See the [release process](/release/process/) and continue with
+You have a built CLI and a verdict on current host compatibility. There is no
+trusted package yet; `brew install hostwright` does not exist today. See the
+[release process](/release/process/) and continue with
 [Plan a single service](/tasks/single-service-plan/).

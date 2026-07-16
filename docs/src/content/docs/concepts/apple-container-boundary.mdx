@@ -1,6 +1,6 @@
 ---
 title: Apple container boundary
-description: Apple container is the execution substrate. Hostwright sits above it and is careful about what it does and does not own.
+description: Apple container is the execution substrate. Hostwright sits above it with a clear ownership boundary.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -18,8 +18,8 @@ sits is essential to understanding the project.
 Apple container is a Mac-native runtime built for Apple silicon. The properties
 that matter for Hostwright:
 
-- A **VM-per-container** model — each container runs in its own lightweight
-  Linux VM rather than a single shared VM.
+- A **VM-per-container** model: each container runs in its own lightweight
+  Linux VM.
 - An **OCI image** flow, so standard container images work.
 - A command surface and helper services managed under macOS, with `vmnet`-based
   networking.
@@ -55,7 +55,7 @@ Everything above the adapter is Hostwright. Everything below it is Apple's.
 - The image store and registry interactions.
 - The networking stack and system helpers.
 
-## Verified, not assumed
+## Verified shapes only
 
 Hostwright adapts **documented, locally verified** Apple container CLI behavior
 only. The current command shapes are based on verified Apple container 1.0.0
@@ -73,11 +73,11 @@ error.
 
 ## Open questions at the boundary
 
-These depend on Apple container behavior and are tracked, not assumed:
+These depend on Apple container behavior and are tracked as open questions:
 
 - The boundaries of `exec` and interactive attach (not implemented, research-only).
 - Port-forwarding semantics and equivalents.
 - Log streaming for short-lived containers (`logs` is bounded tail-only today).
-- Localhost HTTP reachability evidence — on the current proof host, the Apple
+- Localhost HTTP reachability evidence: on the current proof host, the Apple
   container listener accepts then resets while macOS Local Network access for
   `container-runtime-linux` is disabled.

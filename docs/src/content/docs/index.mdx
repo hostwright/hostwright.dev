@@ -1,6 +1,6 @@
 ---
 title: What Hostwright is
-description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Current capabilities and the v0.0.2 roadmap start here.
+description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Current capabilities and the roadmap start here.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -9,9 +9,8 @@ Hostwright is a **Mac-native desired-state container platform** for [Apple conta
 
 You declare services in a versioned [`hostwright.yaml`](/reference/manifest/) manifest. Hostwright validates intent, computes a deterministic plan, persists exact desired/observed/operation identity, and crosses a typed runtime-provider boundary for every runtime action.
 
-<Aside type="caution" title="0.0.2 development build">
-Hostwright is on the `0.0.2-dev` line. The release target is `v0.0.2`; it has
-not passed GA qualification and is not production ready. `brew install
+<Aside type="caution" title="In active development">
+Hostwright is in active development and not production ready. `brew install
 hostwright` does not exist today. Build from source and read
 [Limitations](/reference/limitations/) before relying on behavior.
 </Aside>
@@ -28,7 +27,7 @@ hostwright` does not exist today. Build from source and read
 - SQLite schema v7 establishes UUID identity, provider binding, fencing, saga intent, compensation, and verification records.
 - Secret references, local policy/team profiles, a one-shot Control API v2 process, advisory scheduler models, and unsigned developer distribution evidence exist within their documented narrow boundaries.
 
-Everything else is a **current limitation with an owner**, not a discarded non-goal. The 15-phase `v0.0.2` program covers trusted install, both Apple providers, complete lifecycle, images/registries/secrets, storage, networking, autonomous recovery, security/extensions, scheduling/accelerators, multi-Mac HA, Kubernetes, Docker ecosystem, GUI/team/cloud, and GA qualification.
+Everything else is a **current limitation with an owner** on the [roadmap](/roadmap/), which covers trusted install, both Apple providers, complete lifecycle, images/registries/secrets, storage, networking, autonomous recovery, security/extensions, scheduling/accelerators, multi-Mac HA, Kubernetes, and the Docker ecosystem.
 
 ## Locked contracts
 
@@ -49,7 +48,7 @@ Everything else is a **current limitation with an owner**, not a discarded non-g
 | **Tasks** | Walkthroughs labeled non-mutating, state-writing, or runtime-mutating. |
 | **Reference** | Exact CLI, manifest, compatibility, limitations, error, policy, and evidence contracts. |
 | **Operations** | Security, team workflow, daemon, events, diagnostics, and recovery. |
-| **Release** | The v0.0.2 RC/GA process plus immutable historical notes. |
+| **Release** | The release process and historical release notes. |
 | **Roadmap** | All 15 phases and 167 workstreams; planned behavior is never current support. |
 
 ## Where to start
@@ -57,4 +56,4 @@ Everything else is a **current limitation with an owner**, not a discarded non-g
 - Read [Why Hostwright](/overview/why-hostwright/) and [Desired state](/concepts/desired-state/).
 - Read [Limits, fallbacks, and safety boundaries](/overview/non-goals/) plus the exhaustive [Limitations](/reference/limitations/).
 - Follow [Install from source](/getting-started/install-from-source/) and the [Quick start](/getting-started/quick-start/).
-- Inspect the [v0.0.2 roadmap](/roadmap/) before interpreting research or historical pages as current scope.
+- Inspect the [roadmap](/roadmap/) before interpreting research or historical pages as current scope.

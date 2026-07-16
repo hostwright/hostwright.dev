@@ -13,10 +13,10 @@ a deterministic plan.
 
 ## Two kinds of state
 
-- **Desired state** — what you declared in [`hostwright.yaml`](/reference/manifest/).
+- **Desired state**: what you declared in [`hostwright.yaml`](/reference/manifest/).
   Persisted as a snapshot to the explicit SQLite database you pass with
   `--state-db`.
-- **Observed state** — what is running, read back from the runtime
+- **Observed state**: what is running, read back from the runtime
   through the [RuntimeAdapter](/concepts/runtime-adapter/) at a point in time.
   `hostwright status --state-db <path>` records it as an observed snapshot.
 
@@ -25,25 +25,25 @@ records and issues, and produces a plan with a deterministic hash. Convergence
 is never automatic: mutation happens only through the confirmed
 [apply gate](/concepts/safety-model/), one action at a time.
 
-## Why declare instead of command
+## Why declarative
 
 Imperative commands describe *how*; a manifest describes *what*. A declarative
 model provides properties that imperative commands do not:
 
-- **Idempotency** — apply recomputes the plan and refuses to run when the
+- **Idempotency**: apply recomputes the plan and refuses to run when the
   confirmed hash no longer matches reality, so a stale intent cannot re-execute.
-- **Drift detection** — with desired and observed snapshots both recorded,
+- **Drift detection**: with desired and observed snapshots both recorded,
   Hostwright reports when observed state diverges from desired state.
-- **Reviewable change** — the difference is shown as a plan, with a hash, before
+- **Reviewable change**: the difference is shown as a plan, with a hash, before
   anything mutates.
-- **Recovery** — operation intent, checkpoints, and recovery records are
+- **Recovery**: operation intent, checkpoints, and recovery records are
   persisted before mutation, so an interrupted operation is diagnosable with
   [`hostwright recovery`](/operations/events-and-diagnostics/).
 
 ## The unit of declaration
 
 A manifest declares a **project** that contains one or more **services**. A
-service references an image and the runtime details needed to run it — ports,
+service references an image and the runtime details needed to run it: ports,
 environment, secret references, health checks, and restart policy.
 
 ```yaml
@@ -67,7 +67,7 @@ and [Limits and fallbacks](/overview/non-goals/).
 ## What convergence is not
 
 Hostwright does not run an aggressive convergence loop. The foreground
-[daemon](/operations/daemon/) observes, plans, and records events — it never
-mutates. `apply` executes exactly one confirmed action per invocation. Automatic
+[daemon](/operations/daemon/) observes, plans, and records events. Mutation
+remains reserved for the confirmed apply gate. `apply` executes exactly one confirmed action per invocation. Automatic
 rollback and multi-action apply are not implemented; see
 [Limitations](/reference/limitations/).
