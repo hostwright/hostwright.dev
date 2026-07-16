@@ -1,6 +1,6 @@
 ---
 title: Why Hostwright
-description: The motivation — a new Mac-native runtime surface, the value of local desired-state control, and the decisions that follow.
+description: "The motivation: a new Mac-native runtime surface, the value of local desired-state control, and the decisions that follow."
 ---
 
 Hostwright exists because of a specific change in the Mac development landscape,
@@ -43,17 +43,17 @@ designed to extend to multiple Macs later.
 ## Why Swift
 
 The runtime substrate is Apple-native, so the control plane is too. Swift gives
-Hostwright direct access to macOS facilities — the Keychain, process control,
-system SQLite — and a path to Apple's Containerization APIs without a
-foreign-language bridge. A Swift daemon, CLI, and core library keep the whole
+Hostwright direct access to macOS facilities such as the Keychain, process
+control, and system SQLite, plus a native path to Apple's Containerization
+APIs. A Swift daemon, CLI, and core library keep the whole
 system in one idiomatic, testable codebase, with no external package
 dependencies.
 
 ## Why the RuntimeAdapter is the core boundary
 
 Apple container is young and will change. The single most important design
-decision is to route every runtime operation through one typed boundary — the
-[RuntimeAdapter](/concepts/runtime-adapter/) — so that runtime change is
+decision is to route every runtime operation through one typed boundary, the
+[RuntimeAdapter](/concepts/runtime-adapter/), so that runtime change is
 contained to one place. Hostwright can start on the Apple container CLI today
 and move to a native API later without rewriting the reconciler, because both
 implement the same provider contract.

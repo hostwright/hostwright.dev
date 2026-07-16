@@ -15,7 +15,7 @@ gates.
 
 - **Plan before mutation.** `apply` recomputes the plan against a live
   observation and refuses to run unless your `--confirm-plan <hash>` matches it.
-- **One action per apply.** Exactly one executable action runs per invocation —
+- **One action per apply.** Exactly one executable action runs per invocation;
   create a missing service, or a restart-policy-allowed managed start or
   restart. Zero executable actions refuses; more than one refuses.
 - **Dry-run before deletion.** `cleanup --dry-run` classifies every candidate
@@ -25,7 +25,7 @@ gates.
   checkpoints are persisted to the explicit state database *before* the runtime
   is touched.
 - **Conservative validation.** Unsafe or ambiguous manifests are refused, not
-  guessed at — see the [policy engine](/concepts/policy-engine/).
+  refused. See the [policy engine](/concepts/policy-engine/).
 - **Ownership-tracked cleanup.** No broad garbage collection. Cleanup touches
   only resources Hostwright can prove it owns.
 - **No secret leakage.** Plans, events, logs, state rows, and errors carry
@@ -33,7 +33,7 @@ gates.
 
 ## The apply gate, concretely
 
-`hostwright apply` refuses mutation when — among other cases — the state
+`hostwright apply` refuses mutation when, among other cases, the state
 database or plan hash is missing or mismatched, observation fails, the plan has
 blockers, zero or multiple executable actions exist, a create action uses
 mounts or privileged ports or broad bind addresses, the local image cannot be
@@ -56,8 +56,8 @@ deletes a resource it cannot prove Hostwright owns.
 
 Cleanup classifications from the dry run: `eligible`, `ambiguous`, `stale`,
 `running` (never deleted), `unknown`, `blocked`, and `never-delete`. Only
-`eligible` — an exact Hostwright-owned created/stopped/exited container covered
-by the current token — is ever deleted. Images, volumes, networks, and
+`eligible` (an exact Hostwright-owned created/stopped/exited container covered
+by the current token) is ever deleted. Images, volumes, networks, and
 unmanaged containers are never touched, and broad flags like `--all` or
 `--force` are never used.
 
@@ -71,5 +71,5 @@ last moment before a confirmed create.
 <Aside type="note" title="User-space first">
 Hostwright does not install privileged helpers, launch agents, or services.
 Any future operation that would require elevated privilege needs a threat
-model first — see [Security and safety](/operations/security-and-safety/).
+model first. See [Security and safety](/operations/security-and-safety/).
 </Aside>

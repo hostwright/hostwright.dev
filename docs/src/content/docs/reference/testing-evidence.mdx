@@ -5,7 +5,7 @@ description: The eleven evidence classes behind every Hostwright support claim, 
 
 Hostwright separates deterministic test coverage from evidence that exercises
 real local systems. Every support claim in these docs traces back to one of
-these classes — a report uses exactly one:
+these classes; a report uses exactly one:
 
 | Evidence class | What it proves | What it cannot prove |
 | --- | --- | --- |
@@ -22,8 +22,8 @@ these classes — a report uses exactly one:
 | `ux-accessibility` | Completed workflows, API parity, accessibility and assistive-technology results. | Visual review alone. |
 
 Reports conform to `schemas/hostwright-evidence.schema.json` in the core
-repository. Status is `passed`, `failed`, or `blocked` — **there is no
-skipped-success status**.
+repository. Status is `passed`, `failed`, or `blocked`; **every run resolves to one of
+the three**.
 
 The default repository gate runs `swift test` (unit-contract plus local
 integration), then `scripts/integration.sh` against the built CLI. Live
@@ -40,7 +40,7 @@ A passing report must:
 - include raw executed/passed/failed/blocked counts;
 - contain no failures or blockers;
 - record cleanup as `not-required` or `succeeded`;
-- use evidence from the declared class — never a fixture standing in for a
+- use evidence from the declared class: never a fixture standing in for a
   higher class.
 
 Release evidence must come from a clean checkout. A dirty report can support
@@ -59,7 +59,7 @@ development diagnosis but cannot satisfy a release gate.
 
 ## Why this matters for these docs
 
-The [v0.0.2 Phase 01 documentation rules](/roadmap/) require every current-support
+The [documentation rules](/roadmap/) require every current-support
 claim on this site to trace to reference docs or tests in the core repository.
 When a page here says "implemented", that means covered by passing evidence in
-one of these classes for the reviewed commit — not "should work".
+one of these classes for the reviewed commit.

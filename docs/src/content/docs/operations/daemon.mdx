@@ -1,6 +1,6 @@
 ---
 title: Daemon
-description: hostwrightd is a foreground reconciliation loop — it observes, probes, plans, and records, and it never mutates the runtime.
+description: hostwrightd is a foreground reconciliation loop that observes, probes, plans, and records. Mutation stays with the confirmed apply gate.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -20,7 +20,7 @@ Required: `--foreground`, `--config <path>`, `--state-db <path>`. Optional:
 | `--interval <seconds>` | 30 | Base reconciliation cadence. |
 | `--jitter <seconds>` | 5 | Deterministic jitter cap. |
 | `--max-backoff <seconds>` | 300 | Repeated-error backoff cap. |
-| `--max-iterations <count>` | — | Stop after a bounded number of iterations. |
+| `--max-iterations <count>` | none | Stop after a bounded number of iterations. |
 | `--lock-file <path>` | `<state-db>.hostwrightd.lock` | Single-instance lock. |
 
 No default config path, state path, or user-global daemon location exists.
@@ -33,7 +33,7 @@ Each iteration:
 2. Maps the manifest into desired runtime state.
 3. Observes runtime state through the [RuntimeAdapter](/concepts/runtime-adapter/).
 4. Runs bounded in-process loopback health checks for configured running
-   services (the allowlisted `curl`/`wget`/`true`/`false` probe shapes — see
+   services (the allowlisted `curl`/`wget`/`true`/`false` probe shapes; see
    the [manifest reference](/reference/manifest/)).
 5. Persists health results and restart policy state.
 6. Computes a deterministic plan with restart-state blocking.
@@ -41,17 +41,17 @@ Each iteration:
 8. Sleeps according to cadence, jitter, and backoff.
 
 Failed iterations persist a failed operation and a `daemon.reconcile.failed`
-event with a redacted diagnostic code — they never claim a snapshot was
+event with a redacted diagnostic code; they never claim a snapshot was
 recorded.
 
 Recorded events include `daemon.started`, `daemon.reconcile.succeeded`,
 `daemon.reconcile.failed`, `daemon.backoff`, `daemon.sleep_wake_resumed`,
-`daemon.stopped`, `health.check.*`, and `restart.policy.state` — all readable
+`daemon.stopped`, `health.check.*`, and `restart.policy.state`, all readable
 with [`hostwright events`](/operations/events-and-diagnostics/).
 
 <Aside type="caution" title="The daemon never mutates">
 `hostwrightd` uses the read-only adapter and does not call the mutation hook.
-It may observe, probe, persist, and plan — it does not create, start, stop,
+It observes, probes, persists, and plans. It does not create, start, stop,
 restart, delete, repair, or clean up anything. Confirmed mutation remains
 exclusively behind `hostwright apply --confirm-plan` and
 `hostwright cleanup --confirm-cleanup`.

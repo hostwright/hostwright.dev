@@ -1,12 +1,12 @@
 ---
 title: Events and diagnostics
-description: The event ledger, operation recovery groups, and local redacted diagnostics bundles — reference depth for the observability surfaces.
+description: "The event ledger, operation recovery groups, and local redacted diagnostics bundles: reference depth for the observability surfaces."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Every meaningful step — observations, applies, cleanups, daemon iterations,
-health checks — lands in the event ledger of the explicit state database, so
+Every meaningful step (observations, applies, cleanups, daemon iterations,
+health checks) lands in the event ledger of the explicit state database, so
 failures are explainable after the fact. Three read-only commands expose it.
 All three read an **already-migrated** database and fail rather than creating
 or migrating one as a side effect.
@@ -34,14 +34,14 @@ persistence, so the ledger is safe to read but still local-context-rich.
 hostwright recovery --state-db /tmp/hostwright.sqlite [--project <name>]
 ```
 
-Apply persists an operation recovery **group** with step records — intent,
+Apply persists an operation recovery **group** with step records (intent,
 checkpoints, forward runtime steps, rollback-unavailable markers, and redacted
-manual recovery hints — before and during mutation. `recovery` reads those
+manual recovery hints) before and during mutation. `recovery` reads those
 groups and reports, per operation:
 
-- **no automatic recovery required** — it completed;
-- **manual inspection required** — it failed or was interrupted;
-- **rollback unsupported** — no safe inverse operation is proven.
+- **no automatic recovery required**: it completed;
+- **manual inspection required**: it failed or was interrupted;
+- **rollback unsupported**: no safe inverse operation is proven.
 
 Active groups show their redacted lock owner and lease expiry. A group with no
 persisted mutation intent can be reacquired after lease expiry (the old group
@@ -50,7 +50,7 @@ proves runtime execution never began (`pre-runtime-state-incomplete`);
 ambiguous or post-runtime interruptions require manual inspection. Older
 databases with legacy restart recovery records render those as legacy entries.
 
-<Aside type="note" title="Diagnostic, not automatic">
+<Aside type="note" title="Diagnostic output">
 Recovery never observes Apple container, retries mutation, stops/starts/
 deletes resources, or rolls anything back. Hostwright has no automatic
 rollback because no safe inverse operation is proven; the output is a
@@ -69,15 +69,15 @@ Writes a local redacted JSON bundle containing:
 - the telemetry policy statement (local-only, no upload);
 - state schema and version metadata;
 - an optional manifest summary (omitting `--manifest` makes the bundle
-  state-only — the current directory is never searched);
+  state-only; only paths you pass are read);
 - redacted events, operations, operation groups and steps, health results,
   restart policy state, restart recovery records, ownership records, and
   observed snapshots.
 
 It refuses to overwrite an existing bundle path (`HW-CLI-002`) and never
 inspects or mutates the runtime, creates or migrates a database, or uploads
-anything. Bundles can still contain sensitive local context — project names,
-service names, paths, hostnames, identifiers — **review before sharing**.
+anything. Bundles can still contain sensitive local context (project names,
+service names, paths, hostnames, identifiers). **Review before sharing**.
 
 ## Telemetry policy
 

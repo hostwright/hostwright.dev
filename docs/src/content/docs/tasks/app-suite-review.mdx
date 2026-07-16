@@ -5,7 +5,7 @@ description: "Validate and plan a multi-service manifest, and understand health,
 
 import { Aside } from "@astrojs/starlight/components";
 
-**This task is read-only** — it validates and plans; it does not apply.
+**This task is read-only**: it validates and plans; it does not apply.
 
 ## The example manifest
 
@@ -53,7 +53,7 @@ observed state is available, and one deterministic hash for the whole plan.
 ## 2. What health and restart declarations do
 
 - `health.command` is executed by the [daemon](/operations/daemon/) as an
-  in-process loopback probe for allowlisted command shapes — results are
+  in-process loopback probe for allowlisted command shapes. Results are
   persisted and feed drift detection ("unhealthy where policy requires
   health"). Container-exec health checks are not implemented.
 - `restart.policy` gates the *managed start* and *managed restart* actions.
@@ -64,7 +64,7 @@ observed state is available, and one deterministic hash for the whole plan.
 ## 3. One action per apply
 
 <Aside type="caution" title="Not Compose parity">
-If both services are missing, the plan contains two create actions — and
+If both services are missing, the plan contains two create actions, and
 `apply` refuses, because more than one executable action exists. Converging a
 multi-service suite means multiple explicit plan-confirm-apply rounds, one
 action each. Hostwright has a narrow mutation gate; it is not a Compose-style
@@ -86,5 +86,5 @@ observed hash. A stale hash is refused with a confirmation-mismatch error
 
 ## Next
 
-- [Operations and recovery](/tasks/operations-and-recovery/) — watching the suite after it runs.
-- [hostwright.yaml reference](/reference/manifest/) — every supported field.
+- [Operations and recovery](/tasks/operations-and-recovery/): watching the suite after it runs.
+- [hostwright.yaml reference](/reference/manifest/): every supported field.

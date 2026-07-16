@@ -1,6 +1,6 @@
 ---
 title: hostwright.yaml reference
-description: The restricted manifest format — every supported field, the version policy, validation rules, and the fail-closed parser boundary.
+description: "The restricted manifest format: every supported field, the version policy, validation rules, and the fail-closed parser boundary."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -53,7 +53,7 @@ silently downgrades input.
 | `image` | scalar | Required per service. No whitespace, must not begin with `-`; digests must be `@sha256:<64 lowercase hex>`. |
 | `command` | inline array | Tokens non-empty and must not begin with `-`. |
 | `ports` | string list | `"host:container"`, values 1–65535. |
-| `env` | string map | Keys shell-safe (`[A-Za-z_][A-Za-z0-9_]*`). Plaintext credential-like keys are rejected — use `secretEnv`. |
+| `env` | string map | Keys shell-safe (`[A-Za-z_][A-Za-z0-9_]*`). Plaintext credential-like keys are rejected; use `secretEnv`. |
 | `secretEnv` | string map | Values must be `keychain://<service>/<account>`. A key cannot appear in both `env` and `secretEnv`. |
 | `volumes` | string list | `source:/absolute/container/path[:ro|rw]`. Host-root and parent-traversal sources are rejected. |
 | `health.command` | inline array | Non-empty when `health` is present. Bounded probe shapes only (see below). |
@@ -72,7 +72,7 @@ fields fail closed too, including `apiVersion`, `kind`, `metadata`, `build`,
 </Aside>
 
 [`hostwright import-stack`](/tasks/stack-import/) can convert a smaller
-stack-file subset into this shape — conversion only, with the normal validator
+stack-file subset into this shape: conversion only, with the normal validator
 run on the output.
 
 ## Image policy
@@ -92,7 +92,7 @@ services:
 Hostwright does not verify a digest exists in a registry, resolve tags,
 pull images, verify signatures or SBOMs, or scan vulnerabilities.
 
-## Health probes are bounded, not shell
+## Bounded health probes
 
 Health checks are not shell commands and are not container `exec`, and
 Hostwright does not execute host `curl` or `wget` binaries. Current bounded

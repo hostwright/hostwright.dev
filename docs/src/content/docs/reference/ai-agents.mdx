@@ -1,21 +1,20 @@
 ---
 title: Using an AI assistant
-description: The exact prompt to give an AI assistant so it sets up Hostwright correctly — no invented installer, no invented commands, no skipped safety gates.
+description: The exact prompt to give an AI assistant so it sets up Hostwright with the real install path and the real command surface.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright has no trusted packaged release yet — no available Homebrew formula,
-`.pkg`, or signed/notarized binary. The current way to run it is from source.
-That is exactly the kind of gap an assistant tends to paper over: it may
-confidently suggest `brew install hostwright` (doesn't exist today) or invent a
-`hostwright down` command (not implemented). This page is one prompt that
+Hostwright installs from source today; packaged distribution (a Homebrew
+formula, `.pkg`, and signed, notarized binaries) is on the roadmap. Assistants
+tend to paper over that gap: they may suggest `brew install hostwright` or
+invent a `hostwright down` command, and neither exists today. This page is one prompt that
 fixes both.
 
 <Aside type="caution" title="No installer today">
-The `0.0.2-dev` line runs from Swift Package Manager source. Phase 02 owns the
-trusted vendor tap/archive/`.pkg`; Phase 15 owns Homebrew-core submission.
-Those roadmap outcomes are not current installation commands.
+Hostwright runs from Swift Package Manager source. A trusted vendor
+tap/archive/`.pkg` and Homebrew-core submission are on the roadmap; those
+outcomes are not current installation commands.
 </Aside>
 
 ## The prompt
@@ -24,8 +23,8 @@ Paste this into your assistant before asking it to help with Hostwright:
 
 ```text
 I want to try Hostwright, a Mac-native desired-state container platform for
-Apple silicon, currently on 0.0.2-dev with a v0.0.2 target. It has no trusted
-packaged release yet — do not suggest brew, npm, curl-to-shell, or any
+Apple silicon, in active development. It has no trusted packaged release
+yet. Do not suggest brew, npm, curl-to-shell, or any
 installer. The only way to run it is from source:
 
 git clone https://github.com/hostwright/hostwright
@@ -44,7 +43,7 @@ Mutation happens ONLY through two gates, and I want to run those myself:
   apply --state-db <path> --confirm-plan <hash>   (exactly one action)
   cleanup --state-db <path> --confirm-cleanup <token>
 Never suggest running apply or confirmed cleanup automatically, never
-invent flags, and never suggest stop/restart/down/rm commands — they do
+invent flags, and never suggest stop/restart/down/rm commands; they do
 not exist.
 
 The currently executable manifest (hostwright.yaml) requires: version: 2, project,
@@ -52,7 +51,7 @@ imagePolicy (allow-tags|require-digest), and per service: image, command,
 ports, env, secretEnv (keychain://<service>/<account> references only),
 volumes, health.command, health.interval, restart.policy
 (no|on-failure|unless-stopped). Do not add networks, depends_on, build,
-replicas, or secrets: blocks — the parser fails closed on them.
+replicas, or secrets: blocks; the parser fails closed on them.
 
 Help me: clone and build it, run doctor, generate a starter manifest with
 init, then validate and plan it.
@@ -60,8 +59,8 @@ init, then validate and plan it.
 
 ## Why this exists
 
-An assistant's default instincts — assume a mature project has a package
-manager entry, assume "plan" implies it should also "apply" — are wrong for a
+An assistant's default instincts (assume a mature project has a package
+manager entry, assume "plan" implies it should also "apply") are wrong for a
 tool with this safety posture. The prompt is the same ground truth documented
 on this site, handed to the assistant before it guesses. The authoritative
 surfaces are the [CLI reference](/reference/cli/) and the
@@ -69,17 +68,17 @@ surfaces are the [CLI reference](/reference/cli/) and the
 
 ## If an agent works inside your repository
 
-Drop the same constraints into a rules file the agent reads automatically —
+Drop the same constraints into a rules file the agent reads automatically:
 `AGENTS.md` or `CLAUDE.md` at your repo root:
 
 ```md
-# Hostwright — agent ground rules
+# Hostwright agent ground rules
 
-0.0.2-dev source workflow; run via `swift run hostwright ...`. Safe commands:
+Source workflow; run via `swift run hostwright ...`. Safe commands:
 --version, capabilities, migrate preview, init, import-stack, validate, plan, status, logs, events,
 recovery, diagnostics, cleanup --dry-run, doctor. Stateful commands need
 an explicit --state-db path. Mutation only via apply --confirm-plan <hash>
-(one action) or cleanup --confirm-cleanup <token> — never run these
+(one action) or cleanup --confirm-cleanup <token>. Never run these
 without asking me. stop/restart/down/rm do not exist.
 
 hostwright.yaml supports only: version, project, imagePolicy, and per

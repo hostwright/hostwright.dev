@@ -35,9 +35,9 @@ unsupported versions, invalid identifiers, and `optIn: false` fail closed with
 Every required gate must appear exactly once. Profiles can only **add
 stricter** requirements:
 
-- `requireImageDigest` — all service images must use a valid `@sha256:` digest
+- `requireImageDigest`: all service images must use a valid `@sha256:` digest
   even when the manifest defaults to `allow-tags`.
-- `requireManifestReview` — records that manifests require review; all
+- `requireManifestReview`: records that manifests require review; all
   profile-aware apply and confirmed cleanup then require an exact approval.
 
 There is no weakening override format. A profile cannot permit broad binds,
@@ -70,10 +70,10 @@ with `HW-TEAM-003` before mutation.
 
 ## Hash contract
 
-- `profileHash` — SHA-256 of the profile as sorted-key canonical JSON.
-- `manifestHash` — SHA-256 of the exact manifest text read by the command.
-- `planHash` — the deterministic plan hash, or the profile-bound cleanup token.
-- `approvalHash` — computed by Hostwright over the canonical approval record.
+- `profileHash`: SHA-256 of the profile as sorted-key canonical JSON.
+- `manifestHash`: SHA-256 of the exact manifest text read by the command.
+- `planHash`: the deterministic plan hash, or the profile-bound cleanup token.
+- `approvalHash`: computed by Hostwright over the canonical approval record.
 
 Formatting-only changes do not alter canonical hashes; any manifest byte
 change invalidates its approval. A changed plan, observed state, candidate
@@ -112,7 +112,7 @@ into redacted append-only event/operation payloads: `team.profile.selected`,
 events. An audit write failure **before** mutation blocks the mutation.
 
 <Aside type="note" title="Shared machines">
-Profiles, approvals, manifests, and state databases are ordinary local files —
+Profiles, approvals, manifests, and state databases are ordinary local files;
 set filesystem ownership and permissions yourself. Hostwright does not manage
 macOS users, groups, ACLs, Keychain access groups, or MDM policy, and provides
 no cloud team service, hosted audit log, or remote policy distribution.

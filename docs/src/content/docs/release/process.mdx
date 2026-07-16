@@ -1,16 +1,17 @@
 ---
-title: v0.0.2 release process
-description: The dev-to-RC-to-GA ladder and fail-closed implementation, security, conformance, soak, and trusted-distribution gates.
+title: Release process
+description: The development-to-RC-to-GA ladder and fail-closed implementation, security, conformance, soak, and trusted-distribution gates.
 ---
 
-The active target is `v0.0.2`; the working version is `0.0.2-dev`.
+Development builds precede a release-candidate ladder toward the first stable
+release.
 
 ## Release ladder
 
-1. `0.0.2-dev` throughout all 15 implementation phases.
-2. `v0.0.2-rc.1` only after every phase/workstream reaches verification.
+1. Development builds throughout all 15 implementation phases.
+2. The first release candidate only after every phase reaches verification.
 3. A later RC after all defects are fixed and the complete qualification run repeats.
-4. `v0.0.2` only after two clean complete RC runs.
+4. The stable release only after two clean complete RC runs.
 
 An RC cannot omit an unimplemented phase or convert a blocker into a known
 limitation.

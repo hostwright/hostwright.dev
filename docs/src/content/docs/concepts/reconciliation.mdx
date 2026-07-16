@@ -36,8 +36,9 @@ issues, typed planned actions, and a deterministic plan hash.
   restart-policy-allowed `restartManagedService`.
 - **`hostwright cleanup`** is separate from apply, with its own dry-run token
   gate. See the [safety model](/concepts/safety-model/).
-- **`hostwrightd --foreground`** runs the loop continuously — observe, plan,
-  record — but never calls the mutation hook. See [Daemon](/operations/daemon/).
+- **`hostwrightd --foreground`** runs the observe, plan, and record loop
+  continuously. Mutation stays with the apply gate. See
+  [Daemon](/operations/daemon/).
 
 ## Drift cases
 
@@ -54,11 +55,11 @@ The planner detects:
 
 Only `createMissingService` and the restart-policy-allowed start/restart
 actions can be marked executable. Every other action is rendered as
-unavailable — visible in the plan, but not runnable.
+unavailable: visible in the plan and blocked from execution.
 
 ## Correctness requirements
 
-- Planning must be deterministic — same inputs, same plan, same hash.
+- Planning is deterministic: same inputs, same plan, same hash.
 - Desired state and observed state remain separate inputs.
 - Drift must be explainable: every record carries a typed reason.
 - Plan rendering must not expose raw secrets.
@@ -68,9 +69,8 @@ unavailable — visible in the plan, but not runnable.
 - Managed restart requires Hostwright ownership, live observed running state,
   a fresh persisted unhealthy health result, and recovery records.
 
-<Aside type="note" title="Failure is reported, not swallowed">
+<Aside type="note" title="Failure reporting">
 A failed apply emits failure events with operation status and redacted manual
-recovery hints, readable later with `hostwright recovery`. Hostwright never
-silently continues past a safety gate, and there is no automatic rollback —
-recovery is diagnostic and manual by design.
+recovery hints, readable later with `hostwright recovery`. Every safety gate
+stops the operation, and recovery is diagnostic and manual by design.
 </Aside>

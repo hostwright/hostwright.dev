@@ -1,17 +1,16 @@
 ---
 title: Install from source
-description: Build Hostwright 0.0.2-dev from source. No packages are published for this development line.
+description: Build Hostwright from source. No packages are published while it is in development.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright `0.0.2-dev` is not production ready.
+Hostwright is in active development and not production ready.
 
 <Aside type="caution" title="No package-manager install">
-`brew install hostwright` does not exist today. Phase 02 owns a vendor tap,
-signed/notarized archives, and a `.pkg`; Phase 15 submits Homebrew core. The
-future guaranteed fallback is `brew install hostwright/tap/hostwright`, but
-that command is not available until its distribution evidence passes.
+`brew install hostwright` does not exist today. A vendor tap, signed/notarized
+archives, and a `.pkg` are on the roadmap. The planned fallback is `brew
+install hostwright/tap/hostwright`, but that command is not available yet.
 </Aside>
 
 ## Requirements
@@ -34,13 +33,8 @@ swift run hostwright --version
 swift run hostwright capabilities --json
 ```
 
-Expected development version:
-
-```text
-0.0.2-dev
-```
-
-Do not check out a `v0.0.2` tag until the GA gate exists and passes.
+This prints the current development version. There is no release tag to check
+out yet; build from the default branch.
 
 ## Try the current safe surface
 

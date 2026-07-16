@@ -1,4 +1,4 @@
-// Homepage copy follows the executable 0.0.2-dev capability boundary.
+// Homepage copy reflects currently implemented capabilities.
 
 export const hero = {
   title: "Desired-state container control for Apple silicon Macs.",

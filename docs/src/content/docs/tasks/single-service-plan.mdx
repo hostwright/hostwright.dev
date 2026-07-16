@@ -45,15 +45,13 @@ hostwright plan examples/single-service/hostwright.yaml --output json
 ```
 
 The output contains a deterministic `planHash`, typed `issues`, typed
-`actions`, and `observationConnected: false` — `plan` does not inspect Apple
-container by default and does not claim anything is running, stopped, healthy,
-or unhealthy. Running it twice on the same manifest produces the same hash.
+`actions`, and `observationConnected: false`. By default `plan` works from the manifest
+alone and reports declared state only. Running it twice on the same manifest produces the same hash.
 
-## 3. Apply — separate, explicit, gated
+## 3. Apply: separate, explicit, gated
 
 <Aside type="caution" title="Mutating step">
-Apply is not a continuation of plan — it is its own command with its own
-requirements: an explicit state database path, a matching plan hash recomputed
+Apply is a separate command with its own requirements: an explicit state database path, a matching plan hash recomputed
 against a **live** runtime observation, and a locally present image.
 </Aside>
 
@@ -66,16 +64,16 @@ hostwright apply examples/single-service/hostwright.yaml \
 Apply validates the manifest, observes Apple container, recomputes the plan,
 and refuses if your hash does not match the observed plan. It persists desired
 state, observed state, operation intent, and an apply-start event **before**
-mutation, then executes exactly one action — here, creating the missing `web`
+mutation, then executes exactly one action, here creating the missing `web`
 service with its port published to `127.0.0.1:8080`. Success or failure lands
 in the event ledger.
 
-If the local image is missing, apply refuses before mutation — Hostwright never
-pulls images. Fetch it yourself first (for example `container image pull
+If the local image is missing, apply refuses before mutation; pulling the
+image stays with you. Fetch it first (for example `container image pull
 docker.io/library/nginx:1.27`) and re-plan.
 
 ## Next
 
-- [Review an app suite](/tasks/app-suite-review/) — the same flow with multiple services.
-- [Safety model](/concepts/safety-model/) — every refusal condition of the apply gate.
-- [Limitations](/reference/limitations/) — what apply cannot do (multi-action, rollback, image replacement).
+- [Review an app suite](/tasks/app-suite-review/): the same flow with multiple services.
+- [Safety model](/concepts/safety-model/): every refusal condition of the apply gate.
+- [Limitations](/reference/limitations/): what apply cannot do (multi-action, rollback, image replacement).
