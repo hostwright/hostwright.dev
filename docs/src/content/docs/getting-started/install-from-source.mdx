@@ -8,9 +8,9 @@ import { Aside } from "@astrojs/starlight/components";
 Hostwright is in active development and not production ready.
 
 <Aside type="caution" title="No package-manager install">
-`brew install hostwright` does not exist today. A vendor tap, signed/notarized
-archives, and a `.pkg` are on the roadmap. The planned fallback is `brew
-install hostwright/tap/hostwright`, but that command is not available yet.
+`brew install hostwright` does not exist today. A vendor tap, signed and
+notarized archives, and a `.pkg` are planned. The current install path is a
+source build.
 </Aside>
 
 ## Requirements
@@ -55,7 +55,6 @@ swift run hostwright events --state-db /tmp/hostwright.sqlite
 swift run hostwright cleanup --state-db /tmp/hostwright.sqlite --dry-run
 ```
 
-The current checkout is not an installed package, and deleting it is not a
-Hostwright uninstall. Phase 02 implements ownership-aware install, upgrade,
-rollback, repair, and uninstall; until then preserve or clean runtime/state
-resources explicitly.
+The current checkout is a source tree, not an installed package. Managed
+install, upgrade, rollback, repair, and uninstall are planned. Until then,
+preserve or clean runtime and state resources explicitly.

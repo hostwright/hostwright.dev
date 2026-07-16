@@ -1,63 +1,53 @@
 ---
 title: Limitations
-description: Current behavior, the owning roadmap phase for every gap, and the few permanent safety boundaries.
+description: The current support boundary. What Hostwright implements today, and what is outside the current surface.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright is in active development and not production ready. Remaining work is
-split across 15 roadmap phases. Planned scope is not current support.
+Hostwright is in active development and not production ready. This page states
+the current support boundary.
 
-## Implemented current slice
+## Implemented
 
-- Explicit Manifest v2 with a restricted fail-closed parser, deterministic
-  legacy migration preview, validation, planning, and capability JSON.
-- Narrow Apple `container` observation and confirmation-gated
-  create/start/restart/delete paths through the runtime boundary.
-- SQLite schema v7 with desired/observed/event/operation/ownership/health/
-  restart/recovery records, Hostwright UUIDs, provider binding, fencing, and
-  initial saga fields.
-- Bounded logs, local events/recovery/diagnostics, safe doctor checks, local
-  policy/team profiles, secret references/read-only Keychain evidence, a
-  one-shot Control API v2 subset, and reviewed-local extension handshake.
-- Foreground non-autonomous daemon loop, advisory scheduler/resource models,
-  narrow stack import, and unsigned developer artifact/benchmark evidence.
+- Manifest v2 with a restricted, fail-closed parser, deterministic legacy
+  migration preview, validation, planning, and capability reporting.
+- Apple `container` observation and confirmation-gated create, start, restart,
+  and delete paths through the runtime adapter.
+- SQLite state with desired, observed, event, operation, ownership, health,
+  restart, and recovery records, Hostwright UUIDs, provider binding, and
+  fencing.
+- Bounded logs, local events, recovery, and diagnostics; safe doctor checks;
+  local policy and team profiles; secret references with a read-only Keychain
+  reader; a one-shot Control API; and a reviewed-local extension handshake.
+- A foreground reconciliation loop, advisory scheduler and resource models,
+  narrow stack-file import, and local benchmark evidence.
 
-## Current gaps and owners
+## Outside the current surface
 
-| Missing or partial outcome | Phase |
-| --- | ---: |
-| Trusted install, secure defaults/state, upgrade/rollback/uninstall | 02 |
-| Full Apple CLI and Containerization provider conformance | 03 |
-| Complete manifest, lifecycle, probes, updates, automatic rollback | 04 |
-| Images, registries, Keychain/provider lifecycle, supply-chain trust | 05 |
-| Volumes, snapshots, backup/restore, quotas, fencing, reclaim | 06 |
-| Networks, DNS, ingress, TLS/mTLS, policy, tunnels | 07 |
-| Autonomous daemon, recovery, GC, complete observability | 08 |
-| Persistent API, identity/RBAC/admission/audit, WASI/XPC plugins | 09 |
-| Real scheduler, optimization/pressure, host-native accelerators | 10 |
-| Multi-Mac consensus, HA, remote operations/storage/discovery | 11 |
-| Kubernetes CRI/CNI/CSI/Helm through a real pod sandbox | 12 |
-| Docker/Compose/Podman/Testcontainers/CI/IDE interoperability | 13 |
-| Native GUI, team/MDM, optional offline-safe cloud control | 14 |
-| Security/fuzz/soak/conformance/performance/docs/signed GA | 15 |
+The following are outside the current command surface. Each states present
+behavior.
 
-## Permanent exclusions
+| Area | Current behavior |
+| --- | --- |
+| Install | Source build only. No packaged, signed, or notarized distribution, and no upgrade, rollback, or uninstall command. |
+| Runtime providers | Narrow Apple `container` surface. The Containerization framework path is absent. |
+| Lifecycle | One confirmed action per apply. Stop, restart, down, and rm are absent, and rollback is manual. |
+| Images | Local reference policy only. Hostwright uses a pre-pulled local image and performs no registry resolution, signing, or scanning. |
+| Storage | Guarded mounts only. Volumes, snapshots, quotas, and online backup or restore are absent. |
+| Networking | Loopback publishing only. Networks, DNS, ingress, TLS, and tunnels are absent. |
+| Daemon | Foreground loop only. Autonomous background operation, a launch agent, and unattended mutation are absent. |
+| Control and plugins | One-shot API and a declaration handshake. A persistent API, RBAC, audit, and plugin execution are absent. |
+| Scheduling | Advisory models only. Placement, capacity reservation, and accelerator exposure are absent. |
+| Multi-host | Single host only. Clustering, consensus, and remote operations are absent. |
+| Kubernetes and Docker | No CRI, kubelet, pod sandbox, Docker API, or Compose runtime. Stack import is a narrow conversion. |
 
-- private/undocumented Apple APIs;
-- Intel or old-macOS emulation;
-- cluster mutation without quorum;
-- silent telemetry and automatic upload;
-- unauthenticated public control;
-- destructive garbage collection of unmanaged resources.
+## Non-goals
 
-Homebrew-core acceptance and direct guest accelerator passthrough are external
-constraints, not excuses: the vendor tap and authenticated host-native
-Metal/Core ML/MLX service are required fallbacks.
+Some capabilities are held as permanent boundaries by design. See
+[Non-goals](/overview/non-goals/).
 
 <Aside type="note">
-The core repository’s implementation plan and
-`hostwright capabilities --json` are authoritative. A blocked, skipped,
-fixture-only, mock-only, dirty, or cleanup-failed result cannot turn a gap into
-support.
+`hostwright capabilities --json` reports the exact implemented surface for a
+given build.
 </Aside>

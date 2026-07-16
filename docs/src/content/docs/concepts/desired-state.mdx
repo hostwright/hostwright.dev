@@ -57,11 +57,11 @@ services:
       - "8080:8080"
 ```
 
-<Aside type="note" title="Single-host authority today">
-Current desired state is scoped to one Mac. Phase 11 extends the same UUID,
-fencing, recovery, and policy model to managed-etcd multi-Mac authority; it is
-planned, not current support. See [Why Hostwright](/overview/why-hostwright/)
-and [Limits and fallbacks](/overview/non-goals/).
+<Aside type="note" title="Single-host authority">
+Desired state is scoped to one Mac. The same UUID, fencing, recovery, and
+policy model is designed to extend to multiple Macs. See
+[Why Hostwright](/overview/why-hostwright/) and
+[Non-goals](/overview/non-goals/).
 </Aside>
 
 ## What convergence is not

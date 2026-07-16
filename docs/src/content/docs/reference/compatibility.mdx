@@ -1,28 +1,33 @@
 ---
 title: Compatibility
-description: Current development evidence and the evidence-gated compatibility target.
+description: The environment Hostwright runs in and the interface versions it currently supports.
 ---
 
-This is current development evidence, not a stable-release support claim.
+## Host
 
-| Area | Current evidence-backed scope | Target |
-| --- | --- | --- |
-| CPU | Apple silicon. | Apple silicon; M1/8 GB minimum lab cell. |
-| macOS | Package target macOS 26+. | Current and previous supported macOS major, after physical qualification. |
-| Swift | Tools version 6.2; record exact compiler per run. | Reproducible release toolchain in provenance. |
-| Apple `container` | Verified 1.0.0 observation shapes and narrow mutation; no broad guarantee. | Current and previous tested minor through Phase 03 conformance. |
-| Containerization | Not implemented. | One exact framework pin per release behind an out-of-process helper. |
-| Manifest | Explicit v2 contract, restricted parser, legacy preview. | Complete executable Manifest v2. |
-| Control API | v2 contract; one-shot local subset. | Persistent authenticated Unix socket and N/N-1 after v2 baseline. |
-| State | SQLite schema v7. | Qualified local lifecycle; managed etcd 3.7.x for cluster authority. |
-| Distribution | Source and unsigned developer evidence. | Signed/notarized archive/`.pkg`, vendor tap, SBOM/provenance. |
-| Kubernetes | Not implemented. | Exact current/previous tested minor through real CRI/CNI/CSI sandbox conformance. |
-| Docker ecosystem | Narrow conversion-only importer. | Published Docker API, Compose, Podman, and Testcontainers matrix. |
+| Requirement | Supported |
+| --- | --- |
+| CPU | Apple silicon (arm64). |
+| macOS | macOS 26 or newer. |
+| Swift | Tools version 6.2. The exact compiler is recorded per run. |
+| Apple `container` | Verified against 1.0.0 observation shapes and the narrow mutation surface. |
 
-Unsupported versions, fields, endpoints, and clients must fail explicitly;
-Hostwright never silently drops requested behavior. The Phase 15 GA matrix is
-frozen only from passing evidence.
+## Interface versions
 
-Permanent boundaries are Apple silicon, public Apple APIs, safe read-only
-cluster behavior without quorum, explicit telemetry consent, authenticated
-control, and no deletion of unmanaged resources.
+| Interface | Version |
+| --- | ---: |
+| Manifest | 2 |
+| Control API | 2 |
+| Runtime Provider API | 2 |
+| Plugin ABI | 1 |
+| State schema | 7 |
+
+The manifest parser accepts `version: 2` and provides a deterministic preview
+for legacy v1 and versionless input.
+
+Unsupported versions, fields, endpoints, and clients fail with an explicit
+error rather than partial behavior. Container images must provide a
+`linux/arm64` variant.
+
+For the full set of supported and unsupported capabilities, see
+[Limitations](/reference/limitations/).

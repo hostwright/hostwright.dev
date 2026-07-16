@@ -1,6 +1,6 @@
 ---
 title: What Hostwright is
-description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Current capabilities and the roadmap start here.
+description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Start here.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -23,11 +23,11 @@ hostwright` does not exist today. Build from source and read
 - `status`, bounded `logs`, `events`, `recovery`, and local redacted `diagnostics` use explicit state paths.
 - Confirmation-gated `apply` supports only the currently declared narrow create/start/restart surface.
 - `cleanup` classifies first and deletes only exact cleanup-eligible Hostwright-owned non-running containers after token confirmation.
-- `hostwrightd --foreground` observes, plans, checks bounded loopback health, and records events; it is not the autonomous Phase 08 daemon.
+- `hostwrightd --foreground` observes, plans, checks bounded loopback health, and records events. It runs in the foreground and performs no unattended mutation.
 - SQLite schema v7 establishes UUID identity, provider binding, fencing, saga intent, compensation, and verification records.
 - Secret references, local policy/team profiles, a one-shot Control API v2 process, advisory scheduler models, and unsigned developer distribution evidence exist within their documented narrow boundaries.
 
-Everything else is a **current limitation with an owner** on the [roadmap](/roadmap/), which covers trusted install, both Apple providers, complete lifecycle, images/registries/secrets, storage, networking, autonomous recovery, security/extensions, scheduling/accelerators, multi-Mac HA, Kubernetes, and the Docker ecosystem.
+Capabilities outside this set are documented in [Limitations](/reference/limitations/).
 
 ## Locked contracts
 
@@ -44,16 +44,13 @@ Everything else is a **current limitation with an owner** on the [roadmap](/road
 | Section | Answers |
 | --- | --- |
 | **Getting started** | Source setup and the runnable safe loop. |
-| **Concepts** | Desired state, providers, reconciliation, identity/state, policy, safety, and secrets. |
+| **Concepts** | Desired state, providers, reconciliation, state, policy, safety, and secrets. |
 | **Tasks** | Walkthroughs labeled non-mutating, state-writing, or runtime-mutating. |
-| **Reference** | Exact CLI, manifest, compatibility, limitations, error, policy, and evidence contracts. |
-| **Operations** | Security, team workflow, daemon, events, diagnostics, and recovery. |
-| **Release** | The release process and historical release notes. |
-| **Roadmap** | All 15 phases and 167 workstreams; planned behavior is never current support. |
+| **Reference** | CLI, manifest, compatibility, limitations, error codes, and policy. |
+| **Operations** | Security, team workflow, the daemon, events, and diagnostics. |
 
 ## Where to start
 
 - Read [Why Hostwright](/overview/why-hostwright/) and [Desired state](/concepts/desired-state/).
-- Read [Limits, fallbacks, and safety boundaries](/overview/non-goals/) plus the exhaustive [Limitations](/reference/limitations/).
+- Read [Non-goals](/overview/non-goals/) and [Limitations](/reference/limitations/) for the scope and current support boundary.
 - Follow [Install from source](/getting-started/install-from-source/) and the [Quick start](/getting-started/quick-start/).
-- Inspect the [roadmap](/roadmap/) before interpreting research or historical pages as current scope.
