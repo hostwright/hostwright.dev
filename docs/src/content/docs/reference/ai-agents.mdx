@@ -34,10 +34,11 @@ swift test
 
 Run commands with `swift run hostwright ...`, not a bare binary.
 
-Safe commands (no runtime mutation): --version, capabilities, migrate preview,
-init, import-stack, validate, plan, status, logs, events, recovery, diagnostics,
-cleanup --dry-run, doctor. Stateful commands require an explicit
---state-db <path>; there is no default database path.
+Safe commands (no runtime mutation): --version, capabilities, paths, state
+integrity, migrate preview, init, import-stack, validate, plan, status, logs,
+events, recovery, diagnostics, cleanup --dry-run, doctor. State-backed commands
+resolve their database from --state-db, then HOSTWRIGHT_STATE_DB, then the
+default at ~/Library/Application Support/Hostwright/state/state.sqlite.
 
 Mutation happens ONLY through two gates, and I want to run those myself:
   apply --state-db <path> --confirm-plan <hash>   (exactly one action)

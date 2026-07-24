@@ -6,7 +6,7 @@ description: "The event ledger, operation recovery groups, and local redacted di
 import { Aside } from "@astrojs/starlight/components";
 
 Every meaningful step (observations, applies, cleanups, daemon iterations,
-health checks) lands in the event ledger of the explicit state database, so
+health checks) lands in the event ledger of the resolved state database, so
 failures are explainable after the fact. Three read-only commands expose it.
 All three read an **already-migrated** database and fail rather than creating
 or migrating one as a side effect.

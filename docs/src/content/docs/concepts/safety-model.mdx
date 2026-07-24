@@ -22,7 +22,7 @@ gates.
   and prints an exact confirmation token. Only `--confirm-cleanup <token>` with
   that token deletes anything.
 - **Intent before mutation.** Operation intent, recovery groups, and
-  checkpoints are persisted to the explicit state database *before* the runtime
+  checkpoints are persisted to the resolved state database *before* the runtime
   is touched.
 - **Conservative validation.** Unsafe or ambiguous manifests are refused, not
   refused. See the [policy engine](/concepts/policy-engine/).

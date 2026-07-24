@@ -9,8 +9,10 @@ This task covers day-two operations. Labels per step: `status` and `logs` are
 **state-writing observations**; `events`, `recovery`, and `diagnostics` are
 **read-only**; `cleanup --confirm-cleanup` is **mutating**.
 
-Every command here takes an explicit `--state-db <path>`. Hostwright never
-discovers a database implicitly; see [State store](/concepts/state-store/).
+Every command here uses the resolved state database: `--state-db <path>`, then
+`HOSTWRIGHT_STATE_DB`, then the Application Support default. The examples pass
+`--state-db` explicitly; omit it to use the default. See
+[State store](/concepts/state-store/).
 
 ## Status: observe and record
 

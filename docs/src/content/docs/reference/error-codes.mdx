@@ -28,7 +28,7 @@ with an envelope on stderr:
 | `HW-MANIFEST-002` | Manifest validation failed. | Implemented, incl. invalid version shape, unsafe env/volume values, failed import output |
 | `HW-MANIFEST-003` | Unsupported manifest/YAML feature. | Implemented, incl. unsupported fields, older/newer versions, unsupported import fields |
 | `HW-MANIFEST-004` | Manifest file I/O failed. | Implemented for validate, plan, status, apply, logs, cleanup |
-| `HW-STATE-001` | State store unavailable. | Implemented for invalid paths, migration failure, incompatible/future schema, corrupt or locked database, read/write failures |
+| `HW-STATE-001` | State store unavailable. | Implemented for invalid paths, migration failure, incompatible/future schema, corrupt or locked database, backup/restore/repair/recover failures, read/write failures |
 | `HW-SECURITY-001` | Unsafe exposure. | Modelled |
 | `HW-TEAM-001` | Team profile malformed, unsupported, or violates required gates. | Implemented |
 | `HW-TEAM-002` | Approval record malformed, rejected, unsupported, or incomplete. | Implemented for profile-aware apply and confirmed cleanup |
@@ -36,6 +36,8 @@ with an envelope on stderr:
 | `HW-BENCH-001` | Benchmark options or report contract invalid. | Implemented before file or runtime access |
 | `HW-BENCH-002` | Benchmark evidence blocked by missing capability or unmeasured dimension. | Implemented, exit 69, blocked report written |
 | `HW-BENCH-003` | Benchmark command, version, identity, ownership, report, or cleanup evidence failed. | Implemented, exit 72, failed report written when possible |
+| `HW-DIST-001` | Distribution arguments, source binding, artifact verification, command, ownership, installed lifecycle, or recovery failed. | Implemented by `hostwright-dist`; the exit code (64, 65, 69, 71, or 72) identifies the failure class |
+| `HW-DIST-002` | Unsigned artifact assembly or temp-prefix lifecycle succeeded, but required distribution trust stages remain blocked. | Implemented, exit 69, blocked distribution-artifact evidence |
 
 "Modelled" means the code exists in the error model but the triggering surface
 is narrower than the general description.
@@ -47,11 +49,11 @@ is narrower than the general description.
 | `0` | Success | Completed command. |
 | `64` | Usage | Invalid arguments, unsupported flags, missing required confirmation/state arguments, refused overwrite, local non-manifest file I/O failure. |
 | `65` | Validation | Missing/unreadable manifest, manifest/profile/approval validation failure, unsupported manifest/import feature, compatibility failure. |
-| `66` | State unavailable | Explicit state database path failed validation, migration, schema compatibility, locking, corruption, or read/write. |
-| `69` | Runtime unavailable / evidence blocked | Runtime access failed, or a benchmark prerequisite remains blocked. |
-| `70` | Confirmation mismatch | Plan hash, cleanup token, approval scope, or approval hash binding does not match. |
-| `71` | Unsafe operation | Planner or apply safety policy blocked mutation. |
-| `72` | Partial failure | Mixed cleanup outcome or failed benchmark evidence. |
+| `66` | State unavailable | The selected state database failed resolution, validation, migration, schema compatibility, locking, corruption, read/write, or a backup, restore, repair, or recover operation. |
+| `69` | Runtime / tool unavailable / evidence blocked | Runtime access failed, a distribution subprocess failed, or benchmark or distribution evidence remains blocked. |
+| `70` | Confirmation mismatch | Plan hash, cleanup token, state restore or repair token, approval scope, or approval hash binding does not match. |
+| `71` | Unsafe operation | Planner, apply, state-repair authority, extension policy, or distribution ownership checks blocked execution. |
+| `72` | Partial failure | Mixed cleanup outcome, failed benchmark evidence, failed extension handshake, or an installed lifecycle that could not complete safely. |
 
 One special case: `doctor --output json` reports compatibility failures as a
 normal doctor document on stdout with `hasFailures: true` and exit code 65;

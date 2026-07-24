@@ -14,14 +14,21 @@ the current support boundary.
   migration preview, validation, planning, and capability reporting.
 - Apple `container` observation and confirmation-gated create, start, restart,
   and delete paths through the runtime adapter.
-- SQLite state with desired, observed, event, operation, ownership, health,
+- SQLite schema v7 with desired, observed, event, operation, ownership, health,
   restart, and recovery records, Hostwright UUIDs, provider binding, and
-  fencing.
+  fencing, plus secure default paths under Application Support and legacy
+  migration.
+- Online state maintenance: integrity checks, verified backups, and
+  confirmation-gated restore, repair, and recover.
 - Bounded logs, local events, recovery, and diagnostics; safe doctor checks;
-  local policy and team profiles; secret references with a read-only Keychain
-  reader; a one-shot Control API; and a reviewed-local extension handshake.
+  local path reporting; local policy and team profiles; secret references with a
+  read-only Keychain reader; a one-shot Control API; and a reviewed-local
+  extension handshake.
 - A foreground reconciliation loop, advisory scheduler and resource models,
   narrow stack-file import, and local benchmark evidence.
+- An installed-lifecycle tool (`hostwright-dist`) for install, upgrade, repair,
+  rollback, and uninstall at an explicit prefix, plus a signing and
+  notarization release pipeline.
 
 ## Outside the current surface
 
@@ -30,11 +37,11 @@ behavior.
 
 | Area | Current behavior |
 | --- | --- |
-| Install | Source build only. No packaged, signed, or notarized distribution, and no upgrade, rollback, or uninstall command. |
+| Install | Source build only. The installed-lifecycle and release pipelines exist, but no published package channel, Homebrew tap, or signed public artifact is available yet; `brew install hostwright` does not exist. |
 | Runtime providers | Narrow Apple `container` surface. The Containerization framework path is absent. |
-| Lifecycle | One confirmed action per apply. Stop, restart, down, and rm are absent, and rollback is manual. |
+| Workload lifecycle | One confirmed action per apply. Stop, restart, down, and rm are absent, and workload rollback is manual. |
 | Images | Local reference policy only. Hostwright uses a pre-pulled local image and performs no registry resolution, signing, or scanning. |
-| Storage | Guarded mounts only. Volumes, snapshots, quotas, and online backup or restore are absent. |
+| Storage | Guarded mounts only. Named volumes, snapshots, and quotas are absent. |
 | Networking | Loopback publishing only. Networks, DNS, ingress, TLS, and tunnels are absent. |
 | Daemon | Foreground loop only. Autonomous background operation, a launch agent, and unattended mutation are absent. |
 | Control and plugins | One-shot API and a declaration handshake. A persistent API, RBAC, audit, and plugin execution are absent. |

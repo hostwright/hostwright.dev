@@ -20,7 +20,8 @@ hostwright` does not exist today. Build from source and read
 - `hostwright --version` and `hostwright capabilities --json` report the build version and the exact capability set.
 - `hostwright init`, `validate`, and `plan` provide explicit Manifest v2, restricted fail-closed parsing, and deterministic planning.
 - `hostwright migrate preview` produces a deterministic non-writing preview for legacy v1/versionless manifests.
-- `status`, bounded `logs`, `events`, `recovery`, and local redacted `diagnostics` use explicit state paths.
+- `status`, bounded `logs`, `events`, `recovery`, and local redacted `diagnostics` use a resolved state database (an explicit path, `HOSTWRIGHT_STATE_DB`, or the Application Support default).
+- `hostwright paths` and the `hostwright state` suite (`integrity`, `backup`, `restore`, `repair`, `recover`) report the local layout and maintain the SQLite database.
 - Confirmation-gated `apply` supports only the currently declared narrow create/start/restart surface.
 - `cleanup` classifies first and deletes only exact cleanup-eligible Hostwright-owned non-running containers after token confirmation.
 - `hostwrightd --foreground` observes, plans, checks bounded loopback health, and records events. It runs in the foreground and performs no unattended mutation.

@@ -51,8 +51,10 @@ alone and reports declared state only. Running it twice on the same manifest pro
 ## 3. Apply: separate, explicit, gated
 
 <Aside type="caution" title="Mutating step">
-Apply is a separate command with its own requirements: an explicit state database path, a matching plan hash recomputed
-against a **live** runtime observation, and a locally present image.
+Apply is a separate command with its own requirements: a resolved state
+database (the Application Support default or an explicit `--state-db`), a
+matching plan hash recomputed against a **live** runtime observation, and a
+locally present image.
 </Aside>
 
 ```bash
