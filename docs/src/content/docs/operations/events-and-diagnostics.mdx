@@ -6,7 +6,7 @@ description: "The event ledger, operation recovery groups, and local redacted di
 import { Aside } from "@astrojs/starlight/components";
 
 Every meaningful step (observations, applies, cleanups, daemon iterations,
-health checks) lands in the event ledger of the explicit state database, so
+health checks) lands in the event ledger of the resolved state database, so
 failures are explainable after the fact. Three read-only commands expose it.
 All three read an **already-migrated** database and fail rather than creating
 or migrating one as a side effect.
@@ -32,29 +32,38 @@ persistence, so the ledger is safe to read but still local-context-rich.
 
 ```bash
 hostwright recovery --state-db /tmp/hostwright.sqlite [--project <name>]
+hostwright recovery resume --group <uuid> --confirm-plan <hash> [--state-db <path>]
+hostwright recovery rollback --group <uuid> --confirm-plan <hash> [--state-db <path>]
 ```
 
-Apply persists an operation recovery **group** with step records (intent,
-checkpoints, forward runtime steps, rollback-unavailable markers, and redacted
-manual recovery hints) before and during mutation. `recovery` reads those
-groups and reports, per operation:
+A lifecycle command persists an operation recovery **group** with step
+records (intent, checkpoints, forward runtime steps, provable inverse
+actions, and redacted manual recovery hints) before and during mutation. The
+bare `recovery` command reads those groups and reports, per operation:
 
-- **no automatic recovery required**: it completed;
-- **manual inspection required**: it failed or was interrupted;
-- **rollback unsupported**: no safe inverse operation is proven.
+- **no recovery required**: it completed;
+- **resumable**: it can continue from its persisted checkpoint;
+- **compensable**: a provable inverse action can roll it back;
+- **manual inspection required**: interruption left it in an ambiguous state
+  with no provable resume or rollback path.
 
 Active groups show their redacted lock owner and lease expiry. A group with no
 persisted mutation intent can be reacquired after lease expiry (the old group
-is marked interrupted). A recorded intent stays blocked unless its checkpoint
-proves runtime execution never began (`pre-runtime-state-incomplete`);
-ambiguous or post-runtime interruptions require manual inspection. Older
-databases with legacy restart recovery records render those as legacy entries.
+is marked interrupted). Older databases with legacy restart recovery records
+render those as legacy entries.
 
-<Aside type="note" title="Diagnostic output">
-Recovery never observes Apple container, retries mutation, stops/starts/
-deletes resources, or rolls anything back. Hostwright has no automatic
-rollback because no safe inverse operation is proven; the output is a
-diagnosis, not a repair.
+`recovery resume` and `recovery rollback` require the exact group UUID and its
+persisted plan hash, and both re-observe current provider identity,
+capabilities, and ownership before acting. `resume` continues only steps not
+already verified complete. `rollback` applies only the precomputed inverse
+actions the group can prove are safe; anything it cannot prove stays in a safe
+hold rather than being forced.
+
+<Aside type="note" title="Nothing happens without a fresh confirmation">
+The bare `recovery` command only inspects: it never observes the runtime,
+retries mutation, or changes anything. `resume` and `rollback` act only when
+explicitly invoked with a matching plan hash, and only on the exact steps
+their persisted evidence supports.
 </Aside>
 
 ## Diagnostics bundles

@@ -33,7 +33,8 @@ resource posture. See [Limitations](/reference/limitations/).
 ```text
 hostwright CLI / hostwrightd
   → RuntimeAdapter
-    → Apple container CLI (today) / Containerization APIs (later)
+    → Apple container CLI, or the Containerization framework via
+      hostwright-containerization-helper
       → Apple container services
         → lightweight Linux VM
           → your container process
@@ -46,8 +47,9 @@ Everything above the adapter is Hostwright. Everything below it is Apple's.
 - Manifest parsing, validation, and deterministic planning.
 - Drift detection, health probes, restart policy, and the event ledger.
 - The ownership ledger and conservative, token-confirmed cleanup.
-- The four narrow mutations: create-missing-service, managed start, managed
-  restart, exact owned-container delete.
+- Confirmed lifecycle mutation (create, start, stop, restart, remove, update),
+  image management, and interactive access, each behind its own plan hash or
+  confirmation gate. See [Lifecycle commands](/reference/cli/#lifecycle-commands).
 
 ## What Apple container owns
 
@@ -73,11 +75,13 @@ error.
 
 ## Open questions at the boundary
 
-These depend on Apple container behavior and are tracked as open questions:
+`exec`, `attach`, `copy`, `export`, `inspect`, `stats`, and `logs --follow`
+are implemented; see [Interactive and streaming
+commands](/reference/cli/#interactive-and-streaming-commands). What remains
+open depends on Apple container behavior:
 
-- The boundaries of `exec` and interactive attach (not implemented, research-only).
-- Port-forwarding semantics and equivalents.
-- Log streaming for short-lived containers (`logs` is bounded tail-only today).
-- Localhost HTTP reachability evidence: on the current proof host, the Apple
+- Port-forwarding semantics beyond published loopback ports.
+- Log retention and rotation for long-lived containers.
+- Localhost HTTP reachability evidence: on some proof hosts, the Apple
   container listener accepts then resets while macOS Local Network access for
   `container-runtime-linux` is disabled.

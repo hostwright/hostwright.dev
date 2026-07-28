@@ -14,6 +14,9 @@ export default defineConfig({
       favicon: "/favicon.ico",
       customCss: ["./src/styles/theme.css"],
       routeMiddleware: "./src/routeData.ts",
+      components: {
+        ThemeProvider: "./src/components/ThemeProvider.astro",
+      },
       head: [
         {
           tag: "meta",
@@ -81,7 +84,7 @@ export default defineConfig({
           label: "Getting started",
           items: [
             {
-              label: "Install from source",
+              label: "Install and upgrade",
               slug: "getting-started/install-from-source",
             },
             { label: "Quick start", slug: "getting-started/quick-start" },

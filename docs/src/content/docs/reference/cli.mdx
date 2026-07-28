@@ -1,44 +1,143 @@
 ---
 title: CLI reference
-description: Every hostwright and hostwrightd command, flag, output mode, and exit code.
+description: Every hostwright, hostwright-control, hostwrightd, and hostwright-dist command, flag, output mode, and exit code.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-The `hostwright` CLI is dependency-free, with narrow RuntimeAdapter-backed
-operation gates. Two executables exist: `hostwright` and the foreground daemon
-`hostwrightd`.
+Hostwright ships four executables: the `hostwright` CLI, the one-shot local
+control tool `hostwright-control`, the foreground daemon `hostwrightd`, and the
+distribution and installed-lifecycle tool `hostwright-dist`.
 
 ## Command surface
 
 ```bash
 hostwright --version
 hostwright capabilities [--json | --output text|json]
+hostwright runtime providers [--json]
+hostwright runtime migrate [path] --to apple-cli|containerization --dry-run [--state-db <path>] [--json | --output text|json]
+hostwright runtime migrate [path] --to apple-cli|containerization --confirm-migration <token> [--state-db <path>] [--json | --output text|json]
+hostwright paths [--state-db <path>] [--json | --output text|json]
+hostwright state integrity [--state-db <path>] [--json]
+hostwright state backup [--state-db <path>] [--json]
+hostwright state backups [--state-db <path>] [--json]
+hostwright state restore --backup <id> --dry-run [--state-db <path>] [--json]
+hostwright state restore --backup <id> --confirm-restore <token> [--state-db <path>] [--json]
+hostwright state repair --dry-run [--state-db <path>] [--json]
+hostwright state repair --confirm-repair <token> [--state-db <path>] [--json]
+hostwright state recover [--state-db <path>] [--json]
+hostwright secret create|update <keychain-reference> [--state-db <path>] [--json | --output text|json]
+hostwright secret list [--json | --output text|json]
+hostwright secret check <keychain-reference> [--json | --output text|json]
+hostwright secret delete <keychain-reference> [--state-db <path>] [--json | --output text|json]
+hostwright registry login <registry> --username <name> [--state-db <path>] [--json | --output text|json]
+hostwright registry logout <registry> [--state-db <path>] [--json | --output text|json]
+hostwright registry status <registry> [--repository <name> [--action pull|push]...] [--json | --output text|json]
+hostwright registry referrers discover|fetch|publish|copy|retain|release|status|prune|resume ...
+hostwright registry sbom generate|ingest|query|export|resume ...
+hostwright registry vulnerability evaluate|status|grant-exception|revoke-exception|resume ...
+hostwright registry provenance generate|verify|status|resume ...
+hostwright image inspect <reference>... [--runtime-provider auto|apple-cli|containerization] [--output text|json]
+hostwright image pull|push <reference> [--platform linux/arm64|linux/amd64] [--offline] [--progress none|plain] [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image tag <source> <target> [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image load --input <absolute-path> --reference <expected-reference>... [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image save <reference>... --output <absolute-path> [--platform <platform>] [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image build --context <absolute-path> [--file <path-beneath-context>] --tag <reference> [--platform <platform>] [--offline] [--no-cache] [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image delete <reference>... [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image prune (--dry-run | --confirm-plan <sha256>) [--maximum-bytes <bytes> --target-bytes <bytes>] [--retain-seconds <n>] [--max-delete <1-256>] [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image cache status [--maximum-bytes <bytes>] [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright image cache pin|unpin <managed-reference> [--state-db <path>] [--runtime-provider <provider>] [--output text|json]
+hostwright volume list [--project <id>] [--state-db <path>] [--output text|json]
+hostwright volume inspect <volume-uuid> [--state-db <path>] [--output text|json]
+hostwright volume capacity|health [--state-db <path>] [--output text|json]
+hostwright volume recover <volume-uuid> --idempotency-key <key> [--state-db <path>] [--output text|json]
+hostwright volume delete|prune <volume-uuid> (--dry-run | --confirm-plan <sha256>) [--state-db <path>] [--output text|json]
+hostwright volume snapshot create|list|inspect|retain|export|restore|delete ...
+hostwright volume backup create|list|inspect|verify|retain|restore|delete ...
 hostwright migrate preview <path> [--json | --output text|json]
 hostwright init
 hostwright import-stack <path> [--output text|json] [--team-profile <path>]
 hostwright validate [path] [--team-profile <path>]
 hostwright plan [path] [--output text|json] [--team-profile <path>]
-hostwright status [path] [--state-db <path>] [--output text|json]
-hostwright apply [path] --state-db <path> --confirm-plan <hash> [--team-profile <path> --approval-record <path>]
-hostwright logs <service> [path] [--tail <n>] [--state-db <path>]
-hostwright events --state-db <path> [--project <name>] [--type <event>] [--service <name>] [--severity info|warning|error] [--limit <n>] [--sort asc|desc] [--output text|json]
-hostwright recovery --state-db <path> [--project <name>] [--output text|json]
-hostwright diagnostics --state-db <path> --bundle <path> [--project <name>] [--manifest <path>]
-hostwright cleanup [path] --state-db <path> --dry-run [--team-profile <path>]
-hostwright cleanup [path] --state-db <path> --confirm-cleanup <token> [--team-profile <path> --approval-record <path>]
+hostwright status [path] [--state-db <path>] [--output text|json] [--runtime-provider <provider>]
+hostwright apply [path] [--state-db <path>] --confirm-plan <hash> [--runtime-provider <provider>] [--team-profile <path> --approval-record <path>]
+hostwright up|down|start|stop|restart|rm|update [path] [--service <name>] [--state-db <path>] (--dry-run | --confirm-plan <hash>) [--runtime-provider <provider>] [--timeout <seconds>] [--parallelism <1-32>] [--output text|json]
+hostwright run [path] --service <name> [--state-db <path>] (--dry-run | --confirm-plan <hash>) [--runtime-provider <provider>] [--timeout <seconds>] [--parallelism <1-32>] [--output text|json]
+hostwright exec <service> [--manifest <path>] [--state-db <path>] [--runtime-provider <provider>] [--timeout <seconds>] [--tty | --no-tty] [--no-stdin] [--output text|json] -- <command> [args...]
+hostwright attach <service> [--manifest <path>] [--state-db <path>] [--runtime-provider <provider>] [--timeout <seconds>] [--tty | --no-tty] [--no-stdin]
+hostwright copy (<host-path> <service:/container/path> | <service:/container/path> <host-path>) [--manifest <path>] [--state-db <path>] [--runtime-provider <provider>] [--timeout <seconds>] [--output text|json]
+hostwright export <service> <destination-path> [--manifest <path>] [--state-db <path>] [--runtime-provider <provider>] [--timeout <seconds>] [--output text|json]
+hostwright inspect|stats <service> [--manifest <path>] [--state-db <path>] [--runtime-provider <provider>] [--timeout <seconds>] [--output text|json]
+hostwright logs <service> [path] [--tail <n>] [--follow] [--runtime-provider <provider>] [--timeout <seconds>] [--state-db <path>] [--output text|json]
+hostwright events [--state-db <path>] [--project <name>] [--type <event>] [--service <name>] [--severity info|warning|error] [--limit <n>] [--sort asc|desc] [--output text|json]
+hostwright recovery [--state-db <path>] [--project <name>] [--output text|json]
+hostwright recovery resume|rollback --group <uuid> --confirm-plan <hash> [--timeout <seconds>] [--state-db <path>] [--project <name>] [--output text|json]
+hostwright diagnostics [--state-db <path>] --bundle <path> [--project <name>] [--manifest <path>]
+hostwright cleanup [path] [--state-db <path>] --dry-run [--team-profile <path>]
+hostwright cleanup [path] [--state-db <path>] --confirm-cleanup <token> [--team-profile <path> --approval-record <path>]
 hostwright benchmark --image <local-image> --samples <3-10> --report <path> --source-commit <40-hex> --source-dirty <true|false> --expected-container-version <version> [--attended-sleep-wake-seconds <15-300>] --confirm-live
 hostwright extension check --declaration <absolute-path> --executable <absolute-path> [--output text|json]
-hostwright doctor [--output text|json]
+hostwright doctor [--state-db <path>] [--json | --output text|json]
+hostwright-control --version
 hostwright-control --manifest <absolute-path> [--state-db <absolute-path>] [--team-profile <absolute-path>]
-hostwrightd --foreground --config <hostwright.yaml> --state-db <path> [options]
+hostwrightd --foreground --config <hostwright.yaml> [--state-db <path>] [options]
+hostwright-dist --version
+hostwright-dist install|upgrade|repair <artifact-source> --prefix <path> [--state-db <path>] --output json
+hostwright-dist status --prefix <path> --output json
+hostwright-dist adopt-legacy --prefix <path> [--state-db <path>] --output json
+hostwright-dist recover|rollback --prefix <path> --output json
+hostwright-dist uninstall-plan --prefix <path> --data-policy <preserve|remove> --output json
+hostwright-dist uninstall --prefix <path> --data-policy preserve --output json
+hostwright-dist uninstall --prefix <path> --data-policy remove --confirmation <plan-token> --output json
 ```
+
+Command families with an elided argument list (`registry referrers`, `registry
+sbom`, `registry vulnerability`, `registry provenance`, `volume snapshot`,
+`volume backup`) are documented at [`hostwright registry`](#hostwright-registry) and
+[`hostwright volume`](#hostwright-volume) below.
+
+## Runtime provider selection
+
+`--runtime-provider` takes the short flag values `auto`, `apple-cli`, or
+`containerization`. `hostwright runtime providers --json` and stored state
+identify the same two providers by their stable IDs, `apple-container-cli` and
+`apple-containerization`. The flag value and the stable ID refer to the same
+provider; use the short flag value on the command line and expect the long
+form in JSON output and state records.
+
+An existing project keeps its bound provider; changing it requires
+[`hostwright runtime migrate`](#hostwright-runtime-migrate). For an unbound
+project, `auto` prefers a compatible Apple CLI provider and falls back to
+Containerization only when the CLI is unavailable and the helper declares full
+capability.
+
+## State database selection
+
+State-backed commands resolve their database deterministically:
+
+1. `--state-db <absolute-path>` on the command line;
+2. the `HOSTWRIGHT_STATE_DB` environment variable;
+3. the default, `~/Library/Application Support/Hostwright/state/state.sqlite`.
+
+State-writing commands (`status`, lifecycle commands, `apply`, `logs`,
+`cleanup`, `hostwrightd`, `state backup`, confirmed `state restore` and `state
+repair`) create the documented private directories on demand. Read commands
+(`events`, `recovery`, `diagnostics`, `state integrity`, `state backups`, dry
+runs) use the same resolution and fail rather than creating or migrating a
+missing database. `hostwright paths` reports the selected path, its origin,
+and readiness. See [State store](/concepts/state-store/).
 
 ## Output modes
 
-Text is the default everywhere. `capabilities`, `migrate preview`, `import-stack`, `plan`, `status`, `events`,
-`recovery`, `extension check`, and `doctor` also accept JSON output. JSON output never
-changes behavior, state writes, observation, or mutation gates.
+Text is the default for `hostwright` commands. `capabilities`, `runtime
+providers`, `runtime migrate`, `paths`, every `state`, `secret`, `registry`,
+`image`, and `volume` subcommand, `migrate preview`, `import-stack`, `plan`,
+`status`, every lifecycle command, non-TTY interactive operations, `events`,
+`recovery`, `extension check`, and `doctor` accept JSON output where shown
+above. JSON streaming uses bounded NDJSON frames with base64 payloads.
+Interactive TTY mode and JSON mode are mutually exclusive. Installed-lifecycle
+`hostwright-dist` commands require `--output json`. JSON output never weakens a
+mutation gate.
 
 When JSON mode is requested and the CLI can classify the failure, stderr uses:
 
@@ -46,22 +145,24 @@ When JSON mode is requested and the CLI can classify the failure, stderr uses:
 {"code":"HW-CLI-001","exitCode":64,"kind":"error","message":"..."}
 ```
 
-Manifest failures use an `issues` array with stable codes. `doctor --output
-json` reports compatibility failures as a normal doctor document on stdout
-with `hasFailures: true` and exit code 65, not as an error envelope.
+Manifest failures use an `issues` array with stable codes. Doctor readiness
+results are normal doctor documents on stdout: an unsupported or blocked local
+policy exits 65, failed existing-state integrity exits 66, and an external
+runtime constraint exits 69. A `hostwright-dist` failure in JSON mode uses
+`kind: distributionToolError` with code `HW-DIST-001`.
 
 ## Exit codes
 
 | Exit code | Category |
 | ---: | --- |
 | `0` | Success |
-| `64` | Usage: unsupported flags, missing arguments, refused overwrite, local non-manifest file I/O failure |
-| `65` | Validation: missing/unreadable manifest, manifest/profile/approval validation, compatibility failure |
-| `66` | State unavailable: explicit SQLite path could not be opened, migrated, verified, locked, or read |
-| `69` | Runtime unavailable or evidence blocked |
-| `70` | Confirmation mismatch: plan hash, cleanup token, or approval binding does not match |
-| `71` | Unsafe operation: safety policy blocked mutation |
-| `72` | Partial failure: mixed cleanup outcome or failed benchmark evidence |
+| `64` | Usage: unsupported flags, missing arguments, refused overwrite, local file I/O failure, invalid lifecycle arguments |
+| `65` | Validation: manifest, profile, approval, extension declaration, compatibility, distribution evidence, downgrade refusal |
+| `66` | State unavailable: the selected SQLite path could not be resolved, opened, migrated, verified, locked, read, backed up, restored, repaired, or recovered; `state integrity` also exits 66 for `degraded` and `unrecoverable` |
+| `69` | Runtime or tool unavailable, or evidence blocked |
+| `70` | Confirmation mismatch: plan hash, cleanup token, restore or repair token, or approval binding |
+| `71` | Unsafe operation: planner, apply, state-repair authority, extension policy, or distribution ownership checks blocked execution |
+| `72` | Partial failure: mixed cleanup outcome, failed benchmark evidence, failed extension handshake, or an installed lifecycle that could not complete safely |
 
 The stable `HW-*` diagnostic codes are on the
 [error codes page](/reference/error-codes/).
@@ -72,13 +173,258 @@ Prints the current development version.
 
 ## `hostwright capabilities`
 
-Prints deterministic build, contract, phase/issue, capability-state, reason,
-and required-evidence data without runtime, state, or network access.
+Prints the product version, locked contract versions, and a deterministic
+catalog of stable, experimental, unavailable, and externally blocked
+capabilities with their required evidence. JSON is the machine-readable
+current-support source. The command runs without runtime, state, or network
+access.
+
+## `hostwright paths`
+
+Resolves and reports the local layout without creating files: the selected
+state path and its origin (`explicit`, `environment`, or
+`application-support-default`), the daemon lock path, the Application Support,
+cache, log, backup, and control-socket locations, legacy migration state, the
+permission contract, and readiness (`ready`, `needs-creation`,
+`migration-required`, `blocked-conflict`, or `blocked-policy`).
+
+## `hostwright runtime providers`
+
+Negotiates immutable capability snapshots for the Apple CLI and installed
+Containerization helper without changing state or runtime resources. Output
+names the stable provider IDs, detected CLI/API/helper/framework/protocol
+versions, macOS and architecture compatibility, per-feature states and
+reasons, and a canonical capability digest.
+
+An unavailable component is reported as an explicit unavailable or blocked
+result. Unknown or mixed versions, an invalid helper handshake, stale
+component identity, and unsupported architecture never become automatic
+fallback success.
+
+## `hostwright runtime migrate`
+
+Moves a project's provider binding from one runtime provider to another.
+
+`--dry-run` observes the bound source and requested target, checks
+local-image and capability requirements, and emits planned effects, rollback
+actions, and an exact confirmation token, without acquiring an operation or
+mutating either provider.
+
+`--confirm-migration <token>` recomputes the plan, refuses stale capabilities,
+observations, ownership, or state, then quiesces the source, creates and
+verifies the target, preserves UUID identity and prior running state, and
+advances the provider generation. A failed target verification removes only
+verified target resources and restores the source when safe. Active
+operations, ambiguous ownership, collisions, unavailable images, or an
+incompatible target fail closed.
+
+## `hostwright state`
+
+The local state-maintenance surface. These commands operate on the state
+database only and leave Apple container resources untouched.
+
+### `state integrity`
+
+Read-only structure, foreign-key, migration-ledger, required-table, and
+projection checks. JSON returns a versioned report with `health` of `healthy`,
+`degraded`, or `unrecoverable`. `healthy` exits 0; `degraded` and
+`unrecoverable` return the full report on stdout and exit 66 so scripts cannot
+mistake damage for success.
+
+### `state backup` and `state backups`
+
+`state backup` takes an online backup of the selected database and publishes
+it only after digest, size, schema, and logical verification. JSON returns the
+opaque `backupID`. `state backups` lists every catalog entry; entries with
+`restorable: false` remain visible with a verification reason. The default
+catalog lives under `~/Library/Application Support/Hostwright/backups`; an
+explicit database uses an identity-derived catalog beside it.
+
+### `state restore`
+
+```bash
+hostwright state restore --backup backup-... --dry-run --json
+hostwright state restore --backup backup-... --confirm-restore <token> --json
+```
+
+The token binds the selected path, backup identity, and current database
+digest; confirmation after any state change exits 70. Confirmed restore makes a
+pre-restore backup when possible, publishes the verified replacement
+atomically, clears stale runtime and health projections, and verifies the
+result. An unreadable original is preserved at a quarantine path.
+
+### `state repair`
+
+```bash
+hostwright state repair --dry-run --json
+hostwright state repair --confirm-repair <token> --json
+```
+
+Available only when integrity is `degraded` exclusively in reconstructible
+projection tables (`observed_services`, `observed_runtime_snapshots`,
+`health_check_results`). Confirmed repair snapshots first, deletes only those
+projections in one transaction, and requires a final `healthy` report.
+Structural, desired-state, ownership, operation, and audit damage stays with
+[restore](#state-restore).
+
+### `state recover`
+
+Resolves a pending restore or repair journal: removes an unpublished stage,
+restores a displaced original, or finalizes a verified replacement. With no
+journal it is idempotent and reports current health.
+
+<Aside type="note" title="Three recovery commands, three jobs">
+`hostwright state recover` finishes an interrupted state-maintenance
+operation. `hostwright recovery` is read-only inspection of workload
+operation recovery records. `hostwright recovery resume|rollback` continues or
+reverses one of those workload operations. See [Recovery](#hostwright-recovery).
+</Aside>
+
+## `hostwright secret`
+
+Manages Hostwright-owned `keychain://<service>/<account>` generic-password
+items in the macOS Keychain.
+
+`create` and `update` read a bounded UTF-8 value from stdin or an attended
+no-echo terminal; secret values are never accepted as a command argument.
+`list` and `check` return metadata only, never values. `delete` verifies exact
+ownership and item identity before removal. Every mutation persists a redacted
+intent record before touching the Keychain; an interrupted operation is
+inspected with `hostwright recovery` and, for an exactly verified create, can
+be rolled back through the same recovery command.
+
+Manifest `secretEnv` values reference a secret; they never carry the value
+itself. Five reference schemes are supported: `keychain://<service>/<account>`
+for a Hostwright-owned Keychain item, `env-file:///absolute/path#KEY` and
+`local-file:///absolute/path` for guarded local files, and
+`external://<provider>/<item>` or `plugin://<provider>/<item>` for an
+explicitly registered provider. Resolution happens once, at confirmed
+execution, for the exact project/service/key combination; resolved values are
+carried outside argv and never enter Hostwright state, plans, logs, or
+diagnostics.
+
+## `hostwright registry`
+
+Registry authentication and OCI supply-chain evidence: signatures, SBOMs,
+vulnerability reports, and build provenance.
+
+```bash
+hostwright registry login <registry> --username <name>
+hostwright registry logout <registry>
+hostwright registry status <registry> [--repository <name> [--action pull|push]]
+```
+
+`login` accepts only an HTTPS registry origin and a bounded username as
+arguments; the secret comes from stdin or an attended no-echo terminal.
+Hostwright probes the registry over TLS before storing the credential in one
+Hostwright-owned Keychain item. `status` reports the authentication scheme,
+granted scopes, token expiry, and credential source; resolution checks the
+Hostwright Keychain first, then Docker- and OCI-compatible auth files.
+
+The remaining four command groups treat signed artifacts as evidence, never as
+implicit trust:
+
+- **`registry referrers discover|fetch|publish|copy|retain|release|status|prune|resume`**
+  discovers and caches OCI 1.1 referrers (signatures, attestations, SBOMs,
+  provenance) for a subject digest, and can publish or copy them to another
+  registry. `prune` requires an exact plan hash and deletes only the referrer
+  content it can prove Hostwright published.
+- **`registry sbom generate|ingest|query|export|resume`** generates an SPDX or
+  CycloneDX SBOM from a local OCI image archive, ingests a verified SBOM
+  referrer into local state, and re-exports it on request.
+- **`registry vulnerability evaluate|status|grant-exception|revoke-exception|resume`**
+  evaluates a signed vulnerability report against a manifest's
+  `imageVulnerability` policy and records an explainable pass/block decision,
+  with allowlist exceptions requiring a signed external approval record.
+- **`registry provenance generate|verify|status|resume`** emits an in-toto/SLSA
+  build-provenance statement for a local image and verifies one against a
+  manifest's `imageProvenance` policy.
+
+All four require a prior `registry referrers` discovery for the subject; all
+accept `--state-db` and `[--json | --output text|json]`; destructive or
+plan-bound operations (`prune`, `resume`) require `--confirm-plan <sha256>`.
+No registry credential, token, or auth-file content ever appears in command
+arguments, state, output, or diagnostics.
+
+`registry trust verify|status|grant-exception|revoke-exception` verifies a
+subject against a manifest's `imageTrust` policy using an external `cosign`
+executable, and manages time-boxed exceptions to that policy. See
+[`imageTrust`](/reference/manifest/#imagetrust) in the manifest reference.
+
+## `hostwright image`
+
+Local, provider-backed image management: `inspect`, `pull`, `push`, `tag`,
+`load`, `save`, `build`, `delete`, `prune`, and `cache status|pin|unpin`.
+
+```bash
+hostwright image pull ghcr.io/example/api@sha256:<digest> --platform linux/arm64 --runtime-provider apple-cli
+hostwright image inspect ghcr.io/example/api@sha256:<digest>
+hostwright image prune --dry-run
+hostwright image prune --confirm-plan <sha256> --target-bytes 2GiB
+```
+
+Apple `container` is the full image provider after version and capability
+negotiation. The Containerization helper exposes structured inspection only;
+every image mutation through it reports unavailable rather than a silent
+no-op.
+
+Every mutation is proven from structured image inventory observed before and
+after the operation, not from command output. Push, tag, save, delete, and
+prune bind every source reference to its pre-observed digest and refuse if it
+has drifted. `--offline` rejects `pull`, `push`, and `build` before any network
+attempt. `delete` requires an exact Hostwright ownership record and refuses a
+reference a live container still uses. `prune` selects only Hostwright-owned,
+unpinned, unreferenced content after size and retention bounds, requires
+`--confirm-plan`, and never runs a native prune command or accepts `--all` /
+`--force`. `cache status` reports size, ownership, pin, and lease accounting
+for the local content store.
+
+<Aside type="note" title="Lifecycle image resolution stays offline">
+`hostwright up` and the other lifecycle commands resolve images from what is
+already local; they never contact a registry. Pull the image first with
+`hostwright image pull`, then run the lifecycle command.
+</Aside>
+
+## `hostwright volume`
+
+Named-volume storage through Storage Provider API v1. The built-in
+`hostwright-local` provider stores Hostwright-owned volumes on the local Mac.
+
+```bash
+hostwright volume list [--project <id>]
+hostwright volume inspect <volume-uuid>
+hostwright volume capacity
+hostwright volume health
+hostwright volume delete <volume-uuid> --dry-run
+hostwright volume delete <volume-uuid> --confirm-plan <sha256>
+hostwright volume prune --dry-run
+hostwright volume snapshot create <volume-uuid> --snapshot-id <uuid> --name <name>
+hostwright volume snapshot list <volume-uuid>
+hostwright volume backup create --volume <volume-uuid> --key-ref <typed-secret-reference>
+hostwright volume backup restore --target <source-uuid>=<new-target-uuid>
+```
+
+`list`, `inspect`, `capacity`, and `health` are read-only. Every destructive
+operation requires exactly one of `--dry-run` or `--confirm-plan <sha256>`;
+confirmation binds provider identity, project/resource UUIDs, generation,
+fencing, ownership, attachments, holds, and reclaim policy, and fails before
+mutation if any of it has changed. `recover` resumes an interrupted volume
+operation from its persisted idempotency key.
+
+Snapshots are created, inspected, retained, exported, and restored into a new
+target volume through the provider boundary. Backups accept one or more
+`--volume` values and a typed `--key-ref` secret reference; restore accepts
+one or more `<source-uuid>=<new-target-uuid>` mappings and verifies every
+source before promoting it. `prune` never runs name-based or global cleanup.
+
+Declare a named volume in the manifest's top-level `volumes:` block and mount
+it from a service; see [Volumes](/reference/manifest/#volumes) in the manifest
+reference.
 
 ## `hostwright migrate preview <path>`
 
-Prints a deterministic non-writing Manifest v2 preview for v1/versionless
-legacy input. V2 is idempotent and future versions fail closed.
+Prints a deterministic non-writing Manifest v2 preview for v1 and versionless
+legacy input. V2 input is idempotent; future versions fail closed.
 
 ## `hostwright init`
 
@@ -91,84 +437,162 @@ overwritten (`HW-CLI-002`, exit 64).
 Converts a narrow safe stack-file subset and prints `hostwright.yaml` text to
 stdout. Writes nothing, observes nothing, contacts nothing. Unsupported fields
 (build contexts, named volumes, `secrets`, `configs`, `env_file`,
-`depends_on`, `deploy`, networking/DNS fields, shell health checks) fail
-closed with stable diagnostics. See [Import a stack file](/tasks/stack-import/).
+`depends_on`, `deploy`, networking/DNS fields, shell health checks) fail closed
+with stable diagnostics. See [Import a stack file](/tasks/stack-import/).
 
 ## `hostwright validate [path]`
 
-Validates the restricted manifest shape. Does not contact registries or Apple
-container, does not check whether images exist remotely, does not mutate. With
+Validates the restricted manifest shape from the manifest file alone. With
 `--team-profile`, also enforces the profile's strict-only requirements and
 prints the profile and manifest SHA-256 hashes.
 
 ## `hostwright plan [path]`
 
-Reads and validates the manifest, maps it to runtime-shaped desired state,
-runs planning policy checks, and prints a non-mutating dry-run plan with a
+Reads and validates the manifest, maps it to runtime-shaped desired state, runs
+planning policy checks, and prints a non-mutating dry-run plan with a
 deterministic `planHash`, typed issues, typed actions, and an explicit
-execution-unavailable notice. `plan` does not inspect Apple container by
-default (`observationConnected: false`).
+execution-unavailable notice. By default `plan` works from the manifest alone
+(`observationConnected: false`).
 
-## `hostwright apply [path] --state-db <path> --confirm-plan <hash>`
+## Lifecycle commands
 
-The narrow confirmed apply gate. Validates, observes live runtime state,
-recomputes the plan, requires the supplied hash to match, persists desired
-state, observed state, operation intent, and an apply-start event **before**
-mutation, then executes exactly one action: `createMissingService`, a
-restart-policy-allowed `startManagedService`, or a restart-policy-allowed
-`restartManagedService`. Records recovery groups, checkpoints, and redacted
-manual recovery hints, then success/failure events.
+`up`, `down`, `run`, `start`, `stop`, `restart`, `rm`, and `update` are the
+primary way to mutate a workload. Each compiles the manifest, the immutable
+provider capability snapshot, current observation, and ownership state into
+one deterministic `LifecyclePlan` covering every affected service.
 
-Refusal conditions include: missing `--state-db` or `--confirm-plan`, hash
-mismatch, failed observation, plan blockers, zero or multiple executable
-actions, create actions with mounts/privileged ports/broad bind
-addresses/flag-like values, unconfirmed local image, non-matching
-start/restart preconditions, an active operation lease, or a missing/mismatched
-team approval. Ports are published to `127.0.0.1` by default. See the
-[safety model](/concepts/safety-model/).
+Every invocation requires exactly one of:
 
-## `hostwright status [path] [--state-db <path>]`
+- `--dry-run`, which prints the canonical plan and its SHA-256 without
+  acquiring a mutation group; or
+- `--confirm-plan <sha256>`, which re-observes and refuses stale capabilities,
+  provider identity, generations, fences, ownership, or plan data before
+  mutation.
 
-Without `--state-db`: manifest-level status only (a missing manifest is a
-validation failure, not a success). With `--state-db`: observes Apple
-container, persists a status event and snapshot, and renders desired services
-against observed lifecycle/health/port facts. Never mutates.
+The confirmed path persists intent, compensation, and verification state
+before touching the runtime, executes ready nodes with bounded deterministic
+parallelism (`--parallelism`, default bounded, max 32), re-observes between
+waves, and either succeeds, compensates a proven effect, resumes a durable
+checkpoint, or enters a precise safe hold. It never deletes by name and never
+adopts a resource it does not already own.
 
-## `hostwright logs <service> [--tail <n>] [--state-db <path>]`
+| Command | Behavior |
+| --- | --- |
+| `up` | Converges declared replicas in dependency order. Every required image must already exist locally. |
+| `down` | Stops verified managed resources and preserves them. |
+| `run` | Creates one uniquely identified ephemeral instance of exactly one service (`--service` required). |
+| `start`, `stop`, `restart` | Operate only on exact managed instances. |
+| `rm` | Removes only verified Hostwright-owned resources, in safe reverse dependency order. |
+| `update` | Runs the manifest's declared rolling or recreate transition, health-gates promotion, and restores the last verified revision if compensation is provable. |
 
-Last log lines for a declared and observed Hostwright-managed service. Default
-tail 100, clamped at 1000. Output is redacted. No `--follow`, attach,
-interactive, or exec. With `--state-db`, persists a `logs.read` event.
+`--service <name>` scopes a command to one declared service instead of the
+whole project. Manifest-declared ports publish to localhost only. Bind mounts,
+tmpfs, and declared `hostwright-local` named volumes execute through the
+storage boundary; custom networks and DNS still fail closed before mutation.
+Secret references resolve only when their configured backend is available and
+never enter plan output, state, logs, or diagnostics.
 
-## `hostwright events --state-db <path>`
+### `hostwright apply [path] --confirm-plan <hash>`
 
-Reads the SQLite event ledger in deterministic timestamp/id order, with
+`apply` is a compatibility entry point for a confirmed `up` plan. Generate the
+hash with `hostwright up --dry-run`; `apply --confirm-plan <hash>` then runs
+through the identical operation DAG, provider binding, observation,
+verification, retry, compensation, and recovery path as `up`. It does not add
+a separate mutation model or loosen any lifecycle check. It is `up`, spelled
+the way earlier Hostwright versions spelled it.
+
+When `--team-profile` is set, `--approval-record` is mandatory and must bind
+the exact profile, manifest, current plan, and `apply` scope.
+
+## Interactive and streaming commands
+
+`exec`, `attach`, `copy`, `export`, `inspect`, `stats`, and `logs --follow`
+require exact UUID-backed managed identity and a provider capability that
+passed qualification. An operation the selected provider does not support
+fails before execution; there is no host-shell fallback.
+
+- **`exec <service> -- <command> [args...]`** runs a command inside a running
+  managed service and streams its output.
+- **`attach <service>`** attaches to a running service's primary process
+  stream.
+- **`copy`** transfers a file between the host and a service in either
+  direction, using `<service>:/absolute/container/path` as the remote
+  argument.
+- **`export <service> <destination-path>`** writes a filesystem archive for a
+  service to a host path.
+- **`inspect`** and **`stats`** render normalized structured provider output
+  for one service (configuration and point-in-time resource usage,
+  respectively).
+- **`logs --follow`** streams new log output after the existing tail, resuming
+  from bounded provider state across a supported provider restart.
+
+Streams use bounded chunk sizes and queue depth, backpressure, stdin closure,
+TTY resize, a fixed allowed signal set, cancellation, and complete
+process-tree cleanup on exit. JSON mode uses NDJSON/base64 frames and cannot
+be combined with an interactive TTY. Host copy paths must be absolute and
+resolve with no-symlink confinement; container paths and archive entries
+reject traversal.
+
+## `hostwright status [path]`
+
+Manifest-level status resolves the manifest only (a missing manifest is a
+validation failure). With a resolved state database, `status` observes the
+selected runtime provider, persists a status event and snapshot, and renders
+desired services against observed lifecycle, health, and port facts. It never
+mutates.
+
+## `hostwright logs <service> [--tail <n>] [--follow]`
+
+Reads log lines for a declared and observed Hostwright-managed service.
+Default tail is 100 lines, clamped at 1000. Output is redacted before display.
+`--follow` streams new lines using the bounded streaming contract described
+above, when the selected provider supports it. A `logs.read` event is
+persisted to the resolved state database.
+
+## `hostwright events`
+
+Reads the SQLite event ledger in deterministic timestamp and id order, with
 `--project`, `--type`, `--service`, `--severity`, `--limit`, and `--sort`
-filters. Reads an already-migrated database only and leaves the database unmodified.
+filters. Reads an already-migrated database only and leaves it unmodified.
 
-## `hostwright recovery --state-db <path>`
+## `hostwright recovery`
 
-Reads operation recovery groups and steps; renders legacy restart recovery
-records for older databases. Distinguishes: no automatic recovery required,
-manual inspection required, and rollback unsupported. Active groups include
-redacted lock owner and lease expiry. Diagnostic output only; recovery actions stay manual.
+```bash
+hostwright recovery --state-db /tmp/hostwright.sqlite
+hostwright recovery resume --group <uuid> --confirm-plan <hash>
+hostwright recovery rollback --group <uuid> --confirm-plan <hash>
+```
 
-## `hostwright diagnostics --state-db <path> --bundle <path>`
+The bare command reads operation recovery groups and steps, and reports each
+as no recovery required, resumable, compensable, or a safe hold requiring
+manual inspection, with redacted lock owner and lease expiry for active
+groups.
+
+`resume` and `rollback` require the exact group UUID and its persisted plan
+SHA-256. Both re-observe provider identity, capabilities, generations, fences,
+ownership, and already-completed effects before continuing. `resume` skips
+nodes already verified complete. `rollback` applies only precomputed inverse
+actions whose ownership and effect are provable; anything else stays in a safe
+hold rather than deleting or fabricating success.
+
+## `hostwright diagnostics --bundle <path>`
 
 Writes a local redacted JSON bundle: telemetry policy (local-only), schema
 metadata, optional manifest summary, and redacted events, operations, health
 results, restart state, ownership records, and snapshots. Refuses to overwrite
-an existing bundle. The command reads existing state rows only, and the
-bundle stays on local disk.
+an existing bundle. The command reads existing state rows only, and the bundle
+stays on local disk.
 
-## `hostwright cleanup [path] --state-db <path> --dry-run | --confirm-cleanup <token>`
+## `hostwright cleanup [path] --dry-run | --confirm-cleanup <token>`
 
 Exactly one of `--dry-run` or `--confirm-cleanup` is required. The dry run
 classifies candidates (`eligible`, `ambiguous`, `stale`, `running`, `unknown`,
 `blocked`, `never-delete`) and prints an exact confirmation token. Confirmed
 cleanup deletes only `eligible` containers covered by the current token.
-Images, volumes, networks, and unmanaged containers remain untouched. Partial failure exits 72 and preserves successful deletions in the
-report.
+Images, volumes, networks, and unmanaged containers remain untouched; use
+`hostwright image prune` or `hostwright volume prune` for those, each behind
+its own dry-run and plan-hash gate. Partial failure exits 72 and preserves
+successful deletions in the report.
 
 ## `hostwright benchmark ... --confirm-live`
 
@@ -179,27 +603,94 @@ evidence, and a non-existing report path.
 </Aside>
 
 Writes a schema-v2 JSON hardware report. Each iteration creates one unique
-labeled Hostwright-owned resource through the RuntimeAdapter, records
-boot/poll/stats samples, then deletes exactly that identifier and verifies
-absence. It uses a pre-pulled local image, runs without state writes, and keeps the
-report on local disk. Exit 0 only
-when every dimension was measured and exact cleanup succeeded; 69 when
-evidence is blocked; 72 when command/identity/cleanup evidence failed. One
-report records local evidence for the exact host and versions measured.
+labeled Hostwright-owned resource through the selected runtime provider,
+records boot, poll, and stats samples, then deletes exactly that identifier
+and verifies absence. It uses a pre-pulled local image, runs without state
+writes, and keeps the report on local disk. Exit 0 only when every dimension
+was measured and exact cleanup succeeded; 69 when evidence is blocked; 72 when
+command, identity, or cleanup evidence failed. One report records local
+evidence for the exact host and versions measured.
 
-## `hostwright doctor [--output json]`
+## `hostwright extension check`
 
-Safe local checks only: OS version, architecture/macOS gate, Swift toolchain
-version, `container` executable lookup, manifest presence, state-path policy,
-telemetry policy, and a local resource-intelligence report with explicit
-`unmeasured` dimensions. All checks run locally without invoking Apple
-container. See
-[Doctor checks](/reference/doctor-checks/).
+Evaluates one reviewed-local extension declaration and executable pair through
+the declaration policy and handshake, and reports the typed decision.
+Extensions are declaration-checked only; Hostwright loads and executes no
+plugin code.
 
-## `hostwrightd --foreground --config <path> --state-db <path>`
+## `hostwright doctor`
 
-The foreground development daemon loop. Options: `--interval <seconds>`
-(default 30), `--jitter <seconds>` (default 5), `--max-backoff <seconds>`
-(default 300), `--max-iterations <count>`, `--lock-file <path>` (default
-`<state-db>.hostwrightd.lock`). Each iteration validates, observes, plans, and
-records events. Runtime mutation stays with the confirmed apply gate. See [Daemon](/operations/daemon/).
+Safe local checks: OS version, architecture and macOS gate, Swift toolchain
+version, runtime provider readiness, manifest presence, state-path policy and
+readiness for the resolved database, telemetry policy, and a local
+resource-intelligence report with explicit `unmeasured` dimensions. All checks
+run locally; runtime readiness executes only bounded version and status
+probes. See [Doctor checks](/reference/doctor-checks/).
+
+## `hostwright-control --manifest <absolute-path>`
+
+Runs one versioned local JSON request through existing `hostwright` command
+contracts, writes one JSON response, and exits. It is not a daemon, socket, or
+listener of any kind.
+
+Supported operations are `plan`, `status`, `events`, `recovery`, `doctor`,
+`up`, `down`, `run`, `start`, `stop`, `restart`, `rm`, `update`, and `image`.
+Requests are limited to 64 KiB with a five-second read deadline and one 1 MiB
+response. Launch arguments fix the manifest, optional state, and optional
+profile paths; request JSON can never choose or override a path.
+
+```json
+{"apiVersion":2,"requestID":"request-1","operation":"events","project":"demo","eventType":"apply.failed","severity":"error","limit":100,"sort":"desc"}
+```
+
+Lifecycle requests accept only `services`, `dryRun`, `confirmPlan`,
+`runtimeProvider`, `timeout`, and `parallelism`, and require exactly one of
+`dryRun: true` or a `confirmPlan` hash. Image requests use
+`"operation":"image"` with `imageOperation` set to `inspect`, `pull`, `push`,
+`tag`, `load`, `save`, `build`, `delete`, or `prune`. Both delegate to the same
+parser, planner, and provider binding as their CLI counterparts, and cannot
+carry credentials or arbitrary native options.
+
+Without a configured `--state-db`, the control process uses the CLI's
+Application Support default. The API excludes interactive streams, apply
+compatibility, cleanup, logs, diagnostics export, benchmark, and extension
+execution.
+
+## `hostwrightd --foreground --config <path>`
+
+The foreground development daemon loop. Options: `--interval <seconds>` (default
+30), `--jitter <seconds>` (default 5), `--max-backoff <seconds>` (default 300),
+`--max-iterations <count>`, `--lock-file <path>`. The default lock for the
+default database is
+`~/Library/Application Support/Hostwright/run/hostwrightd.lock`; an explicit
+database gets a deterministic per-database lock. Each iteration validates,
+observes, plans, and records events. Runtime mutation stays with the confirmed
+lifecycle and apply gates; the daemon never calls them itself. See
+[Daemon](/operations/daemon/).
+
+## `hostwright-dist`
+
+The distribution and installed-lifecycle tool.
+
+**Developer evidence.** `build`, `assemble`, `verify`, and `lifecycle` produce
+unsigned local development evidence.
+
+**Trusted release.** `release` performs isolated clean builds, signs the
+shipped executables with a hardened runtime, submits the archive and `.pkg`
+for notarization, staples, runs Gatekeeper, generates an SBOM and
+digest-bound provenance, signs the evidence with detached CMS, and
+independently re-verifies the output. `verify-release` re-verifies a release
+directory against the expected Developer ID team. `homebrew-formula` renders a
+formula bound to the exact verified release URL. This is the formula served
+by `brew install hostwright/tap/hostwright`. See
+[Install and upgrade](/getting-started/install-from-source/).
+
+**Installed lifecycle.** `install`, `upgrade`, `repair`, `status`,
+`adopt-legacy`, `recover`, `rollback`, `uninstall-plan`, and `uninstall` manage
+a verified artifact at an explicit existing `--prefix` with structured JSON
+output, durable journals, and exact ownership verification. Upgrade is strict
+SemVer and snapshots a bound state database; rollback restores the one verified
+prior generation. `uninstall --data-policy preserve` keeps the bound state
+database; `remove` requires the current plan token. Lifecycle status is
+`not-installed`, `ready`, or `recovery-required`, and a pending journal must be
+resolved with `recover` before another mutation.

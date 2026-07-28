@@ -68,19 +68,17 @@ export const whatItIs = {
   ] satisfies Capability[],
 };
 
-// Exact command surface from the brief. The CLI is in design; these are the
-// intended shapes, split into a core set and a clearly-planned set.
-export const cliCore = `hostwright init
-hostwright capabilities --json
-hostwright migrate preview hostwright.yaml
+// Representative slices of the real command surface: read-only commands and
+// the two confirmed mutation gates.
+export const cliSafe = `hostwright init
 hostwright validate
 hostwright plan
-hostwright status --state-db /tmp/hostwright.sqlite
+hostwright status
+hostwright paths --json
 hostwright doctor`;
 
-export const cliPlanned = `hostwright up
-hostwright down --dry-run
-hostwright cluster status`;
+export const cliGated = `hostwright apply --confirm-plan <hash>
+hostwright cleanup --confirm-cleanup <token>`;
 
 // Manifest example — kept verbatim. Document only the fields shown here.
 export const manifestExample = `version: 2

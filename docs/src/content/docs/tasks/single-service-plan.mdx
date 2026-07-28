@@ -48,32 +48,39 @@ The output contains a deterministic `planHash`, typed `issues`, typed
 `actions`, and `observationConnected: false`. By default `plan` works from the manifest
 alone and reports declared state only. Running it twice on the same manifest produces the same hash.
 
-## 3. Apply: separate, explicit, gated
+## 3. Bring it up: separate, explicit, gated
 
 <Aside type="caution" title="Mutating step">
-Apply is a separate command with its own requirements: an explicit state database path, a matching plan hash recomputed
-against a **live** runtime observation, and a locally present image.
+`up` is a separate command with its own requirements: a resolved state
+database (the Application Support default or an explicit `--state-db`), a
+matching plan hash recomputed against a **live** runtime observation, and a
+locally present image.
 </Aside>
 
 ```bash
-hostwright apply examples/single-service/hostwright.yaml \
+hostwright up examples/single-service/hostwright.yaml \
+  --state-db /tmp/hostwright.sqlite --dry-run
+
+hostwright up examples/single-service/hostwright.yaml \
   --state-db /tmp/hostwright.sqlite \
-  --confirm-plan <hash-from-the-observed-plan>
+  --confirm-plan <hash-from-the-dry-run>
 ```
 
-Apply validates the manifest, observes Apple container, recomputes the plan,
-and refuses if your hash does not match the observed plan. It persists desired
-state, observed state, operation intent, and an apply-start event **before**
-mutation, then executes exactly one action, here creating the missing `web`
-service with its port published to `127.0.0.1:8080`. Success or failure lands
-in the event ledger.
+`up` validates the manifest, observes the runtime, recomputes the plan, and
+refuses if your hash does not match the observed plan. It persists desired
+state, observed state, operation intent, and a start event **before**
+mutation, then creates the missing `web` service with its port published to
+`127.0.0.1:8080`. Success or failure lands in the event ledger. `hostwright
+apply --confirm-plan <hash>` runs the identical gate under its earlier name.
 
-If the local image is missing, apply refuses before mutation; pulling the
-image stays with you. Fetch it first (for example `container image pull
-docker.io/library/nginx:1.27`) and re-plan.
+If the local image is missing, `up` refuses before mutation; pulling the
+image stays with you. Fetch it first (`hostwright image pull
+docker.io/library/nginx:1.27 --runtime-provider apple-cli`) and re-plan. To
+take the service back down, run `hostwright down` and then `hostwright rm`,
+each with its own `--dry-run` first.
 
 ## Next
 
-- [Review an app suite](/tasks/app-suite-review/): the same flow with multiple services.
-- [Safety model](/concepts/safety-model/): every refusal condition of the apply gate.
-- [Limitations](/reference/limitations/): what apply cannot do (multi-action, rollback, image replacement).
+- [Review an app suite](/tasks/app-suite-review/): the same flow with multiple, dependent services.
+- [Safety model](/concepts/safety-model/): every refusal condition of the lifecycle gate.
+- [Limitations](/reference/limitations/): the current support boundary.

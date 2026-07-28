@@ -53,15 +53,11 @@ const structuredData = {
     <script is:inline>
       document.documentElement.classList.add("js");
       // Theme must be set before first paint to avoid a flash.
+      // Light is the default for a first visit; only an explicit stored
+      // choice (from the toggle) switches it, regardless of OS preference.
       (() => {
         const stored = localStorage.getItem("theme");
-        const theme =
-          stored === "dark" || stored === "light"
-            ? stored
-            : matchMedia("(prefers-color-scheme: dark)").matches
-              ? "dark"
-              : "light";
-        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.theme = stored === "dark" ? "dark" : "light";
       })();
     </script>
     <link rel="preload" href="/fonts/GeneralSans-Variable.woff2" as="font" type="font/woff2" crossorigin />

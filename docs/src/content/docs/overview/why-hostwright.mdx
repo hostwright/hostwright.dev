@@ -54,6 +54,7 @@ dependencies.
 Apple container is young and will change. The single most important design
 decision is to route every runtime operation through one typed boundary, the
 [RuntimeAdapter](/concepts/runtime-adapter/), so that runtime change is
-contained to one place. Hostwright can start on the Apple container CLI today
-and move to a native API later without rewriting the reconciler, because both
-implement the same provider contract.
+contained to one place. Hostwright ships two runtime providers today, the
+Apple container CLI and Apple's Containerization framework, and can add
+another later without rewriting the reconciler, because every provider
+implements the same contract.

@@ -1,30 +1,27 @@
 ---
 import { Code } from "astro:components";
-import StatusChip from "./StatusChip.astro";
-import { cliCore, cliPlanned } from "../data/homepage.ts";
+import { cliSafe, cliGated } from "../data/homepage.ts";
 ---
 
 <div class="cli">
   <div class="term">
     <div class="term-bar">
-      <span class="term-label">hostwright · core</span>
-      <span class="term-note">in design</span>
+      <span class="term-label">hostwright · read-only</span>
     </div>
-    <Code code={cliCore} lang="bash" theme="github-light" />
+    <Code code={cliSafe} lang="bash" theme="github-light" />
   </div>
 
   <div class="term">
     <div class="term-bar">
-      <span class="term-label">hostwright · later</span>
-      <StatusChip status="planned" />
+      <span class="term-label">hostwright · confirmed mutation</span>
     </div>
-    <Code code={cliPlanned} lang="bash" theme="github-light" />
+    <Code code={cliGated} lang="bash" theme="github-light" />
   </div>
 </div>
 
 <p class="cli-caption">
-  The command surface is still in design. These are the intended shapes.
-  Commands marked <em>Planned</em> are scheduled on the roadmap.
+  The read-only commands observe and plan without changing the runtime.
+  Mutation happens only through the two confirmed gates, one action at a time.
 </p>
 
 <style>
@@ -53,11 +50,6 @@ import { cliCore, cliPlanned } from "../data/homepage.ts";
     font-size: var(--text-xs);
     color: var(--color-text-muted);
   }
-  .term-note {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
-  }
   /* Code component renders its own <pre>; strip the doubled border/radius. */
   .term :global(pre.astro-code) {
     border: 0 !important;
@@ -69,11 +61,6 @@ import { cliCore, cliPlanned } from "../data/homepage.ts";
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     max-width: var(--width-prose);
-  }
-  .cli-caption em {
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: 0.9em;
   }
 
   @media (min-width: 46rem) {

@@ -11,17 +11,22 @@ the boundaries mean when you run the tool.
 
 ## Mutation boundaries
 
-Supported mutation is intentionally narrow: one plan-hash-confirmed
-create-missing-service, one restart-policy-allowed managed start, one managed
-restart of an exact Hostwright-owned running/unhealthy service, exact
-token-confirmed cleanup deletes, and the explicitly confirmed benchmark path.
-Broader lifecycle operations are outside the current surface. See
-[Limitations](/reference/limitations/).
+Every mutating command requires an explicit confirmation bound to a specific,
+re-observed reality: a plan-hash-confirmed lifecycle command (`up`, `down`,
+`run`, `start`, `stop`, `restart`, `rm`, `update`, or `apply` as its
+compatibility alias), plan-hash-confirmed image or volume deletion/pruning,
+token-confirmed cleanup, a confirmed runtime-provider migration, or the
+explicitly confirmed benchmark path. Nothing mutates the runtime as a side
+effect of a read command, and no command accepts a broad flag like `--all` or
+`--force`. See [Limitations](/reference/limitations/) for what is outside the
+command surface entirely.
 
 Restart policy state can block the managed start/restart paths through
 backoff, operator hold, `restart.policy: no`, and crash-loop protection.
-Operation recovery records are audit and guidance only; inverse operations
-always require a new confirmed plan.
+Operation recovery records support `hostwright recovery resume` and
+`hostwright recovery rollback`, but both require a fresh confirmation and
+re-observe current reality before acting. Recovery never replays a stale
+intent automatically.
 
 New runtime resources use collision-resistant v2 identifiers and exact
 ownership labels. Ownership is **never inferred** from a Hostwright-looking
@@ -42,11 +47,12 @@ runtime command construction receives the manifest value, while output, logs,
 state payloads, events, plans, and failure messages are redacted.
 
 - Plaintext credential-like keys in `env` are rejected: use
-  [`secretEnv` with `keychain://` references](/concepts/secrets-and-keychain/).
-- Keychain reference labels are themselves redacted, because service/account
-  names reveal local context.
-- The live macOS Keychain is not used by default; the opt-in backend is
-  read-only, interaction-disabled, and excludes synchronizable items.
+  [typed `secretEnv` references](/concepts/secrets-and-keychain/).
+- Reference labels are themselves redacted, because service/account names
+  reveal local context.
+- `hostwright secret` writes only to Hostwright-owned Keychain items,
+  interaction-disabled and excluding synchronizable items; it never touches an
+  item it does not own.
 
 <Aside type="caution" title="Redaction is heuristic">
 Do not place plaintext credentials in manifests, logs, examples, fixtures, or
@@ -65,11 +71,22 @@ and health probe commands before any confirmed apply or daemon run.
 
 ## Image trust
 
-`imagePolicy: require-digest` is **local string validation only**. It gives
-Hostwright a stable content identifier to require; it does not contact
-registries, resolve tags, pull images, verify signatures, inspect SBOMs, scan
-vulnerabilities, or prove provenance. Deciding which registries, publishers,
-and digests to trust remains your call.
+`imagePolicy: require-digest` is **local string validation**: a stable
+content identifier the rest of policy can build on. On its own it does not
+contact a registry, resolve a tag, or judge whether a digest is trustworthy.
+
+Layered on top of it, four optional manifest policies add real, offline,
+signature-based evidence checks before a lifecycle mutation: `imageTrust`
+(Sigstore signature verification against declared authorities), `imageSBOM`
+(required SBOM evidence in a declared format), `imageVulnerability`
+(a signed vulnerability report evaluated against severity/exploitability/fix
+thresholds, with time-boxed exceptions), and `imageProvenance` (a signed
+in-toto/SLSA build-provenance statement checked against declared builders and
+signers). Each is off by default; declaring one makes its evidence mandatory
+before execution. See the policy sections in the [manifest
+reference](/reference/manifest/#image-policy). Deciding which authorities,
+issuers, and builders to trust remains your call. Hostwright verifies
+against what you declare, and declares nothing on your behalf.
 
 ## Network exposure
 

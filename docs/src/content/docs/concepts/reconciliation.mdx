@@ -1,6 +1,6 @@
 ---
 title: Reconciliation
-description: The reconciliation loop observes, diffs, and plans deterministically; mutation happens only through the confirmed single-action apply gate.
+description: The reconciliation loop observes, diffs, and plans deterministically; mutation happens only through a confirmed lifecycle plan.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -16,7 +16,7 @@ designed to fail closed.
 2. Observe runtime state through the [RuntimeAdapter](/concepts/runtime-adapter/).
 3. Compute drift.
 4. Produce a dry-run plan with a deterministic hash.
-5. Apply only through the confirmed single-action persistence gate.
+5. Mutate only through a confirmed lifecycle plan.
 6. Record events.
 
 The planner maps the supported manifest subset to runtime-shaped desired state,
@@ -24,21 +24,23 @@ accepts optional adapter-shaped observed state, runs
 [policy checks](/concepts/policy-engine/), and emits typed drift records, typed
 issues, typed planned actions, and a deterministic plan hash.
 
-## Plan and apply are separate commands
+## Plan and mutate are separate commands
 
 - **`hostwright plan`** renders desired-state and policy diagnostics. It does
   not perform live runtime observation by default, and it says so explicitly in
   its output.
-- **`hostwright apply`** recomputes the plan against a live observation,
-  requires a matching `--confirm-plan` hash, persists operation intent *before*
-  mutation, and executes exactly **one** executable action:
-  `createMissingService`, a restart-policy-allowed `startManagedService`, or a
-  restart-policy-allowed `restartManagedService`.
-- **`hostwright cleanup`** is separate from apply, with its own dry-run token
-  gate. See the [safety model](/concepts/safety-model/).
+- **`hostwright up`, `down`, `run`, `start`, `stop`, `restart`, `rm`, and
+  `update`** each recompute their own plan against a live observation, require
+  a matching `--confirm-plan` hash, persist operation intent *before*
+  mutation, then execute the plan's ready nodes with bounded parallelism.
+  `apply` is a compatibility alias for a confirmed `up` plan. See
+  [Lifecycle commands](/reference/cli/#lifecycle-commands).
+- **`hostwright cleanup`** is separate from the lifecycle commands, with its
+  own dry-run token gate, and never removes anything a lifecycle command
+  would manage. See the [safety model](/concepts/safety-model/).
 - **`hostwrightd --foreground`** runs the observe, plan, and record loop
-  continuously. Mutation stays with the apply gate. See
-  [Daemon](/operations/daemon/).
+  continuously. It never calls a lifecycle command itself; mutation stays
+  with an operator running one explicitly. See [Daemon](/operations/daemon/).
 
 ## Drift cases
 
@@ -53,9 +55,13 @@ The planner detects:
 - unsupported unknown observed lifecycle states;
 - unavailable observation.
 
-Only `createMissingService` and the restart-policy-allowed start/restart
-actions can be marked executable. Every other action is rendered as
-unavailable: visible in the plan and blocked from execution.
+Each drift record maps to a typed planned action (create, start, stop,
+restart, remove, or update) scoped to one service. A plan can carry more
+than one such action; what makes an action executable is passing every
+policy and precondition check, not being the only action in the plan. An
+action that fails a check is still rendered in the plan, marked
+unavailable and blocked from execution, so the operator can see exactly
+what would not happen and why.
 
 ## Correctness requirements
 

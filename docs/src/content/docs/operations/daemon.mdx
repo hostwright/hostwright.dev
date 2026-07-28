@@ -21,9 +21,14 @@ Required: `--foreground`, `--config <path>`, `--state-db <path>`. Optional:
 | `--jitter <seconds>` | 5 | Deterministic jitter cap. |
 | `--max-backoff <seconds>` | 300 | Repeated-error backoff cap. |
 | `--max-iterations <count>` | none | Stop after a bounded number of iterations. |
-| `--lock-file <path>` | `<state-db>.hostwrightd.lock` | Single-instance lock. |
+| `--lock-file <path>` | see below | Single-instance lock. |
 
-No default config path, state path, or user-global daemon location exists.
+`--config` is always explicit. The state database resolves through `--state-db`,
+`HOSTWRIGHT_STATE_DB`, then the Application Support default. The default database
+uses the lock
+`~/Library/Application Support/Hostwright/run/hostwrightd.lock`; an explicit or
+environment-selected database gets a deterministic per-database lock so
+independent databases never share one.
 
 ## Loop contract
 
@@ -52,9 +57,10 @@ with [`hostwright events`](/operations/events-and-diagnostics/).
 <Aside type="caution" title="The daemon never mutates">
 `hostwrightd` uses the read-only adapter and does not call the mutation hook.
 It observes, probes, persists, and plans. It does not create, start, stop,
-restart, delete, repair, or clean up anything. Confirmed mutation remains
-exclusively behind `hostwright apply --confirm-plan` and
-`hostwright cleanup --confirm-cleanup`.
+restart, remove, update, or clean up anything. Confirmed mutation remains
+exclusively behind an operator running a lifecycle command (`up`, `down`,
+`run`, `start`, `stop`, `restart`, `rm`, `update`, or `apply`) with
+`--confirm-plan`, or `hostwright cleanup --confirm-cleanup`.
 </Aside>
 
 ## Locking and shutdown

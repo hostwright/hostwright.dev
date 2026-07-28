@@ -1,11 +1,13 @@
 ---
 title: Review an app suite
-description: "Validate and plan a multi-service manifest, and understand health, restart policy, and the one-action-per-apply rule."
+description: "Validate and plan a multi-service manifest, and understand health, restart policy, and dependency-ordered lifecycle convergence."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-**This task is read-only**: it validates and plans; it does not apply.
+**Steps 1 and 2 are read-only**: validate and plan touch nothing. Step 3 shows
+the confirmed lifecycle command that would converge the suite, labeled as the
+mutating step it is.
 
 ## The example manifest
 
@@ -52,39 +54,48 @@ observed state is available, and one deterministic hash for the whole plan.
 
 ## 2. What health and restart declarations do
 
-- `health.command` is executed by the [daemon](/operations/daemon/) as an
-  in-process loopback probe for allowlisted command shapes. Results are
-  persisted and feed drift detection ("unhealthy where policy requires
-  health"). Container-exec health checks are not implemented.
+- `health.command` (this example's legacy scalar form) is executed by the
+  [daemon](/operations/daemon/) as an in-process loopback probe for
+  allowlisted command shapes. Results are persisted and feed drift detection
+  ("unhealthy where policy requires health"). `migrate preview` converts it
+  into an equivalent typed liveness probe automatically; typed `probes` also
+  support a real container-`exec` action for `startup`, `readiness`, and
+  `liveness` checks. See [Health, restart, and
+  updates](/reference/manifest/#health-restart-and-updates).
 - `restart.policy` gates the *managed start* and *managed restart* actions.
   `policy: no` (as on `worker`) is a manual hold: Hostwright will never mark a
   start or restart of that service executable. Restart state also tracks max
   attempts, backoff, and crash-loop blocking.
 
-## 3. One action per apply
+## 3. Converging the whole suite
 
-<Aside type="caution" title="Not Compose parity">
-If both services are missing, the plan contains two create actions, and
-`apply` refuses, because more than one executable action exists. Converging a
-multi-service suite means multiple explicit plan-confirm-apply rounds, one
-action each. Hostwright has a narrow mutation gate; it is not a Compose-style
-up command.
-</Aside>
-
-Bring the suite up one gated step at a time:
+If both services are missing, `hostwright plan` reports two create actions
+under one plan hash. `hostwright up` confirms and executes that same plan as
+one operation: it creates both services, in the order their `dependsOn`
+declarations require (this example declares none, so both are eligible
+immediately), with bounded parallelism, and re-observes between waves so a
+later step never acts on stale information.
 
 ```bash
-hostwright plan examples/app-suite/hostwright.yaml --output json   # note the hash
-hostwright apply examples/app-suite/hostwright.yaml \
-  --state-db /tmp/hostwright.sqlite --confirm-plan <hash>          # one action
-hostwright plan examples/app-suite/hostwright.yaml --output json   # re-plan: new hash
+hostwright up examples/app-suite/hostwright.yaml --dry-run           # one plan, both services
+hostwright up examples/app-suite/hostwright.yaml \
+  --state-db /tmp/hostwright.sqlite --confirm-plan <hash>            # converges both
+hostwright status examples/app-suite/hostwright.yaml --state-db /tmp/hostwright.sqlite
 ```
 
-Each apply changes observed reality, so each subsequent apply needs a freshly
-observed hash. A stale hash is refused with a confirmation-mismatch error
-(exit code 70).
+<Aside type="note" title="Scoping to one service">
+Pass `--service worker` to plan or converge a single named service instead of
+the whole project. `hostwright run --service <name>` creates one ephemeral
+instance of a single service outside the declared replica set.
+</Aside>
+
+A confirmed plan is bound to the observation it was computed against. If
+reality changes between the dry run and confirmation, for example another
+process starts one of the services, the confirmed hash no longer matches and
+the command refuses with a confirmation-mismatch error (exit code 70) rather
+than acting on stale intent.
 
 ## Next
 
 - [Operations and recovery](/tasks/operations-and-recovery/): watching the suite after it runs.
-- [hostwright.yaml reference](/reference/manifest/): every supported field.
+- [hostwright.yaml reference](/reference/manifest/): every supported field, including `dependsOn`.

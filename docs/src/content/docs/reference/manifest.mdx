@@ -1,6 +1,6 @@
 ---
 title: hostwright.yaml reference
-description: "The restricted manifest format: every supported field, the version policy, validation rules, and the fail-closed parser boundary."
+description: "The Manifest v2 format: every supported field, the version policy, validation rules, and the fail-closed parser boundary."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -15,70 +15,262 @@ version: 2
 project: api-local
 imagePolicy: allow-tags
 
+volumes:
+  database-data:
+    provider: hostwright-local
+    capacity: 2GiB
+    accessMode: read-write-once
+    reclaimPolicy: retain
+
 services:
   api:
-    image: ghcr.io/example/api:latest
+    image: ghcr.io/example/api@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    replicas: 1
+    platform:
+      os: linux
+      architecture: arm64
+    resources:
+      cpus: 2
+      memory: 1GiB
+    user: 1000
+    group: 1000
+    workdir: /app
+    entrypoint: ["/app/server"]
+    command: ["serve"]
+    init: true
+    dependsOn:
+      - service: database
+        condition: ready
     ports:
       - "8080:8080"
+    volumes:
+      - type: volume
+        source: database-data
+        target: /var/lib/api
     env:
       APP_ENV: development
     secretEnv:
       API_TOKEN: keychain://hostwright.api/api-token
-    health:
-      command: ["curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
+    labels:
+      app.example.role: api
+    probes:
+      startup:
+        exec: ["/app/server", "check"]
+        interval: 2s
+        failureThreshold: 30
+      readiness:
+        http:
+          port: 8080
+          path: /health
+        interval: 10s
+      liveness:
+        tcp:
+          port: 8080
+        interval: 20s
     restart:
       policy: on-failure
+    update:
+      strategy: rolling
+      maxSurge: 1
+      maxUnavailable: 0
+      progressDeadline: 300s
+    hooks:
+      postStart:
+        exec: ["/app/server", "warm"]
+      preStop:
+        exec: ["/app/server", "drain"]
+    readOnlyRootFilesystem: true
+    shmSize: 64MiB
 ```
 
-Canonical Hostwright manifests use this contract. Do not add Kubernetes `apiVersion`, `kind`, or `metadata` fields; the parser rejects them.
+Canonical Hostwright manifests use this contract only. Do not add Kubernetes
+`apiVersion`, `kind`, or `metadata` fields, or Compose fields such as `build`,
+`depends_on`, `deploy`, or `networks`; the parser rejects them.
 
 ## Version policy
 
-`version: 2` is required for execution. Versionless and explicit v1 manifests
-are legacy input. Preview a deterministic non-writing conversion with
-`hostwright migrate preview hostwright.yaml` (or `--json`). The current preview
-inserts or replaces the version contract and is idempotent for v2. Future
-versions fail closed, and input is never silently downgraded.
+`version: 2` is required for execution. Versionless and explicit `version: 1`
+manifests are legacy input and fail closed with migration guidance. Preview a
+deterministic non-writing conversion:
 
-## Fields
+```bash
+hostwright migrate preview hostwright.yaml
+hostwright migrate preview hostwright.yaml --json
+```
+
+The preview inserts or replaces the version contract, converts legacy
+`health` into an equivalent typed liveness probe, is idempotent for `v2`
+input, and rejects future versions. Hostwright never silently downgrades or
+rewrites a manifest during `validate`, `plan`, or a lifecycle command.
+
+## Project and image policy
 
 | Field | Form | Rules |
 | --- | --- | --- |
 | `version` | required scalar | Exactly `2`. |
 | `project` | scalar | Required, DNS-like name. |
-| `imagePolicy` | optional scalar | `allow-tags` (default) or `require-digest`. |
-| `services.<name>` | map | Service names are DNS-like; two-space indentation. |
-| `image` | scalar | Required per service. No whitespace, must not begin with `-`; digests must be `@sha256:<64 lowercase hex>`. |
-| `command` | inline array | Tokens non-empty and must not begin with `-`. |
-| `ports` | string list | `"host:container"`, values 1–65535. |
-| `env` | string map | Keys shell-safe (`[A-Za-z_][A-Za-z0-9_]*`). Plaintext credential-like keys are rejected; use `secretEnv`. |
-| `secretEnv` | string map | Values must be `keychain://<service>/<account>`. A key cannot appear in both `env` and `secretEnv`. |
-| `volumes` | string list | `source:/absolute/container/path[:ro|rw]`. Host-root and parent-traversal sources are rejected. |
-| `health.command` | inline array | Non-empty when `health` is present. Bounded probe shapes only (see below). |
-| `health.interval` | scalar | Seconds form, like `10s`. |
-| `restart.policy` | scalar | `no`, `on-failure`, or `unless-stopped`. |
+| `imagePolicy` | optional scalar | `allow-tags` (default) or `require-digest`. See [Image policy](#image-policy). |
 
-## Parser limitation
+## Volumes
+
+A top-level `volumes:` map declares named volumes that services mount by
+name. Each declaration requires a supported `provider` (`hostwright-local`
+today), a normalized `capacity`, an `accessMode` of `read-write-once` or
+`read-only-many`, and a `reclaimPolicy`. Declaration labels cannot use the
+reserved `dev.hostwright.` prefix.
+
+```yaml
+volumes:
+  database-data:
+    provider: hostwright-local
+    capacity: 2GiB
+    accessMode: read-write-once
+    reclaimPolicy: retain
+```
+
+A service mounts a declared volume with a typed entry in its own `volumes:`
+list. See [Storage](#storage). Volume lifecycle (snapshots, backups, quota,
+recovery) is managed with [`hostwright volume`](/reference/cli/#hostwright-volume),
+not through the manifest.
+
+## Service identity and scheduling
+
+| Field | Form | Rules |
+| --- | --- | --- |
+| `image` | scalar | Required. No whitespace, must not begin with `-`; digest references use `@sha256:<64 lowercase hex>`. |
+| `replicas` | integer | 1 to 256. Default 1. |
+| `platform.os` | scalar | `linux`. |
+| `platform.architecture` | scalar | `arm64`, or `amd64` where Rosetta capability is available. |
+| `resources.cpus` | scalar | Positive integer. |
+| `resources.memory` | scalar | Normalized unit, e.g. `512MiB`, `1GiB`. |
+| `user`, `group` | integer | Numeric UID/GID. |
+| `workdir` | scalar | Normalized absolute container path. |
+| `entrypoint`, `command` | inline array | Bounded non-empty tokens. |
+| `init` | boolean | Runs an init process in the container. |
+| `dependsOn` | list | Each entry names a declared service and a condition: `started`, `ready`, or `completed`. Self-reference and cycles are rejected. |
+
+`dependsOn` is what makes a multi-service `hostwright up` converge in a safe
+order: a service with `condition: ready` waits for its dependency's readiness
+probe before starting. See [Lifecycle commands](/reference/cli/#lifecycle-commands).
+
+## Environment, secrets, and labels
+
+| Field | Form | Rules |
+| --- | --- | --- |
+| `env` | string map | Keys shell-safe (`[A-Za-z_][A-Za-z0-9_]*`). Plaintext credential-like keys are rejected; use `secretEnv`. |
+| `secretEnv` | string map | Values are typed references (see below). A key cannot appear in both `env` and `secretEnv`. |
+| `labels` | string map | Bounded; cannot use the reserved `dev.hostwright.` prefix. |
+
+`secretEnv` accepts five reference schemes: `keychain://<service>/<account>`
+for a Hostwright-owned Keychain item, `env-file:///absolute/path#KEY` and
+`local-file:///absolute/path` for guarded local files, and
+`external://<provider>/<item>` or `plugin://<provider>/<item>` for an
+explicitly registered provider. A reference resolves once, at confirmed
+execution, and never appears in plans, state, logs, or diagnostics. See
+[Secrets and Keychain](/concepts/secrets-and-keychain/).
+
+## Networking and storage
+
+The executable manifest has no bind-address field: Hostwright-created port
+publishes always bind to `127.0.0.1`. Custom networks, DNS, and network
+policy are not yet part of the executable manifest.
+
+| Field | Form | Rules |
+| --- | --- | --- |
+| `ports` | string list | `"host:container"`, values 1–65535. Fixed localhost ports cannot collide, including across replicas. |
+
+A service's own `volumes:` list uses typed mounts, distinct from the
+top-level volume declarations:
+
+```yaml
+volumes:
+  - type: volume
+    source: database-data     # must name a top-level volumes: declaration
+    target: /var/lib/api
+  - type: bind
+    source: /Users/me/config
+    target: /etc/api
+    readOnly: true
+  - type: tmpfs
+    target: /tmp/scratch
+    sizeLimit: 64MiB
+```
+
+Bind sources cannot expose host root, device files, path traversal,
+symlinks, or unsafe ownership. `volume`-type sources must reference a
+declared top-level volume.
+
+## Health, restart, and updates
+
+Typed `probes` replace the legacy scalar `health` field (still accepted and
+converted automatically by `migrate preview`). Each probe stage (`startup`,
+`readiness`, `liveness`) declares exactly one action:
+
+```yaml
+probes:
+  startup:
+    exec: ["/app/server", "check"]
+    interval: 2s
+    failureThreshold: 30
+  readiness:
+    http:
+      port: 8080
+      path: /health
+    interval: 10s
+  liveness:
+    tcp:
+      port: 8080
+    interval: 20s
+```
+
+- `exec` crosses the runtime provider's process-control boundary; it never
+  uses a host shell.
+- `http` and `tcp` probes target only the container's own loopback and a
+  port the service declares; `http` follows at most three same-origin
+  loopback redirects.
+
+Startup gates readiness and liveness. Readiness gates dependent services and
+rollout promotion. Liveness drives the existing restart policy.
+
+| Field | Form | Rules |
+| --- | --- | --- |
+| `restart.policy` | scalar | `no`, `on-failure`, or `unless-stopped`. |
+| `update.strategy` | scalar | `rolling` or `recreate`. |
+| `update.maxSurge`, `update.maxUnavailable` | integer | Bounds for a rolling update; must be internally consistent. |
+| `update.progressDeadline` | scalar | Seconds form; must be positive. |
+| `hooks.postStart`, `hooks.preStop` | exec block | Run after start / before stop. Same bounded `exec` shape as probes. |
+| `readOnlyRootFilesystem` | boolean | Mounts the container root filesystem read-only. |
+| `shmSize` | scalar | Normalized unit for `/dev/shm`. |
+| `rosetta` | boolean | Requires `platform.architecture: amd64` plus virtualization support. |
+
+## Parser contract
+
+Hostwright pins Yams 6.2.2 inside `HostwrightManifest` and applies its own
+strict, source-aware decoding contract. Input is limited to one UTF-8 YAML
+document, 1 MiB, nesting depth 64, and 100,000 expanded nodes. Duplicate keys
+are rejected at every level. Anchors, aliases, merge keys, custom tags,
+multiple documents, ambiguous scalar coercion, unknown fields, and limit
+violations fail with a stable line, column, and manifest-path diagnostic.
+Canonical encoding uses fixed field order and lexically sorted maps; every
+checked-in manifest satisfies parse → canonical encode → parse equality.
 
 <Aside type="caution" title="Not a general YAML parser">
-Hostwright uses a restricted manifest subset parser. Unsupported YAML features
-fail closed: anchors, aliases, tags, merge keys, block scalars, document
-markers, flow maps, tabs, and arbitrary indentation. Unsupported orchestrator
-fields fail closed too, including `apiVersion`, `kind`, `metadata`, `build`,
-`depends_on`, `deploy`, `networks`, `network_mode`, `dns`, `hostname`,
+Unsupported Kubernetes, Compose, and orchestrator fields fail closed,
+including `apiVersion`, `kind`, `metadata`, `build`, `depends_on`, `deploy`,
+`networks`, `network_mode`, `dns`, `dns_search`, `domainname`, `hostname`,
 `extra_hosts`, `aliases`, `expose`, `configs`, and `secrets`.
 </Aside>
 
-[`hostwright import-stack`](/tasks/stack-import/) can convert a smaller
-stack-file subset into this shape: conversion only, with the normal validator
-run on the output.
+[`hostwright import-stack`](/tasks/stack-import/) converts a smaller
+stack-file subset into this shape: conversion only, with the normal
+validator run on the output. Validation itself never contacts a registry or
+Apple container.
 
 ## Image policy
 
-`imagePolicy` is a **local string policy only**. The default `allow-tags`
-accepts tag-based references. `require-digest` rejects mutable tag-only
-references and requires digest pinning:
+`imagePolicy` is a local string policy. The default `allow-tags` accepts
+tag-based references such as `ghcr.io/example/api:latest`. `require-digest`
+rejects mutable tag-only references and requires digest pinning:
 
 ```yaml
 imagePolicy: require-digest
@@ -88,34 +280,151 @@ services:
     image: ghcr.io/example/api@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 ```
 
-Hostwright does not verify a digest exists in a registry, resolve tags,
-pull images, verify signatures or SBOMs, or scan vulnerabilities.
+`require-digest` is also a prerequisite for `imageTrust`, `imageSBOM`,
+`imageVulnerability`, and `imageProvenance` below. Lifecycle image resolution
+stays local and offline: Hostwright does not contact a registry or pull
+missing content as part of `up`, `down`, or the other lifecycle commands.
+Pull images ahead of time with [`hostwright image
+pull`](/reference/cli/#hostwright-image).
 
-## Bounded health probes
+## `imageTrust`
 
-Health checks are not shell commands and are not container `exec`, and
-Hostwright does not execute host `curl` or `wget` binaries. Current bounded
-probes parse `curl`, `wget`, `true`, and `false` shaped commands:
+An optional offline image-signature trust policy on top of digest pinning:
 
-- `curl`: no-output status flags plus one loopback HTTP(S) URL;
-- `wget`: quiet spider mode plus one loopback HTTP(S) URL;
-- `true` / `false`: no arguments, evaluated directly.
+```yaml
+imagePolicy: require-digest
+imageTrust:
+  version: 1
+  threshold: 2
+  trustedRoot: /Users/me/.config/hostwright/sigstore-trusted-root.json
+  authorities:
+    - id: release-key
+      type: keyed
+      publicKey: /Users/me/.config/hostwright/release.pub
+    - id: ci-oidc
+      type: keyless
+      issuer: https://token.actions.githubusercontent.com
+      identity: https://github.com/example/repo/.github/workflows/release.yml@refs/heads/main
+```
 
-URL-shaped probes run through Hostwright's in-process URL fetcher in the
-[daemon](/operations/daemon/).
+`version` is locked to `1`. `threshold` (1–8) cannot exceed the number of
+declared `authorities` (1–8). Each authority is `keyed` (an absolute
+`publicKey` path) or `keyless` (an HTTPS `issuer`, a non-empty `identity`,
+and a Sigstore TrustedRoot JSON document). Optional `notBefore`, `notAfter`,
+and `revokedAt` timestamps are RFC3339 and chronologically ordered.
 
-## Ports and networking
+Verification accepts only Sigstore bundle v0.3 message signatures through an
+external `cosign` executable (see [`hostwright registry trust
+verify`](/reference/cli/#hostwright-registry)) and does not expose a way to
+disable transparency or identity checks. The manifest text and exact trust
+material are bound into lifecycle plan confirmation, so changing either
+invalidates a pending confirmation.
 
-The currently executable v2 subset has no bind-address field. Hostwright-created
-runtime port publishes default to `127.0.0.1`. DNS, service discovery, network
-aliases, and reverse proxy settings are not manifest features.
+## `imageSBOM`
+
+Declares which image-SBOM formats Hostwright may generate and whether
+evidence is required before a lifecycle mutation:
+
+```yaml
+imagePolicy: require-digest
+imageSBOM:
+  version: 1
+  requirement: required
+  formats:
+    - spdx-json
+    - cyclonedx-json
+```
+
+`version` is locked to `1`. `requirement` is `optional` or `required`.
+`formats` holds one or both of `spdx-json` and `cyclonedx-json`. A `required`
+policy re-verifies the SBOM evidence graph before execution and again during
+recovery, so evidence cannot go stale between a dry run and a confirmed
+apply.
+
+## `imageVulnerability`
+
+Declares an explainable, signed vulnerability-report policy:
+
+```yaml
+imagePolicy: require-digest
+imageTrust:
+  threshold: 1
+  authorities:
+    - id: release
+      type: keyed
+      publicKey: /Users/me/.config/hostwright/release.pub
+imageVulnerability:
+  version: 1
+  severityThreshold: high
+  minimumVulnerabilityAgeSeconds: 86400
+  exploitability: known-exploited
+  fixAvailability: fix-available
+  maximumDatabaseAgeSeconds: 604800
+  staleAction: fail-closed
+  unavailableAction: fail-closed
+  exceptionApproval: required
+  allowlist:
+    - vulnerabilityID: CVE-2026-0001
+      packagePURL: pkg:swift/example@1.0.0
+      reason: Not reachable in this deployment
+      expiresAt: "2026-12-01T00:00:00Z"
+```
+
+Requires `imagePolicy: require-digest` plus `imageTrust`. Severity is `low`,
+`medium`, `high`, or `critical`; `staleAction` and `unavailableAction` are
+`fail-open` or `fail-closed`. Selectors are ANDed: a candidate finding must
+clear severity, age, exploitability, and fix-availability all at once.
+`fail-open` never overrides a known matching finding. Allowlist entries
+require a `reason` and an RFC3339 `expiresAt`, and expire automatically.
+`exceptionApproval: required` means an allowlist entry alone is not enough.
+See [`hostwright registry vulnerability
+grant-exception`](/reference/cli/#hostwright-registry).
+
+## `imageProvenance`
+
+Declares which signed build provenance may authorize an image:
+
+```yaml
+imagePolicy: require-digest
+imageProvenance:
+  version: 1
+  requirement: required
+  builderIDs:
+    - urn:hostwright:builder:apple-container
+  buildTypes:
+    - https://hostwright.dev/build-types/apple-container/v1
+  signers:
+    - id: release-builder
+      publicKey: /Users/me/.config/hostwright/provenance.pub
+  maximumAgeSeconds: 604800
+  requireReproducible: true
+```
+
+Requires `imagePolicy: require-digest`. `requirement` is `optional` or
+`required`. Builder and build-type entries are unique, bounded, and
+credential-free (HTTPS or URN only). `maximumAgeSeconds` is between 60 and
+one year. A `required` policy checks the in-toto/SLSA statement's subject,
+builder, build type, timestamps, materials, and signer authority before
+execution, and again during recovery.
+
+## Storage
+
+Named volumes declared at the top level and mounted with a `type: volume`
+entry execute through the exact Hostwright-owned volume lifecycle: guarded
+mounts, snapshots, verified backup/restore, quota and pressure accounting,
+reclaim policy, and orphan recovery. See [`hostwright
+volume`](/reference/cli/#hostwright-volume).
 
 ## Untrusted manifests
 
-Treat third-party manifests as untrusted input. `validate` and `plan` are
-non-mutating gates, but an accepted manifest still describes images, ports,
-environment values, paths, and probe commands an operator should review before
-any confirmed apply or daemon run.
+Treat manifests from third parties as untrusted input. `hostwright
+validate`, `hostwright plan`, and every lifecycle command's `--dry-run` are
+non-mutating gates, but an accepted manifest can still describe images,
+ports, environment values, paths, hooks, probes, and process arguments that
+deserve review before a confirmed plan runs.
 
-Never place plaintext credentials in manifests. `secretEnv` stores a local
-reference, not a value; see [Secrets and Keychain](/concepts/secrets-and-keychain/).
+Never place plaintext credentials in a manifest. `secretEnv` stores a typed
+reference, never a value; a confirmed lifecycle execution resolves it only
+through the exact workload grant and configured provider, and state, events,
+diagnostics, plans, and recovery records redact both the resolved value and
+the reference itself.
