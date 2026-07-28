@@ -1,27 +1,41 @@
 ---
-title: Install from source
-description: Build Hostwright from source. No packages are published while it is in development.
+title: Install and upgrade
+description: Install the vendor Homebrew tap or build Hostwright from source.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
 Hostwright is in active development and not production ready.
 
-<Aside type="caution" title="No package-manager install">
-`brew install hostwright` does not exist today. A vendor tap, signed and
-notarized archives, and a `.pkg` are planned. The current install path is a
-source build.
+<Aside type="caution" title="Qualification builds, not a GA release">
+`brew install hostwright/tap/hostwright` installs an unsupported qualification
+build from the Hostwright-maintained tap. The unqualified `brew install
+hostwright` (Homebrew-core) does not exist. Neither the tap nor a source build
+is a GA support claim; read [Compatibility](/reference/compatibility/).
 </Aside>
 
 ## Requirements
 
 - Apple silicon Mac.
 - macOS 26 or newer for the current package target.
-- Swift 6.2-compatible toolchain.
-- Apple `container` only for live runtime commands.
-- Git.
+- A supported [Apple `container`](/reference/compatibility/) version for live runtime commands.
+- Swift 6.2-compatible toolchain and Git, for a source build.
 
-## Build and verify
+## Vendor tap
+
+```bash
+brew install hostwright/tap/hostwright
+hostwright --version
+hostwright capabilities --json
+```
+
+This installs the same four executables a source build produces:
+`hostwright`, `hostwright-control`, `hostwrightd`, and `hostwright-dist`.
+Upgrade and uninstall through Homebrew as usual; `hostwright-dist status
+--prefix <path>` reports the installed-lifecycle state Homebrew is managing
+underneath.
+
+## Build from source
 
 ```bash
 git clone https://github.com/hostwright/hostwright.git
@@ -34,10 +48,10 @@ swift run hostwright capabilities --json
 ```
 
 This prints the current development version. There is no release tag to check
-out yet; build from the default branch. The build produces four executables:
-`hostwright` (the CLI), `hostwright-control` (one-shot local control),
-`hostwrightd` (the foreground daemon), and `hostwright-dist` (distribution and
-installed-lifecycle tooling). Locate them with `swift build --show-bin-path`.
+out yet; build from the default branch. The build produces the same four
+executables. Locate them with `swift build --show-bin-path`. In a source
+checkout, prefix every command with `swift run` (`swift run hostwright ...`)
+unless you install the binaries onto your `PATH` yourself.
 
 ## Try the current safe surface
 
@@ -62,8 +76,9 @@ swift run hostwright paths --json
 ```
 
 `hostwright-dist` implements an installed lifecycle (install, upgrade, repair,
-rollback, uninstall) for a verified artifact at an explicit prefix, plus a
-trusted release pipeline. A published package channel needs credentialed
-release evidence that is not yet in place, so the current install path stays a
-source build. The source checkout is separate from an installed prefix;
-deleting the checkout does not uninstall or remove state.
+rollback, uninstall) for a verified artifact at an explicit prefix, plus the
+trusted release pipeline that produces the vendor tap's formula and the signed
+archives it installs. A Homebrew-core submission still needs broader
+qualification evidence than the vendor tap requires. The source checkout is
+separate from an installed prefix; deleting the checkout does not uninstall or
+remove state.

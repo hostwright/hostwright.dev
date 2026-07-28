@@ -28,11 +28,15 @@ lifecycle, health, and port facts. It never mutates.
 
 ```bash
 hostwright logs web --state-db /tmp/hostwright.sqlite --tail 200
+hostwright logs web --state-db /tmp/hostwright.sqlite --follow
 ```
 
 Reads the last log lines for an observed Hostwright-managed service. Default
-tail is 100 lines, clamped at 1000. Output is redacted before display. There
-is no `--follow`, attach, or exec.
+tail is 100 lines, clamped at 1000. Output is redacted before display.
+`--follow` streams new output when the selected runtime provider supports it.
+For a shell inside the service or a file transfer, see `exec`, `attach`, and
+`copy` in the [interactive and streaming
+commands](/reference/cli/#interactive-and-streaming-commands).
 
 ## Events: the ledger, filtered
 
@@ -58,11 +62,18 @@ lease expiry for active groups. Recovery output distinguishes: no recovery
 required, manual inspection required, and rollback unsupported (no safe
 inverse operation is proven).
 
-<Aside type="note" title="Diagnostic output">
-`recovery` does not observe Apple container, retry mutations, stop or start
-anything, or roll back changes. An interrupted operation's plan can be reused
-only when its checkpoint proves runtime execution never began; anything
-ambiguous stays blocked for manual inspection.
+Once you have reviewed a held operation, `hostwright recovery resume --group
+<uuid> --confirm-plan <hash>` continues it, and `hostwright recovery rollback
+--group <uuid> --confirm-plan <hash>` applies only the precomputed inverse
+actions that are provably safe. Both re-observe current reality before acting;
+neither is automatic.
+
+<Aside type="note" title="Diagnostic by default">
+The bare `hostwright recovery` command only inspects; it never observes the
+runtime, retries mutation, or changes anything. An interrupted operation's
+plan can be resumed or rolled back only when its checkpoint proves the exact
+remaining or reversible work; anything ambiguous stays in a safe hold for
+manual inspection.
 </Aside>
 
 ## Diagnostics: a local, redacted bundle

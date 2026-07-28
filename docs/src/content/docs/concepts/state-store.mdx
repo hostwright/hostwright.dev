@@ -55,7 +55,7 @@ sidecar across the open boundary.
 
 ## Migration continuity
 
-Migrations are explicit and checksummed. The current schema is version 7.
+Migrations are explicit and checksummed. The current schema is version 15.
 
 - A database migrated by a newer Hostwright release fails closed with an
   incompatible-schema error. Hostwright does not downgrade or convert.
@@ -67,7 +67,9 @@ Migrations are explicit and checksummed. The current schema is version 7.
 
 Recent schema versions added exact observed resource identifiers, network
 metadata, ownership identity versions, Hostwright UUIDs, runtime-provider
-binding, and fencing fields. See
+binding, fencing fields, immutable image digest locks, signed image-trust,
+SBOM, vulnerability, and provenance evidence, and storage volume/snapshot/
+backup/orphan/quota records. See
 [Runtime adapter: identity and ownership](/concepts/runtime-adapter/).
 
 ## What is (and is not) stored

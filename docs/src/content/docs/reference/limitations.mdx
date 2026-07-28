@@ -12,23 +12,43 @@ the current support boundary.
 
 - Manifest v2 with a restricted, fail-closed parser, deterministic legacy
   migration preview, validation, planning, and capability reporting.
-- Apple `container` observation and confirmation-gated create, start, restart,
-  and delete paths through the runtime adapter.
-- SQLite schema v7 with desired, observed, event, operation, ownership, health,
-  restart, and recovery records, Hostwright UUIDs, provider binding, and
-  fencing, plus secure default paths under Application Support and legacy
-  migration.
+- Two negotiated runtime providers (Apple CLI and Containerization) with
+  immutable capability snapshots, observation, and confirmation-gated
+  lifecycle mutation: `up`, `down`, `run`, `start`, `stop`, `restart`, `rm`,
+  and `update`, each dependency-ordered and plan-hash confirmed. `apply` is a
+  compatibility alias for a confirmed `up` plan.
+- `exec`, `attach`, `copy`, `export`, `inspect`, `stats`, and `logs --follow`
+  against a qualified runtime provider.
+- Local image management (`inspect`, `pull`, `push`, `tag`, `load`, `save`,
+  `build`, `delete`, `prune`, cache pin/unpin) bound to observed digests, not
+  command output.
+- Registry authentication, OCI referrer discovery/publishing, and signed
+  supply-chain evidence: image-signature trust (`imageTrust`), SBOMs
+  (`imageSBOM`), vulnerability-report policy (`imageVulnerability`), and build
+  provenance (`imageProvenance`).
+- Hostwright-owned named-volume storage through Storage Provider API v1:
+  guarded mounts, snapshots, verified backup/restore, quota and pressure
+  accounting, reclaim policy, and orphan recovery via the built-in
+  `hostwright-local` provider.
+- Hostwright-owned Keychain secret management (`create`, `update`, `list`,
+  `check`, `delete`) and five `secretEnv` reference schemes.
+- SQLite schema v15 with desired, observed, event, operation, ownership,
+  health, restart, image, storage, and recovery records, Hostwright UUIDs,
+  provider binding, and fencing, plus secure default paths under Application
+  Support and legacy migration.
 - Online state maintenance: integrity checks, verified backups, and
   confirmation-gated restore, repair, and recover.
-- Bounded logs, local events, recovery, and diagnostics; safe doctor checks;
-  local path reporting; local policy and team profiles; secret references with a
-  read-only Keychain reader; a one-shot Control API; and a reviewed-local
-  extension handshake.
+- Bounded logs, local events, workload recovery inspection plus
+  `recovery resume|rollback`, and diagnostics; safe doctor checks; local path
+  reporting; local policy and team profiles; a one-shot Control API covering
+  lifecycle and image operations; and a reviewed-local extension handshake.
 - A foreground reconciliation loop, advisory scheduler and resource models,
   narrow stack-file import, and local benchmark evidence.
-- An installed-lifecycle tool (`hostwright-dist`) for install, upgrade, repair,
-  rollback, and uninstall at an explicit prefix, plus a signing and
-  notarization release pipeline.
+- Source builds and a vendor Homebrew tap
+  (`brew install hostwright/tap/hostwright`) as unsupported qualification
+  channels, an installed-lifecycle tool (`hostwright-dist`) for install,
+  upgrade, repair, rollback, and uninstall at an explicit prefix, and a
+  signing and notarization release pipeline.
 
 ## Outside the current surface
 
@@ -37,17 +57,14 @@ behavior.
 
 | Area | Current behavior |
 | --- | --- |
-| Install | Source build only. The installed-lifecycle and release pipelines exist, but no published package channel, Homebrew tap, or signed public artifact is available yet; `brew install hostwright` does not exist. |
-| Runtime providers | Narrow Apple `container` surface. The Containerization framework path is absent. |
-| Workload lifecycle | One confirmed action per apply. Stop, restart, down, and rm are absent, and workload rollback is manual. |
-| Images | Local reference policy only. Hostwright uses a pre-pulled local image and performs no registry resolution, signing, or scanning. |
-| Storage | Guarded mounts only. Named volumes, snapshots, and quotas are absent. |
-| Networking | Loopback publishing only. Networks, DNS, ingress, TLS, and tunnels are absent. |
+| Distribution | Source build and a vendor Homebrew tap are available as unsupported qualification channels; `brew install hostwright` (the unqualified formula name, Homebrew-core) does not exist. |
+| Networking | Loopback publishing only. Custom networks, DNS, ingress, TLS termination, and tunnels are absent. |
 | Daemon | Foreground loop only. Autonomous background operation, a launch agent, and unattended mutation are absent. |
-| Control and plugins | One-shot API and a declaration handshake. A persistent API, RBAC, audit, and plugin execution are absent. |
+| Control and plugins | One-shot API covering read operations, lifecycle, and image mutation. A persistent listener, RBAC, audit API, and plugin execution are absent. |
 | Scheduling | Advisory models only. Placement, capacity reservation, and accelerator exposure are absent. |
 | Multi-host | Single host only. Clustering, consensus, and remote operations are absent. |
 | Kubernetes and Docker | No CRI, kubelet, pod sandbox, Docker API, or Compose runtime. Stack import is a narrow conversion. |
+| Storage sharing | No shared or remote storage backend; volumes are local to the one Mac that created them. |
 
 ## Non-goals
 

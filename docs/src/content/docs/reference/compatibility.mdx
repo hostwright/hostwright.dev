@@ -10,7 +10,21 @@ description: The environment Hostwright runs in and the interface versions it cu
 | CPU | Apple silicon (arm64). |
 | macOS | macOS 26 or newer. |
 | Swift | Tools version 6.2. The exact compiler is recorded per run. |
-| Apple `container` | Verified against 1.0.0 observation shapes and the narrow mutation surface. |
+| Apple `container` | Conformance-tested against 1.0.0 and 1.1.0. Unsupported or mixed versions fail before mutation. |
+| Containerization | Pinned framework version 0.35.0, driven through the out-of-process `hostwright-containerization-helper`. |
+
+## Runtime providers
+
+| Provider | `--runtime-provider` value | Stable ID |
+| --- | --- | --- |
+| Apple CLI | `apple-cli` | `apple-container-cli` |
+| Containerization | `containerization` | `apple-containerization` |
+
+Both pass the same capability-conformance suite for every feature they
+declare; the Containerization provider currently exposes a smaller
+local-image-only subset for image mutation. `hostwright runtime providers
+--json` reports live per-feature status for each. See [Runtime
+adapter](/concepts/runtime-adapter/).
 
 ## Interface versions
 
@@ -20,7 +34,7 @@ description: The environment Hostwright runs in and the interface versions it cu
 | Control API | 2 |
 | Runtime Provider API | 2 |
 | Plugin ABI | 1 |
-| State schema | 7 |
+| State schema | 15 |
 
 The manifest parser accepts `version: 2` and provides a deterministic preview
 for legacy v1 and versionless input.

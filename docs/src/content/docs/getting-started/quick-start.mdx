@@ -1,13 +1,13 @@
 ---
 title: Quick start
-description: "The safe core loop: init, validate, plan, doctor, and how confirmed apply fits in after it."
+description: "The safe core loop: init, validate, plan, doctor, and how a confirmed lifecycle command fits in after it."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
 This page covers the safe core loop. Every command here is **read-only or
-local-file-only**. The container runtime stays untouched until you opt into
-the confirmed apply gate at the end.
+local-file-only**. The container runtime stays untouched until you opt into a
+confirmed lifecycle command at the end.
 
 ## Requirements
 
@@ -91,14 +91,23 @@ does not mutate anything. Run `hostwright paths` to see the resolved location.
 
 ## Mutation is a separate, gated step
 
-<Aside type="caution" title="The only mutating paths">
-Runtime mutation happens only through `hostwright apply --confirm-plan <hash>`
-and `hostwright cleanup --confirm-cleanup <token>`. Apply executes exactly
-**one** confirmed action per invocation and refuses to run if the plan hash
-does not match the currently observed plan. There is no multi-action apply.
+<Aside type="caution" title="The mutating paths">
+Runtime mutation happens only through a confirmed lifecycle command
+(`hostwright up --confirm-plan <hash>`, and its siblings `down`, `run`,
+`start`, `stop`, `restart`, `rm`, `update`, plus `apply` as the same gate
+under its earlier name) or `hostwright cleanup --confirm-cleanup <token>`. Each
+refuses to run if its hash or token does not match currently observed
+reality.
 </Aside>
 
-The apply flow is covered step by step in
+```bash
+hostwright image pull docker.io/library/nginx:1.27 --platform linux/arm64 --runtime-provider apple-cli
+hostwright up --dry-run --runtime-provider apple-cli
+hostwright up --confirm-plan <hash-from-the-dry-run> --runtime-provider apple-cli
+hostwright status
+```
+
+The full flow is covered step by step in
 [Plan a single service](/tasks/single-service-plan/), and the safety reasoning
 in the [Safety model](/concepts/safety-model/).
 

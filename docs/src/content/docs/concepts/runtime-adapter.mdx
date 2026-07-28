@@ -48,9 +48,11 @@ runner is not a general shell-out path:
 
 - the executable must resolve through a controlled resolver;
 - read-only commands must pass read-only policy;
-- mutating commands must carry one of exactly four supported kinds:
-  `createMissingService`, `startManagedService`, `restartManagedService`,
-  `deleteManagedContainer`;
+- mutating commands must carry one of a bounded set of supported kinds:
+  lifecycle actions (create, start, stop, restart, remove, update a managed
+  service), image actions (pull, push, tag, load, save, build, delete), and
+  interactive actions (exec, attach, copy, export), each gated behind its own
+  confirmation and capability check;
 - forbidden, unknown, and unsupported specs are rejected before execution;
 - every command has a timeout (default 30 s, maximum 300 s) and captured,
   **redacted** output.
@@ -80,17 +82,25 @@ failure; unverified CLI output is never converted into observed state.
 
 <Aside type="note" title="Adapter scope">
 Apple container owns its internals: helpers, VM lifecycle, and the networking
-stack. The adapter rejects command specs outside its reviewed surface,
-including mounts, DNS, custom networks, Rosetta, `run`, pull, build, exec,
-attach, `--all`, `--force`, image deletes, and volume deletes. See the
-[Apple container boundary](/concepts/apple-container-boundary/).
+stack. The adapter's reviewed surface now covers the full lifecycle, image,
+and interactive command families documented in the [CLI
+reference](/reference/cli/); it still rejects anything outside that reviewed
+surface, including custom networks, DNS, and broad flags like `--all` or
+`--force`. See the [Apple container boundary](/concepts/apple-container-boundary/).
 </Aside>
 
-## CLI adapter first, native adapter later
+## Two providers today
 
-The concrete implementations today drive the **Apple container CLI**:
-`AppleContainerReadOnlyAdapter` for observation and `AppleContainerApplyAdapter`
-for the four narrow mutations. A Swift-native adapter built on Apple's
-Containerization APIs is a later option, adopted when that surface is stable
-enough to depend on. Both would implement the same protocol, so the rest of
-the system is unaffected by the switch.
+Two runtime providers implement the adapter contract: the **Apple CLI**
+provider (`--runtime-provider apple-cli`, stable ID `apple-container-cli`),
+which drives the Apple `container` CLI for both observation and mutation, and
+the **Containerization** provider (`--runtime-provider containerization`,
+stable ID `apple-containerization`), which drives the pinned Containerization
+framework through an authenticated out-of-process helper,
+`hostwright-containerization-helper`. Both are negotiated through
+`hostwright runtime providers` and pass the same capability conformance suite
+for every feature they declare; the Containerization provider currently
+exposes a smaller local-image-only subset for image mutation. A project binds
+to one provider at a time, and moving between them goes through the fenced
+[`hostwright runtime migrate`](/reference/cli/#hostwright-runtime-migrate)
+operation, never a silent switch.

@@ -37,7 +37,7 @@ and what to change.
 | Images | `require-digest` failures are local string-policy blockers, evaluated without registry lookups. |
 | Environment and secrets | Secret-like env values are redaction warnings; unresolved secret references are blockers before mutation. |
 | Cleanup | Only exact Hostwright-owned non-running containers can become eligible; everything else fails closed. |
-| Lifecycle | Only the narrow create, managed-start, managed-restart, and cleanup gates are allowed. Broad lifecycle actions are blockers. |
+| Lifecycle | Create, start, stop, restart, remove, and update actions are allowed only inside a confirmed, dependency-ordered lifecycle plan or cleanup gate. An action outside that plan, or one whose preconditions no longer hold, is a blocker. |
 | Untrusted manifests | Unsupported fields are blockers. |
 | Accelerators | GPU, ANE, Metal, Core ML, MLX, and accelerator scheduling are blockers in current core scope. |
 

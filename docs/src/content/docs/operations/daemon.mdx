@@ -57,9 +57,10 @@ with [`hostwright events`](/operations/events-and-diagnostics/).
 <Aside type="caution" title="The daemon never mutates">
 `hostwrightd` uses the read-only adapter and does not call the mutation hook.
 It observes, probes, persists, and plans. It does not create, start, stop,
-restart, delete, repair, or clean up anything. Confirmed mutation remains
-exclusively behind `hostwright apply --confirm-plan` and
-`hostwright cleanup --confirm-cleanup`.
+restart, remove, update, or clean up anything. Confirmed mutation remains
+exclusively behind an operator running a lifecycle command (`up`, `down`,
+`run`, `start`, `stop`, `restart`, `rm`, `update`, or `apply`) with
+`--confirm-plan`, or `hostwright cleanup --confirm-cleanup`.
 </Aside>
 
 ## Locking and shutdown

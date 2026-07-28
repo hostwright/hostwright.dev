@@ -22,16 +22,17 @@ a deterministic plan.
 
 The [reconciler](/concepts/reconciliation/) compares the two, emits typed drift
 records and issues, and produces a plan with a deterministic hash. Convergence
-is never automatic: mutation happens only through the confirmed
-[apply gate](/concepts/safety-model/), one action at a time.
+is never automatic: mutation happens only through a confirmed
+[lifecycle plan](/concepts/safety-model/).
 
 ## Why declarative
 
 Imperative commands describe *how*; a manifest describes *what*. A declarative
 model provides properties that imperative commands do not:
 
-- **Idempotency**: apply recomputes the plan and refuses to run when the
-  confirmed hash no longer matches reality, so a stale intent cannot re-execute.
+- **Idempotency**: a lifecycle command recomputes the plan and refuses to run
+  when the confirmed hash no longer matches reality, so a stale intent cannot
+  re-execute.
 - **Drift detection**: with desired and observed snapshots both recorded,
   Hostwright reports when observed state diverges from desired state.
 - **Reviewable change**: the difference is shown as a plan, with a hash, before
@@ -67,7 +68,11 @@ policy model is designed to extend to multiple Macs. See
 ## What convergence is not
 
 Hostwright does not run an aggressive convergence loop. The foreground
-[daemon](/operations/daemon/) observes, plans, and records events. Mutation
-remains reserved for the confirmed apply gate. `apply` executes exactly one confirmed action per invocation. Automatic
-rollback and multi-action apply are not implemented; see
-[Limitations](/reference/limitations/).
+[daemon](/operations/daemon/) observes, plans, and records events; it never
+calls a lifecycle command itself. Mutation stays reserved for an operator (or
+an operator-triggered script) running `up`, `down`, `run`, `start`, `stop`,
+`restart`, `rm`, or `update` with an explicit `--confirm-plan`. A confirmed
+plan can converge every affected service in one invocation, in dependency
+order, but only the services and actions named in that exact plan; see
+[Limitations](/reference/limitations/) for what recovery can and cannot do
+when a plan is interrupted partway through.

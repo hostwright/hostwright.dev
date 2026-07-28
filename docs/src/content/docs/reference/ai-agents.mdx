@@ -5,16 +5,16 @@ description: The exact prompt to give an AI assistant so it sets up Hostwright w
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright installs from source today; packaged distribution (a Homebrew
-formula, `.pkg`, and signed, notarized binaries) is planned. Assistants tend to
-paper over that gap: they may suggest `brew install hostwright` or invent a
-`hostwright down` command, and neither exists today. This page is one prompt
-that fixes both.
+Hostwright's command surface and manifest format have grown quickly.
+Assistants trained on an earlier snapshot, or on generic container-tooling
+conventions, tend to guess wrong in both directions: inventing flags that
+never existed, or asserting a command "doesn't exist yet" after it shipped.
+This page is one prompt that fixes both, kept in sync with the current CLI
+and manifest reference.
 
-<Aside type="caution" title="No installer today">
-Hostwright runs from Swift Package Manager source. A trusted vendor
-tap/archive/`.pkg` and Homebrew-core submission are planned, and are not
-current installation commands.
+<Aside type="note" title="Still pre-release">
+Hostwright is in active development and not production ready. Give the
+assistant the current ground truth below rather than letting it guess.
 </Aside>
 
 ## The prompt
@@ -23,49 +23,57 @@ Paste this into your assistant before asking it to help with Hostwright:
 
 ```text
 I want to try Hostwright, a Mac-native desired-state container platform for
-Apple silicon, in active development. It has no trusted packaged release
-yet. Do not suggest brew, npm, curl-to-shell, or any
-installer. The only way to run it is from source:
+Apple silicon, in active development. Use only the commands and manifest
+fields below; do not invent flags, and do not assume Docker Compose or
+Kubernetes semantics apply.
 
-git clone https://github.com/hostwright/hostwright
-cd hostwright
-swift build
-swift test
+Install: `brew install hostwright/tap/hostwright` (a vendor-tap qualification
+build), or build from source:
+  git clone https://github.com/hostwright/hostwright
+  cd hostwright && swift build && swift test
+In a source checkout, run commands as `swift run hostwright ...`.
 
-Run commands with `swift run hostwright ...`, not a bare binary.
+Safe commands (no runtime mutation): --version, capabilities, runtime
+providers, paths, state integrity, migrate preview, init, import-stack,
+validate, plan, status, logs, events, recovery, diagnostics, cleanup
+--dry-run, every lifecycle command with --dry-run, doctor. State-backed
+commands resolve their database from --state-db, then HOSTWRIGHT_STATE_DB,
+then the default at ~/Library/Application Support/Hostwright/state/state.sqlite.
 
-Safe commands (no runtime mutation): --version, capabilities, paths, state
-integrity, migrate preview, init, import-stack, validate, plan, status, logs,
-events, recovery, diagnostics, cleanup --dry-run, doctor. State-backed commands
-resolve their database from --state-db, then HOSTWRIGHT_STATE_DB, then the
-default at ~/Library/Application Support/Hostwright/state/state.sqlite.
+Mutation happens ONLY through an explicit --confirm-plan <hash> (lifecycle:
+up, down, run, start, stop, restart, rm, update, plus apply as a compatibility
+alias for a confirmed up plan) or --confirm-cleanup <token> (cleanup), plus
+narrower confirmed gates for image prune, volume delete/prune, secret
+create/update/delete, and registry/runtime-provider operations. I want to run
+every confirmed command myself. Never suggest running one automatically, and
+never invent a command or flag not listed here.
 
-Mutation happens ONLY through two gates, and I want to run those myself:
-  apply --state-db <path> --confirm-plan <hash>   (exactly one action)
-  cleanup --state-db <path> --confirm-cleanup <token>
-Never suggest running apply or confirmed cleanup automatically, never
-invent flags, and never suggest stop/restart/down/rm commands; they do
-not exist.
+The manifest (hostwright.yaml, version: 2) supports per project: project,
+imagePolicy (allow-tags|require-digest), and a top-level volumes: map. Per
+service: image, replicas, platform, resources, user, group, workdir,
+entrypoint, command, init, dependsOn, ports, volumes (typed bind/volume/
+tmpfs), env, secretEnv (keychain://, env-file://, local-file://, external://,
+or plugin:// references, never a literal secret value), labels, probes
+(startup/readiness/liveness, each exec/http/tcp), restart.policy, update,
+hooks, readOnlyRootFilesystem, shmSize, rosetta, virtualization. Do not add
+Kubernetes apiVersion/kind/metadata or Compose build/depends_on/deploy/
+networks fields; the parser fails closed on them. Custom networks and DNS are
+not yet part of the executable manifest.
 
-The currently executable manifest (hostwright.yaml) requires: version: 2, project,
-imagePolicy (allow-tags|require-digest), and per service: image, command,
-ports, env, secretEnv (keychain://<service>/<account> references only),
-volumes, health.command, health.interval, restart.policy
-(no|on-failure|unless-stopped). Do not add networks, depends_on, build,
-replicas, or secrets: blocks; the parser fails closed on them.
-
-Help me: clone and build it, run doctor, generate a starter manifest with
+Help me: install or build it, run doctor, generate a starter manifest with
 init, then validate and plan it.
 ```
 
 ## Why this exists
 
-An assistant's default instincts (assume a mature project has a package
-manager entry, assume "plan" implies it should also "apply") are wrong for a
-tool with this safety posture. The prompt is the same ground truth documented
-on this site, handed to the assistant before it guesses. The authoritative
-surfaces are the [CLI reference](/reference/cli/) and the
-[manifest reference](/reference/manifest/).
+An assistant's default instincts (assume a mature-looking project has a
+package-manager entry, assume every "plan" implies an unconditional "apply",
+assume a small early command surface is still small) are each wrong somewhere
+in Hostwright's current surface. The prompt is the same ground truth
+documented on this site, handed to the assistant before it guesses. The
+authoritative surfaces are the [CLI reference](/reference/cli/) and the
+[manifest reference](/reference/manifest/); when this page and those
+disagree, the reference pages win.
 
 ## If an agent works inside your repository
 
@@ -75,14 +83,23 @@ Drop the same constraints into a rules file the agent reads automatically:
 ```md
 # Hostwright agent ground rules
 
-Source workflow; run via `swift run hostwright ...`. Safe commands:
---version, capabilities, migrate preview, init, import-stack, validate, plan, status, logs, events,
-recovery, diagnostics, cleanup --dry-run, doctor. Stateful commands need
-an explicit --state-db path. Mutation only via apply --confirm-plan <hash>
-(one action) or cleanup --confirm-cleanup <token>. Never run these
-without asking me. stop/restart/down/rm do not exist.
+Install via `brew install hostwright/tap/hostwright` or build from source and
+run via `swift run hostwright ...`. Safe commands: --version, capabilities,
+runtime providers, paths, migrate preview, init, import-stack, validate,
+plan, status, logs, events, recovery, diagnostics, cleanup --dry-run, every
+lifecycle command with --dry-run, doctor. Stateful commands need an explicit
+--state-db path or HOSTWRIGHT_STATE_DB.
 
-hostwright.yaml supports only: version, project, imagePolicy, and per
-service image, command, ports, env, secretEnv (keychain:// refs), volumes,
-health.command, health.interval, restart.policy.
+Mutation only via an explicit --confirm-plan <hash> (up/down/run/start/stop/
+restart/rm/update, or apply as a compatibility alias for up) or
+--confirm-cleanup <token> (cleanup), plus narrower gates for image prune,
+volume delete/prune, and secret/registry operations. Never run a confirmed
+command without asking me first, and never invent flags.
+
+hostwright.yaml (version: 2) supports project, imagePolicy, top-level
+volumes:, and per service: image, replicas, platform, resources, user,
+group, workdir, entrypoint, command, init, dependsOn, ports, typed volumes,
+env, secretEnv (typed references only), labels, probes, restart.policy,
+update, hooks, readOnlyRootFilesystem, shmSize, rosetta, virtualization. No
+Kubernetes or Compose fields. No custom networks or DNS yet.
 ```
