@@ -14,6 +14,9 @@ export default defineConfig({
       favicon: "/favicon.ico",
       customCss: ["./src/styles/theme.css"],
       routeMiddleware: "./src/routeData.ts",
+      components: {
+        ThemeProvider: "./src/components/ThemeProvider.astro",
+      },
       head: [
         {
           tag: "meta",
