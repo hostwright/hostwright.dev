@@ -1,66 +1,46 @@
 # Hostwright website
 
-The marketing and documentation site for **Hostwright** — a Mac-native
-desired-state control plane for Apple container workloads.
+The static root site at `hostwright.dev` and documentation app at `docs.hostwright.dev` use Astro 7 and TypeScript. The root uses React for its interactive terminal scene; docs use Starlight and MDX. Both use local IBM Plex fonts.
 
-## Stack
+## Local verification
 
-- [Astro](https://astro.build) (static output) + TypeScript
-- MDX for documentation content
-- Self-hosted IBM Plex Sans / IBM Plex Mono (via `@fontsource`)
-- Build-time syntax highlighting (Shiki) — no client JavaScript shipped for code
-- Hand-written CSS with design tokens (no UI framework)
-
-## Commands
-
-| Command | What it does |
-| --- | --- |
-| `npm install` | Install dependencies. |
-| `npm run dev` | Start the dev server at `localhost:4321`. |
-| `npm run build` | Generate the social card, then build static output to `dist/`. |
-| `npm run preview` | Serve the built `dist/` locally. |
-| `npm run check` | Type-check the project (`astro check`). |
-| `npm run og` | Regenerate `public/og.png` from `assets/og-card.svg`. |
-
-## Structure
-
-```
-src/
-  data/        Typed content: site config, nav, roadmap, non-goals, homepage copy
-  content/docs/  Documentation pages (MDX)
-  components/   Small, single-purpose UI components
-  layouts/     BaseLayout (chrome + meta) and DocsLayout (sidebar + TOC)
-  pages/       index.astro, docs/[...slug].astro, 404.astro
-  styles/      tokens.css (design tokens) + base.css
-assets/        og-card.svg (source for the social image)
-public/        hostwright-mark.svg (favicon + logo), generated og.png
-scripts/       render-og.mjs (SVG → PNG social card)
-brand/         Brand notes; see brand/README.md
-```
-
-Editing copy rarely means touching components: most text lives in `src/data/*.ts`
-and `src/content/docs/**`.
-
-## Deploying
-
-This is a static site. Build it and serve the `dist/` directory from any static
-host (Cloudflare Pages, Netlify, Vercel, GitHub Pages, S3, etc.):
+Run each project's commands from its own directory. Lockfiles are separate.
 
 ```bash
-npm install
+npm ci
+npm run check
 npm run build
-# deploy ./dist
+npm run check:links
+npm audit --audit-level=high
+
+cd docs
+npm ci
+npm run check
+npm run build
+npm run check:links
+npm audit --audit-level=high
 ```
 
-The production URL is set in `astro.config.mjs` (`site: "https://hostwright.dev"`)
-and is used for canonical links and the social card URL. Update it if the domain
-changes.
+Root output is `dist/`; docs output is `docs/dist/`. `check:links` verifies generated local routes, assets, and HTML fragments. The docs build also runs Starlight's link validator. External URLs require separate verification.
 
-## Before publishing
+Use `npm run dev` or `npm run preview` inside either project to serve it locally. Set a distinct port when serving both at once.
 
-The project name is selected but its public namespaces are **not yet reserved**.
-Confirm and update these placeholders in `src/data/site.ts` first:
+## Source layout
 
-- `links.github` — the real GitHub repository URL.
-- `links.x`, `links.reddit` — real social handles (or remove them).
-- The `hostwright.dev` domain.
+- `src/data/`: root copy, site links, roadmap, and release boundaries.
+- `src/components/`, `src/pages/`, `src/styles/`: root UI.
+- `docs/src/content/docs/`: documentation pages.
+- `docs/src/styles/`, `docs/src/routeData.ts`: documentation theme and navigation.
+- `scripts/`: social card generation and built-link checks.
+
+## Hosting and CI
+
+The root is hosted on GitHub Pages. `.github/workflows/deploy.yml` checks, builds, and publishes only the root `dist/` on authorized main-branch updates. `.github/workflows/check.yml` independently installs, typechecks, builds, checks links, and audits both projects on pull requests and main updates; it does not publish docs.
+
+Docs use the existing Cloudflare Pages project. Account/project access is pending; dashboard access is signed out. Do not infer a configured deployment or migrate hosting. The docs project must use `docs` as its build root, `npm run build` as its build command, and `dist` as its output directory. Verify the existing project settings once access is available.
+
+## Release truth
+
+The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24. Signed vendor-tap dev.11/dev.12 artifacts are unsupported qualification prereleases; current-source/final-version release qualification remains pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported.
+
+Canonical scope: [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). Installation and compatibility truth belong in the docs content and current core repository contracts.

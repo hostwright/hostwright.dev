@@ -3,81 +3,41 @@ title: Apple container boundary
 description: Apple container is the execution substrate. Hostwright sits above it with a clear ownership boundary.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
 
-Hostwright does not run containers. **Apple container** runs containers;
-Hostwright validates what *should* run, observes what is running, and mutates
-only through narrow confirmed gates. Every one of those interactions crosses
-the [RuntimeAdapter](/concepts/runtime-adapter/). Understanding where that line
-sits is essential to understanding the project.
+Apple container is the first planned runtime substrate.
 
-![Responsibility split between what Hostwright owns and what Apple's container runtime owns.](/diagrams/07-apple-container-boundary.svg)
+## Boundary
 
-## What Apple container provides
+Hostwright may adapt documented Apple container CLI behavior after local verification. It must not depend on private helper internals or undocumented behavior.
 
-Apple container is a Mac-native runtime built for Apple silicon. The properties
-that matter for Hostwright:
+## Current State
 
-- A **VM-per-container** model: each container runs in its own lightweight
-  Linux VM.
-- An **OCI image** flow, so standard container images work.
-- A command surface and helper services managed under macOS, with `vmnet`-based
-  networking.
+`AppleContainerReadOnlyAdapter` can attempt read-only observation through `RuntimeAdapter`. `AppleContainerApplyAdapter` can execute only the currently supported narrow mutation commands through the same boundary.
 
-The VM-per-container model is a defining constraint: replicas and large stacks
-carry real per-VM memory overhead, which shapes Hostwright's conservative
-resource posture. See [Limitations](/reference/limitations/).
+The adapters:
 
-## The path of a runtime operation
+- resolves the `container` executable through root-owned path-chain validation in `RuntimeExecutableResolver`;
+- build command specs in `AppleContainerCommand`;
+- run only policy-approved specs through `SecureRuntimeProcessRunner`;
+- parse only fixture-defined and locally verified observation output;
+- reports missing executables as runtime unavailable;
+- reports unsupported output as parse failure.
 
-```text
-hostwright CLI / hostwrightd
-  → RuntimeAdapter
-    → Apple container CLI (today) / Containerization APIs (later)
-      → Apple container services
-        → lightweight Linux VM
-          → your container process
-```
+The current list-style command shape is an adapter assumption based on verified local output, not a public Apple CLI compatibility claim. If local output does not match the supported parser schema, Hostwright must fail closed.
 
-Everything above the adapter is Hostwright. Everything below it is Apple's.
+Supported mutation is limited to:
 
-## What Hostwright owns
+- create one missing Hostwright-managed service after plan-hash confirmation and local-image checks;
+- start one exact Hostwright-managed stopped/created/exited service when restart policy allows it;
+- internally stop then start one exact Hostwright-managed running/unhealthy service when restart policy allows managed restart;
+- delete exact cleanup-eligible Hostwright-owned stopped/created/exited containers after dry-run token confirmation.
 
-- Manifest parsing, validation, and deterministic planning.
-- Drift detection, health probes, restart policy, and the event ledger.
-- The ownership ledger and conservative, token-confirmed cleanup.
-- The four narrow mutations: create-missing-service, managed start, managed
-  restart, exact owned-container delete.
+The adapter does not expose public stop/restart commands, remove broadly, run, pull, push, build, exec, attach, use `--all`, use `--force`, delete images, delete volumes, install services, or mutate unmanaged resources.
 
-## What Apple container owns
+## Future Requirements
 
-- The container and VM lifecycle internals.
-- The image store and registry interactions.
-- The networking stack and system helpers.
-
-## Verified shapes only
-
-Hostwright adapts **documented, locally verified** Apple container CLI behavior
-only. The current command shapes are based on verified Apple container 1.0.0
-output; they are not a broad Apple CLI compatibility claim. If local output
-does not match a reviewed parser shape, Hostwright fails closed with a parse
-error rather than guessing.
-
-<Aside type="note" title="No reaching past the seam">
-Hostwright does not reimplement, patch, or assume the internals of Apple
-container, and it must not depend on private helper internals or undocumented
-behavior. When the runtime cannot do something, Hostwright reports it as a
-[limitation](/reference/limitations/) rather than hiding it behind a vague
-error.
-</Aside>
-
-## Open questions at the boundary
-
-These depend on Apple container behavior and are tracked as open questions:
-
-- The boundaries of `exec` and interactive attach (not implemented, research-only).
-- Port-forwarding semantics and equivalents.
-- Log streaming for short-lived containers (`logs` is bounded tail-only today).
-- Localhost HTTP reachability evidence: on the current proof host, the Apple
-  container listener accepts then resets while macOS Local Network access for
-  `container-runtime-linux` is disabled.
+- Verify additional Apple container output shapes before documenting broader command compatibility.
+- Prefer documented structured output when available.
+- Convert runtime errors into Hostwright errors.
+- Keep bounded process execution behind `RuntimeAdapter` and `RuntimeProcessRunning`.
+- Document unverified Apple container behavior in `docs/BUILD_STATUS.md`.

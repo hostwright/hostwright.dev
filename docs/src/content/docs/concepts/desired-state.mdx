@@ -3,71 +3,17 @@ title: Desired state
 description: Hostwright separates declared state from observed runtime state and computes the difference deterministically.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Hostwright separates versioned intent from observed provider facts. Manifest v3
+requires explicit CPU and memory requests and limits for executable services.
+The reconciler computes deterministic drift and a reviewable plan. An authenticated
+local daemon executes confirmed lifecycle intent through durable, fenced operation
+groups and can reconcile supported owned drift using recorded restart policy.
 
-Hostwright is a **desired-state** system. You declare what should run; Hostwright
-observes what is running, computes the difference, and reports it as drift with
-a deterministic plan.
+State uses the secure Application Support default unless an operator selects another
+path. Intent and checkpoints are recorded before external effects; recovery
+re-observes exact owned resources before replay. No SQLite transaction performs
+runtime mutation, and unmanaged resources are never inferred from names.
 
-![Desired state and observed runtime state compared by a comparator to produce a drift report.](/diagrams/05-desired-observed-drift.svg)
-
-## Two kinds of state
-
-- **Desired state**: what you declared in [`hostwright.yaml`](/reference/manifest/).
-  Persisted as a snapshot to the explicit SQLite database you pass with
-  `--state-db`.
-- **Observed state**: what is running, read back from the runtime
-  through the [RuntimeAdapter](/concepts/runtime-adapter/) at a point in time.
-  `hostwright status --state-db <path>` records it as an observed snapshot.
-
-The [reconciler](/concepts/reconciliation/) compares the two, emits typed drift
-records and issues, and produces a plan with a deterministic hash. Convergence
-is never automatic: mutation happens only through the confirmed
-[apply gate](/concepts/safety-model/), one action at a time.
-
-## Why declarative
-
-Imperative commands describe *how*; a manifest describes *what*. A declarative
-model provides properties that imperative commands do not:
-
-- **Idempotency**: apply recomputes the plan and refuses to run when the
-  confirmed hash no longer matches reality, so a stale intent cannot re-execute.
-- **Drift detection**: with desired and observed snapshots both recorded,
-  Hostwright reports when observed state diverges from desired state.
-- **Reviewable change**: the difference is shown as a plan, with a hash, before
-  anything mutates.
-- **Recovery**: operation intent, checkpoints, and recovery records are
-  persisted before mutation, so an interrupted operation is diagnosable with
-  [`hostwright recovery`](/operations/events-and-diagnostics/).
-
-## The unit of declaration
-
-A manifest declares a **project** that contains one or more **services**. A
-service references an image and the runtime details needed to run it: ports,
-environment, secret references, health checks, and restart policy.
-
-```yaml
-version: 2
-project: api-local
-
-services:
-  api:
-    image: ghcr.io/example/api:latest
-    ports:
-      - "8080:8080"
-```
-
-<Aside type="note" title="Single-host authority">
-Desired state is scoped to one Mac. The same UUID, fencing, recovery, and
-policy model is designed to extend to multiple Macs. See
-[Why Hostwright](/overview/why-hostwright/) and
-[Non-goals](/overview/non-goals/).
-</Aside>
-
-## What convergence is not
-
-Hostwright does not run an aggressive convergence loop. The foreground
-[daemon](/operations/daemon/) observes, plans, and records events. Mutation
-remains reserved for the confirmed apply gate. `apply` executes exactly one confirmed action per invocation. Automatic
-rollback and multi-action apply are not implemented; see
-[Limitations](/reference/limitations/).
+Read the [manifest reference](/reference/manifest/), [reconciler](/concepts/reconciliation/),
+[state store](/concepts/state-store/), and [lifecycle command reference](/reference/cli/).
+Multi-Mac authority and scheduler optimization are deferred from this release.

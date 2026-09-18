@@ -1,64 +1,96 @@
 ---
 title: Import a stack file
-description: "Convert a narrow, safe Compose-like subset into hostwright.yaml text for review. Conversion only, with the standard validator applied to the output."
+description: Convert a narrow Compose subset with explicit CPU and memory mapping, then review and confirm local execution.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
 
-**This task is read-only.** `import-stack` prints converted manifest text to
-stdout. It does not write files, create state, observe Apple container,
-contact registries, or pull images.
+Status: v0.0.2 local Compose conversion.
 
-## Convert
+`hostwright import-stack <path>` assesses a narrow safe stack-file subset and either emits a validated `hostwright.yaml` text for review or returns structured diagnostics. It is non-mutating: it does not write files, create state, observe Apple container, contact registries, pull images, or execute runtime actions.
+
+## Command
 
 ```bash
 hostwright import-stack compose.yaml
 hostwright import-stack compose.yaml --output json
 ```
 
-Text mode prints the converted manifest; warnings go to stderr, so you can
-redirect stdout safely. JSON mode returns the manifest and structured warnings,
-or a validation-style error envelope on failure.
+Text mode prints the converted manifest to stdout. JSON mode returns a `composeImport` envelope with `succeeded`, `manifestText`, `canonicalComposeText`, and `lossReport`. A rejected import exits with validation status, leaves stdout empty, and writes the unsuccessful envelope to stderr. Check `succeeded: true` and an empty error loss report before saving the manifest.
 
-## What converts
+## Accepted Subset
 
-The accepted subset is intentionally small:
+The importer accepts:
 
-- top-level `name` or `project`, and `services`;
+- top-level `name` or `project`;
+- top-level `services`;
 - service `image`;
-- `command` as an inline array;
-- `environment` as a key-value map of scalars;
-- `ports` as string entries like `"8080:8080"`;
-- `volumes` only with explicit host-path sources (`./data`, `/tmp/data`);
-- `healthcheck.test` only as `["CMD", ...]`, plus `healthcheck.interval`;
-- `restart` as a scalar policy or `restart.policy`.
+- complete service `deploy.resources.reservations` and `deploy.resources.limits` CPU and memory blocks;
+- service `command` as an inline array;
+- service `environment` as a key-value map with plain or quoted scalar values;
+- service `ports` as string entries like `"8080:8080"`;
+- service `volumes` only when each source is an explicit host path such as `./data` or `/tmp/data`;
+- service `healthcheck.test` only as `["CMD", ...]`;
+- service `healthcheck.interval`;
+- service `restart` as a scalar or `restart.policy`.
 
-Converted output still runs through Hostwright manifest validation; invalid
-names, missing images, unsafe ports, unsafe mounts, and plaintext
-credential-like environment keys fail closed.
+The converted output still runs through Hostwright manifest validation. Invalid names, missing images, unsafe ports, unsafe mounts, plaintext credential-like environment keys, and unsupported restart policies fail closed.
 
-## What is rejected, on purpose
+Manifest v3 requires explicit CPU and memory requests and limits for every executable service. The importer maps `deploy.resources.reservations` to `resources.requests` and `deploy.resources.limits` to `resources.limits`. Both blocks must specify both resources, and requests must fit within limits. Missing or unrepresentable values fail closed with structured diagnostics and no manifest text.
 
-<Aside type="caution" title="Not Compose compatibility">
-The importer rejects unsupported semantics instead of silently dropping them:
-`build`, `depends_on`, `deploy`, `networks`/`network_mode`, DNS/aliases/
-`extra_hosts`/`expose`, `secrets` and `configs`, `env_file`, named volumes,
-shell health checks (`CMD-SHELL`), container names, labels, profiles, and pull
-policy. Import output does not imply Docker Compose, scheduler, networking, or
-runtime compatibility. See [Limitations](/reference/limitations/).
-</Aside>
+CPU values must be normalized positive whole counts, such as `"1"`; fractional CPUs are rejected. Memory values use positive whole amounts with `b`, `k`/`kb`, `m`/`mb`, or `g`/`gb` suffixes, case-insensitively. For this supported subset, `512m` maps to `512MiB` (536,870,912 bytes), and `1g` maps to `1GiB`.
 
-## Safe review flow
+```yaml
+name: compose-local
+services:
+  web:
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    command: ["python3", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
+    ports:
+      - "18103:8080"
+    deploy:
+      resources:
+        reservations:
+          cpus: "1"
+          memory: 512m
+        limits:
+          cpus: "1"
+          memory: 512m
+```
 
-1. `hostwright import-stack compose.yaml > hostwright.yaml`
-2. Review every converted image, port, volume, environment value, health
-   check, and restart policy yourself.
-3. `hostwright validate`
-4. `hostwright plan`
-5. Apply only through the explicit state path and plan-hash confirmation gate;
-   `import-stack` never performs this step.
+The resource mapping records local admission requests and provider limits; it does not implement Compose deployment orchestration.
 
-## Next
+## Rejected Scope
 
-- [hostwright.yaml reference](/reference/manifest/): the target format in full.
-- [Plan a single service](/tasks/single-service-plan/): what to do with the converted manifest.
+The importer rejects unsupported or unsafe stack semantics instead of silently dropping them. Rejected fields include:
+
+- `build`;
+- `depends_on`;
+- `deploy` fields other than the supported CPU/memory resource blocks, including replicas, placement, and update policy;
+- `networks` and `network_mode`;
+- DNS, aliases, hostnames, `extra_hosts`, and `expose`;
+- top-level or service-level `secrets` and `configs`;
+- `env_file`;
+- named volumes;
+- shell health checks such as `CMD-SHELL`;
+- container names, labels, profiles, and pull policy.
+
+These rejections are intentional. Import output does not imply Docker Compose compatibility, scheduler compatibility, networking compatibility, or runtime compatibility.
+
+## Safe Review Flow
+
+Complete the [installation](/getting-started/install-from-source/) first. Provision local identities with `hostwright daemon bootstrap-identities --output json`, then use the [daemon lifecycle](/operations/daemon/) to start the installed service. Keep the same configuration and state location throughout preview, confirmation, status, and cleanup.
+
+1. Run `hostwright import-stack compose.yaml`. Correct any diagnostics, including incomplete resource blocks.
+2. Save the successful converted output to a new manifest file, keeping the source Compose file.
+3. Review every resulting image, resource request and limit, port, volume, environment value, health check, and restart policy.
+4. Run `hostwright validate hostwright.yaml`.
+5. Run `hostwright up hostwright.yaml --dry-run --output json` and review the observed-runtime plan. `hostwright plan` is a read-only manifest plan and does not supply the confirmed lifecycle hash.
+6. Execute `hostwright up hostwright.yaml --confirm-plan <planSHA256>` using the exact hash from step 5. The Application Support default is used unless you deliberately pass `--state-db`; use the same state path for planning and execution. If the plan changes, review a new dry-run before confirming.
+
+Check the service with `hostwright status hostwright.yaml --output json`. To stop its owned resources, review `hostwright down hostwright.yaml --dry-run --output json`, then execute `hostwright down hostwright.yaml --confirm-plan <planSHA256>` with that shutdown plan's hash.
+
+Verify the application responds on its published port and inspect the provider's actual CPU and memory configuration. For this example, the allocation must be one CPU and 536,870,912 bytes. Restart uses its own reviewed `hostwright restart hostwright.yaml --dry-run --output json` preview and exact `--confirm-plan` hash. After shutdown, review and confirm `hostwright rm hostwright.yaml` to remove the stopped resources owned by this manifest. Preserve unrelated resources and images.
+
+Repeated imports and `hostwright export-stack hostwright.yaml --output json` produce deterministic conversion results. `hostwright plan-stack-update current.yaml desired.yaml --output json` reports changes without executing them. Fractional CPUs, missing capacity fields, and unsupported deployment fields return explicit errors before any lifecycle action.
+
+`import-stack` itself never performs step 6.

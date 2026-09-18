@@ -56,6 +56,23 @@ const navLinks = [
   </div>
 </header>
 
+<script>
+  function bindNavigation() {
+    document.querySelectorAll<HTMLDetailsElement>(".nav-mobile").forEach((menu) => {
+      if (menu.dataset.keyboardBound) return;
+      menu.dataset.keyboardBound = "true";
+      menu.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || !menu.open) return;
+        menu.open = false;
+        menu.querySelector<HTMLElement>("summary")?.focus();
+        event.preventDefault();
+      });
+    });
+  }
+  bindNavigation();
+  document.addEventListener("astro:page-load", bindNavigation);
+</script>
+
 <style>
   .site-header {
     position: sticky;

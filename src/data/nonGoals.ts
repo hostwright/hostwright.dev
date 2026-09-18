@@ -11,8 +11,8 @@ export const nonGoals: NonGoal[] = [
     detail: "Hostwright uses supported public APIs and versioned helpers, never unstable undocumented interfaces.",
   },
   {
-    title: "No unsafe quorum writes",
-    detail: "A cluster without quorum remains useful for reads and recovery but stops mutation.",
+    title: "Single-Mac release",
+    detail: "Multi-Mac authority is deferred. This release makes no cluster availability or quorum claim.",
   },
   {
     title: "No silent telemetry",
@@ -31,11 +31,11 @@ export const nonGoals: NonGoal[] = [
 // External constraints receive product fallbacks instead of becoming excuses.
 export const underResearch: NonGoal[] = [
   {
-    title: "Homebrew-core fallback",
-    detail: "Core acceptance is external; a maintained Hostwright vendor tap is the guaranteed Phase 02 path.",
+    title: "Vendor tap installation",
+    detail: "The maintained vendor tap supplies unsupported qualification packages. Homebrew-core submission is deferred from v0.0.2.",
   },
   {
-    title: "Accelerator fallback",
-    detail: "Until Apple exposes public guest passthrough, Phase 10 delivers signed host-native Metal, Core ML, and MLX.",
+    title: "Accelerators deferred",
+    detail: "Guest passthrough and host-native Metal, Core ML, and MLX services are excluded from the accepted v0.0.2 scope.",
   },
 ];

@@ -3,77 +3,75 @@ title: Plan a single service
 description: "Validate and plan the single-service example manifest. Planning is non-mutating; apply is a separate, gated, state-writing step."
 ---
 
-import { Aside } from "@astrojs/starlight/components";
-
-**Validate and plan are read-only.** The optional apply at the end is
-**mutating** and requires its own explicit gates.
-
-## The example manifest
-
-`examples/single-service/hostwright.yaml` in the core repository:
+Validation and manifest planning are read-only. Confirmed lifecycle execution
+changes the selected runtime and persists durable intent and ownership.
+Save this canonical example to a new `hostwright.yaml`; check project and port conflicts first.
 
 ```yaml
-version: 2
-project: single-service
+version: 3
+project: phase04-single
+imagePolicy: require-digest
 
 services:
   web:
-    image: docker.io/library/nginx:1.27
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    resources:
+      requests: {cpus: 1, memory: 512MiB}
+      limits: {cpus: 1, memory: 512MiB}
+    command: ["python3", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
     ports:
-      - "8080:80"
-    health:
-      command: ["curl", "-f", "http://localhost:8080/"]
-      interval: 30s
+      - "18080:8080"
+    probes:
+      startup:
+        exec: ["python3", "-c", "raise SystemExit(0)"]
+      readiness:
+        tcp:
+          port: 8080
+      liveness:
+        http:
+          port: 8080
+          path: /
     restart:
-      policy: on-failure
+      policy: unless-stopped
+    update:
+      strategy: recreate
+      maxSurge: 0
+      maxUnavailable: 1
+      progressDeadline: 60s
 ```
 
-## 1. Validate
+## Review and execute
 
 ```bash
-hostwright validate examples/single-service/hostwright.yaml
+hostwright validate hostwright.yaml
+hostwright plan hostwright.yaml --output json
+hostwright runtime providers --json
+hostwright up hostwright.yaml --dry-run --runtime-provider apple-cli --output json
 ```
 
-Validation checks the restricted manifest shape only. It does not contact
-registries, does not contact Apple container, and does not check whether the
-image exists anywhere.
+`validate` and `plan` do not change the runtime. `plan` is a manifest-level plan;
+the lifecycle confirmation hash comes from the observed-runtime `up --dry-run`.
+Review its exact image, resource requests/limits, ownership, provider, and actions.
 
-## 2. Plan
+Confirmed execution requires the signed payload and an authenticated local daemon
+identity. Follow the [installation guide](/getting-started/install-from-source/) and
+[daemon reference](/operations/daemon/). An absent or stale authority fails closed.
 
 ```bash
-hostwright plan examples/single-service/hostwright.yaml --output json
+hostwright up hostwright.yaml --confirm-plan <planSHA256> --runtime-provider apple-cli
+hostwright status hostwright.yaml --runtime-provider apple-cli --output json
 ```
 
-The output contains a deterministic `planHash`, typed `issues`, typed
-`actions`, and `observationConnected: false`. By default `plan` works from the manifest
-alone and reports declared state only. Running it twice on the same manifest produces the same hash.
-
-## 3. Apply: separate, explicit, gated
-
-<Aside type="caution" title="Mutating step">
-Apply is a separate command with its own requirements: an explicit state database path, a matching plan hash recomputed
-against a **live** runtime observation, and a locally present image.
-</Aside>
+Use the exact hash from the fresh dry run, with the same manifest, provider, and
+selected state path. If anything changes, review another dry run. Stopping and
+removing resources each require their own fresh dry-run hash:
 
 ```bash
-hostwright apply examples/single-service/hostwright.yaml \
-  --state-db /tmp/hostwright.sqlite \
-  --confirm-plan <hash-from-the-observed-plan>
+hostwright down hostwright.yaml --dry-run --runtime-provider apple-cli
+hostwright down hostwright.yaml --confirm-plan <down-planSHA256> --runtime-provider apple-cli
+hostwright rm hostwright.yaml --dry-run --runtime-provider apple-cli
+hostwright rm hostwright.yaml --confirm-plan <rm-planSHA256> --runtime-provider apple-cli
 ```
 
-Apply validates the manifest, observes Apple container, recomputes the plan,
-and refuses if your hash does not match the observed plan. It persists desired
-state, observed state, operation intent, and an apply-start event **before**
-mutation, then executes exactly one action, here creating the missing `web`
-service with its port published to `127.0.0.1:8080`. Success or failure lands
-in the event ledger.
-
-If the local image is missing, apply refuses before mutation; pulling the
-image stays with you. Fetch it first (for example `container image pull
-docker.io/library/nginx:1.27`) and re-plan.
-
-## Next
-
-- [Review an app suite](/tasks/app-suite-review/): the same flow with multiple services.
-- [Safety model](/concepts/safety-model/): every refusal condition of the apply gate.
-- [Limitations](/reference/limitations/): what apply cannot do (multi-action, rollback, image replacement).
+Only proven Hostwright-owned resources are eligible for removal. Preserve unmanaged
+workloads and inspect [recovery](/reference/cli/) after interruption.
