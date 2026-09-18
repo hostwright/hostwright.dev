@@ -10,6 +10,7 @@
     "build": "node scripts/render-og.mjs && astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "check:links": "node scripts/check-links.mjs dist https://hostwright.dev",
     "og": "node scripts/render-og.mjs"
   },
   "dependencies": {

@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Documentation site for Hostwright — hostwright.dev/docs",
+    "description": "Documentation site for Hostwright — docs.hostwright.dev",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "check:links": "node ../scripts/check-links.mjs dist https://docs.hostwright.dev"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.3",

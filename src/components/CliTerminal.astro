@@ -1,33 +1,24 @@
 ---
-// Animated terminal: a non-mutating `hostwright plan` run. Output reveals line
-// by line when the terminal scrolls into view. Progressive enhancement — with
-// no JS the full transcript is shown; reduced-motion freezes it fully visible.
-// The transcript is honest: plan computes a diff but applies nothing.
 ---
 
-<div class="term-live" aria-label="Example output of hostwright plan">
+<div class="term-live" aria-label="Confirmed local lifecycle commands">
   <div class="tl-bar">
     <span class="tl-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="tl-title">hostwright plan</span>
-    <span class="tl-tag">non-mutating</span>
+    <span class="tl-title">hostwright lifecycle</span>
+    <span class="tl-tag">confirm each change</span>
   </div>
 
   <pre class="tl-body"><code>{
     [
-      { c: "cmd",   t: "$ hostwright plan" },
-      { c: "muted", t: "∙ reading hostwright.yaml" },
-      { c: "muted", t: "∙ validating manifest … ok" },
-      { c: "muted", t: "∙ computing plan (non-mutating)" },
-      { c: "blank", t: " " },
-      { c: "head",  t: "  project: api-local" },
-      { c: "blank", t: " " },
-      { c: "add",   t: "  + create   service/api      ghcr.io/example/api:latest" },
-      { c: "add",   t: "  + create   service/redis    redis:7" },
-      { c: "chg",   t: "  ~ map      ports            8080→8080, 6379→6379" },
-      { c: "blank", t: " " },
-      { c: "muted", t: "  plan: 2 to create, 1 to configure, 0 to destroy" },
-      { c: "blank", t: " " },
-      { c: "ok",    t: "✓ no changes applied. review, then apply" },
+      { c: "muted", t: "# Signed, authenticated local daemon required" },
+      { c: "cmd", t: "$ hostwright validate hostwright.yaml" },
+      { c: "cmd", t: "$ hostwright up hostwright.yaml --dry-run" },
+      { c: "muted", t: "# Review images, resources, ownership and actions" },
+      { c: "muted", t: "# Copy the reviewed planSHA256" },
+      { c: "cmd", t: "$ hostwright up hostwright.yaml \\" },
+      { c: "cmd", t: "    --confirm-plan <planSHA256>" },
+      { c: "cmd", t: "$ hostwright status hostwright.yaml" },
+      { c: "muted", t: "# Every later change needs a fresh reviewed hash" },
     ].map((l, i) => (
       <span class:list={["ln", l.c]} style={`--i:${i}`}>{l.t}<span class="cur" aria-hidden="true"></span></span>
     ))

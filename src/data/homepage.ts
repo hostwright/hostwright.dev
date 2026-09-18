@@ -7,7 +7,7 @@ export const hero = {
   ctaPrimary: { label: "Read the docs", href: "https://docs.hostwright.dev/" },
   ctaSecondary: {
     label: "View on GitHub",
-    href: "https://github.com/hostwright",
+    href: "https://github.com/hostwright/hostwright",
   },
 };
 
@@ -17,7 +17,7 @@ export const problem = {
   body: [
     "Apple container gives the Mac a native container runtime: lightweight Linux VMs, an OCI image flow, and a command surface built for Apple silicon.",
     "Running a multi-service stack requires more than starting containers: declared state, validation, health checks, restart policy, drift detection between declared and observed state, and ownership-checked cleanup.",
-    "Hostwright is that layer. It targets a single Mac first; the same identity, fencing, recovery, and policy model is designed to extend across Macs.",
+    "Hostwright is that layer. The accepted v0.0.2 scope is one Mac; multi-Mac orchestration is deferred.",
   ],
 };
 
@@ -33,7 +33,7 @@ export const whatItIs = {
     {
       title: "Declares services in hostwright.yaml",
       detail:
-        "An explicit Manifest v2 subset describes local desired state; legacy v1/versionless input has a deterministic migration preview.",
+        "Manifest v3 describes local desired state with explicit CPU and memory requests and limits; legacy v1/v2 input has a deterministic migration preview.",
     },
     {
       title: "Plans changes before mutation",
@@ -48,7 +48,7 @@ export const whatItIs = {
     {
       title: "Tracks local state",
       detail:
-        "SQLite schema v7 records desired/observed state, events, operations, ownership UUIDs, provider binding, fencing, and recovery.",
+        "SQLite schema v24 records desired/observed state, events, operations, ownership UUIDs, provider binding, fencing, and recovery.",
     },
     {
       title: "Detects drift",
@@ -68,41 +68,36 @@ export const whatItIs = {
   ] satisfies Capability[],
 };
 
-// Exact command surface from the brief. The CLI is in design; these are the
+// Exact command surface from the brief. These are the current
 // intended shapes, split into a core set and a clearly-planned set.
 export const cliCore = `hostwright init
 hostwright capabilities --json
 hostwright migrate preview hostwright.yaml
 hostwright validate
 hostwright plan
-hostwright status --state-db /tmp/hostwright.sqlite
+hostwright paths --json
+hostwright status hostwright.yaml --output json
 hostwright doctor`;
 
-export const cliPlanned = `hostwright up
-hostwright down --dry-run
-hostwright cluster status`;
+export const cliLifecycle = `hostwright up hostwright.yaml --dry-run
+hostwright up hostwright.yaml --confirm-plan <planSHA256>
+hostwright down hostwright.yaml --dry-run`;
 
-// Manifest example — kept verbatim. Document only the fields shown here.
-export const manifestExample = `version: 2
+export const manifestExample = `version: 3
 project: api-local
-
 services:
-  api:
-    image: ghcr.io/example/api:latest
+  web:
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    resources:
+      requests:
+        cpus: 1
+        memory: 512MiB
+      limits:
+        cpus: 1
+        memory: 512MiB
+    command: ["python3", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
     ports:
-      - "8080:8080"
-    env:
-      APP_ENV: development
-    health:
-      command: ["curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
-    restart:
-      policy: on-failure
-
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"`;
+      - "18080:8080"`;
 
 export const safety = {
   heading: "Safety model",
