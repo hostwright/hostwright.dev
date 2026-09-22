@@ -1,98 +1,46 @@
 ---
 title: Security and safety
-description: "The operational security posture: mutation boundaries, redaction, image trust, network exposure, and untrusted input."
+description: The local mutation, ownership, privacy, and disclosure boundaries in Hostwright's development release.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright is in active development and not production ready. This page is the
-operational counterpart to the [safety model](/concepts/safety-model/): what
-the boundaries mean when you run the tool.
+Hostwright `0.0.2-dev` is not production-ready. The v0.0.2 release still
+requires current-source runtime, security, and signed-artifact qualification.
+Read the core [security policy](https://github.com/hostwright/hostwright/blob/main/SECURITY.md)
+and [security safety reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/security-safety.md)
+for the current source-of-truth details.
 
-## Mutation boundaries
+## Runtime changes
 
-Supported mutation is intentionally narrow: one plan-hash-confirmed
-create-missing-service, one restart-policy-allowed managed start, one managed
-restart of an exact Hostwright-owned running/unhealthy service, exact
-token-confirmed cleanup deletes, and the explicitly confirmed benchmark path.
-Broader lifecycle operations are outside the current surface. See
-[Limitations](/reference/limitations/).
+Runtime lifecycle commands require a current dry-run plan and exact
+confirmation. The authenticated local daemon revalidates the selected
+manifest, provider capability, ownership, and request authority before effects.
+Cleanup uses a separate confirmation and only removes exact eligible
+Hostwright-owned resources. Ambiguous ownership or state fails closed.
 
-Restart policy state can block the managed start/restart paths through
-backoff, operator hold, `restart.policy: no`, and crash-loop protection.
-Operation recovery records are audit and guidance only; inverse operations
-always require a new confirmed plan.
+## Data and diagnostics
 
-New runtime resources use collision-resistant v2 identifiers and exact
-ownership labels. Ownership is **never inferred** from a Hostwright-looking
-name.
+State and diagnostics remain local. Support bundles show a preview and require
+confirmation; they include bounded, redacted information and can be encrypted
+before writing. Hostwright does not upload bundles or run a hosted telemetry
+service. Review every bundle before sharing because local identifiers and
+configuration context can remain sensitive.
 
-## Cleanup safety
+Do not put plaintext credentials in manifests, logs, fixtures, screenshots,
+or public issue reports. Use supported typed secret references and inspect
+commands, image references, ports, mounts, and environment before confirming
+an untrusted manifest.
 
-Destructive cleanup requires all of: explicit `--state-db`, a dry run first, a
-matching token, a Hostwright ownership record, live observation, an exact
-owned identifier, matching project/service, and a created/stopped/exited
-lifecycle. Images, volumes, networks, Apple builder resources, base images,
-and unmanaged containers remain untouched.
+## Reporting a security issue
 
-## Secrets and redaction
+Do not publish secrets, credentials, private hostnames or paths, diagnostic
+bundles, live-resource identifiers, or exploit details in a public issue. The
+project has not published a dedicated private security contact. If a report
+contains sensitive details, request a private maintainer contact before
+sharing them.
 
-Execution values are kept separate from display and persistence values:
-runtime command construction receives the manifest value, while output, logs,
-state payloads, events, plans, and failure messages are redacted.
-
-- Plaintext credential-like keys in `env` are rejected: use
-  [`secretEnv` with `keychain://` references](/concepts/secrets-and-keychain/).
-- Keychain reference labels are themselves redacted, because service/account
-  names reveal local context.
-- The live macOS Keychain is not used by default; the opt-in backend is
-  read-only, interaction-disabled, and excludes synchronizable items.
-
-<Aside type="caution" title="Redaction is heuristic">
-Do not place plaintext credentials in manifests, logs, examples, fixtures, or
-issue reports. Diagnostic bundles are local-only and redacted, but can still
-contain project names, paths, hostnames, and identifiers. Review before
-sharing.
+<Aside type="caution" title="No production support channel">
+Hostwright currently has no production support SLA, hosted diagnostics,
+telemetry upload, or cloud control plane.
 </Aside>
-
-## Untrusted manifest input
-
-Treat third-party `hostwright.yaml` files as untrusted. The restricted parser
-rejects unsupported YAML, orchestrator fields, unsafe mount sources, and
-unsafe env keys. Trust decisions stay with you after `validate` and `plan`
-pass: inspect image names, port publishes, environment values, volume paths,
-and health probe commands before any confirmed apply or daemon run.
-
-## Image trust
-
-`imagePolicy: require-digest` is **local string validation only**. It gives
-Hostwright a stable content identifier to require; it does not contact
-registries, resolve tags, pull images, verify signatures, inspect SBOMs, scan
-vulnerabilities, or prove provenance. Deciding which registries, publishers,
-and digests to trust remains your call.
-
-## Network exposure
-
-Ports use `"host:container"` with no bind-address field. Hostwright-created
-publishes bind to `127.0.0.1` explicitly. Broad bind addresses (`0.0.0.0`,
-`::`) are blocked in desired state, and observed non-target services on the
-same host port block mutation planning.
-
-## Team, extension, and control-surface boundaries
-
-- [Team workflow](/operations/team-workflow/) is explicit local profile and
-  approval data only; profiles can only make requirements stricter.
-- Extensions are declaration-only: Hostwright evaluates typed declarations but
-  does not load, install, distribute, or execute plugins.
-- Future GUIs must go through Hostwright command contracts preserving the same
-  gates; nothing may call Apple container, SQLite, or the RuntimeAdapter
-  directly.
-
-## Security-sensitive scope
-
-Several security-sensitive capabilities are outside the current surface,
-including trusted distribution (signing, notarization, SBOM, provenance), a
-launch agent with unattended operation, DNS and tunnel management, and plugin
-execution. [Limitations](/reference/limitations/) lists the complete boundary.
-
-Report security issues per `SECURITY.md` in the core repository.

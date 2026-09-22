@@ -1,9 +1,9 @@
-// Homepage copy reflects currently implemented capabilities.
+// Homepage copy describes the current, not yet GA-qualified release candidate.
 
 export const hero = {
   title: "Desired-state container control for Apple silicon Macs.",
   subtitle:
-    "Declare services in one manifest. Hostwright validates it, computes a deterministic plan, records state in a local SQLite ledger, and changes the Apple container runtime only through confirmation-gated operations.",
+    "Declare local workloads in Manifest v3. Hostwright validates them, plans changes, records state in SQLite, and executes confirmed lifecycle actions through authenticated local control.",
   ctaPrimary: { label: "Read the docs", href: "https://docs.hostwright.dev/" },
   ctaSecondary: {
     label: "View on GitHub",
@@ -16,8 +16,8 @@ export const problem = {
     "Apple container is a runtime. Local stacks still need a control plane.",
   body: [
     "Apple container gives the Mac a native container runtime: lightweight Linux VMs, an OCI image flow, and a command surface built for Apple silicon.",
-    "Running a multi-service stack requires more than starting containers: declared state, validation, health checks, restart policy, drift detection between declared and observed state, and ownership-checked cleanup.",
-    "Hostwright is that layer. It targets a single Mac first; the same identity, fencing, recovery, and policy model is designed to extend across Macs.",
+    "A local stack needs more than a runtime command: declared state, capacity checks, health and restart policy, drift handling, and ownership-checked cleanup.",
+    "Hostwright provides that local control plane on one Apple silicon Mac. Multi-Mac operation is outside the v0.0.2 release scope.",
   ],
 };
 
@@ -33,7 +33,7 @@ export const whatItIs = {
     {
       title: "Declares services in hostwright.yaml",
       detail:
-        "An explicit Manifest v2 subset describes local desired state; legacy v1/versionless input has a deterministic migration preview.",
+        "Strict Manifest v3 describes local desired state and requires explicit CPU and memory requests and limits.",
     },
     {
       title: "Plans changes before mutation",
@@ -41,19 +41,29 @@ export const whatItIs = {
         "Plans are deterministic and reviewable; live mutation remains bound to exact confirmation, identity, provider, and state gates.",
     },
     {
-      title: "Routes operations through a RuntimeAdapter",
+      title: "Uses authenticated local control",
       detail:
-        "Apple container observation and narrow lifecycle calls cross one typed boundary; no other code path reaches the runtime.",
+        "Control API 2.2 binds confirmed lifecycle actions to the selected manifest, local daemon authority, and provider boundary.",
     },
     {
       title: "Tracks local state",
       detail:
-        "SQLite schema v7 records desired/observed state, events, operations, ownership UUIDs, provider binding, fencing, and recovery.",
+        "SQLite schema v24 records desired and observed state, reservations, ownership, operations, audit, and recovery evidence.",
     },
     {
       title: "Detects drift",
       detail:
         "Typed deterministic drift and plan actions compare declared and observed state without guessing unsupported runtime shapes.",
+    },
+    {
+      title: "Imports a narrow Compose subset",
+      detail:
+        "The importer converts supported fields for review and rejects unsupported fields. It is not Docker Compose compatibility.",
+    },
+    {
+      title: "Provides a native desktop console",
+      detail:
+        "The app supports authenticated local up, down, and restart with confirmation; signed-app and accessibility qualification remains in progress.",
     },
     {
       title: "Runs doctor checks",
@@ -63,50 +73,45 @@ export const whatItIs = {
     {
       title: "Treats destruction as explicit",
       detail:
-        "Cleanup is dry-run first and token-confirmed, limited to exact owned eligible containers. Broad garbage collection is not implemented.",
+        "Cleanup is dry-run first and token-confirmed, limited to exact Hostwright-owned resources proven eligible by current state.",
     },
   ] satisfies Capability[],
 };
 
-// Exact command surface from the brief. The CLI is in design; these are the
-// intended shapes, split into a core set and a clearly-planned set.
 export const cliCore = `hostwright init
-hostwright capabilities --json
-hostwright migrate preview hostwright.yaml
-hostwright validate
-hostwright plan
-hostwright status --state-db /tmp/hostwright.sqlite
-hostwright doctor`;
+hostwright runtime providers --json
+hostwright validate hostwright.yaml
+hostwright up hostwright.yaml --dry-run
+hostwright status hostwright.yaml
+hostwright doctor --output json`;
 
-export const cliPlanned = `hostwright up
-hostwright down --dry-run
-hostwright cluster status`;
+export const cliLocalOps = `hostwright import-stack compose.yaml
+hostwright up hostwright.yaml --dry-run
+hostwright status hostwright.yaml`;
 
-// Manifest example — kept verbatim. Document only the fields shown here.
-export const manifestExample = `version: 2
-project: api-local
+export const manifestExample = `version: 3
+project: quickstart
+imagePolicy: require-digest
 
 services:
-  api:
-    image: ghcr.io/example/api:latest
+  web:
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    resources:
+      requests:
+        cpus: 1
+        memory: 512MiB
+      limits:
+        cpus: 1
+        memory: 512MiB
+    command: ["python3", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
     ports:
-      - "8080:8080"
-    env:
-      APP_ENV: development
-    health:
-      command: ["curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
+      - "18080:8080"
     restart:
-      policy: on-failure
-
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"`;
+      policy: unless-stopped`;
 
 export const safety = {
   heading: "Safety model",
-  intro: "Defaults are conservative and mutation is always explicit.",
+  intro: "The development release keeps mutation explicit and ownership-scoped.",
   principles: [
     {
       title: "Plan before mutation",

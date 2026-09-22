@@ -11,8 +11,8 @@ description: Every safe local check hostwright doctor performs, and the hard bou
 - Apple silicon architecture and macOS 26+ compatibility gate.
 - Swift toolchain version, through a controlled `swift --version` process.
 - Apple container CLI presence: **executable lookup only**.
-- `hostwright.yaml` presence in the current directory.
-- Explicit state database path policy.
+- selected manifest presence and validity when supplied.
+- Local state database availability and schema status.
 - Local-only telemetry policy.
 - Resource intelligence: local host facts (architecture, macOS major version,
   physical memory, processor count, current thermal state) with explicit

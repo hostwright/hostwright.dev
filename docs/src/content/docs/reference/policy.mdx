@@ -1,49 +1,28 @@
 ---
 title: Policy reference
-description: The decision shape, current defaults, team policy boundary, and everything policy evaluation refuses to do.
+description: Local policy decisions and the fail-closed boundaries shared by planning, admission, and lifecycle execution.
 ---
 
-Hostwright policy is local and deterministic. It explains why a planned input
-is allowed, warned, or blocked before any supported mutation path can run. The
-conceptual overview is in [Policy engine](/concepts/policy-engine/).
+Hostwright evaluates policy before runtime effects. Decisions identify a
+category, stable reason code, severity, operator explanation, and remediation.
+The current policy surface covers Manifest v3 validation, resource admission,
+provider capability, ownership, image and secret rules, exposure, cleanup, and
+recovery.
 
-## Decision shape
+## Core rules
 
-Every policy decision includes:
+- Unsupported manifest fields and provider behaviors fail before effects.
+- Capacity requests and limits are validated and reserved through local
+  scheduler authority.
+- Broad host exposure and unsafe mount or secret handling are blocked.
+- Cleanup requires a current plan and exact proof of Hostwright ownership.
+- Team profiles can add stricter requirements. They cannot bypass built-in
+  safety gates or grant broader mutation authority.
 
-- `category`: the policy area, such as `port`, `mount`, `image`, `secret`, `cleanup`, or `accelerator`;
-- `reasonCode`: a stable machine-readable reason;
-- `severity`: `allow`, `warning`, or `blocker`;
-- `message`: human-readable explanation;
-- `remediation`: operator guidance;
-- `stableDetailKey`: deterministic ordering and comparison detail.
+Policy decisions explain and constrain behavior; they do not themselves run a
+runtime command, write state, or contact a registry. Commands enforce their
+own authenticated effect and recovery boundaries.
 
-## Current defaults
-
-- Host publishes remain localhost-first; broad bind addresses are blocked.
-- Duplicate desired host ports and observed non-target host-port conflicts are blocked.
-- Privileged host ports produce warnings in planning and are rejected by the create path before mutation.
-- Host-root and parent-traversal mount sources are blocked.
-- Secret-like environment values are redacted from plans; unresolved secret references block mutation.
-- Cleanup deletes only exact Hostwright-owned non-running eligible containers after dry-run token confirmation.
-- Unsupported manifest fields, secure exposure, broad lifecycle actions, and accelerator requests fail closed.
-- Stack-file import maps unsupported fields to stable policy reason codes.
-- Advisory scheduling consumes policy decisions for explanations and scores without changing the gates.
-- Extension declarations are evaluated as local data: built-in or reviewed-local non-mutating declarations can be allowed only when every required boundary (RuntimeAdapter, state, policy, redaction, audit, explicit paths, ownership, confirmation, no runtime mutation) is declared. Third-party, untrusted, runtime-mutation, state-write, networking, tunnel, secret-resolution, and accelerator declarations fail closed.
-- Team policy profiles are explicit local opt-in, versioned, and auditable. Operational profiles can only add **stricter** digest or manifest-review requirements. Approval records authorize one exact bound mutation; they never weaken required gates.
-
-## Evaluation boundary
-
-Policy evaluation is a pure, in-memory function. It reads the plan and profile
-data passed to it and returns typed decisions. Every side effect (runtime
-commands, SQLite reads and writes, registry calls, telemetry, plugin
-execution) belongs to the commands that consume those decisions, each behind
-its own gate.
-
-## Team policy boundary
-
-Team profiles apply when an operator supplies a path with `--team-profile`.
-Profiles can only make requirements stricter, and approval records authorize
-one exact bound mutation while the hard-coded safety gates continue to apply.
-The operational flow, JSON schemas, and audit records are documented in
-[Team workflow](/operations/team-workflow/).
+For exact rules and reason codes, see the core
+[policy reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/policy.md)
+and [Limitations](/reference/limitations/).

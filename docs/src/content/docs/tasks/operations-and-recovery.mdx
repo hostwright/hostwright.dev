@@ -1,100 +1,41 @@
 ---
 title: Operations and recovery
-description: "Status, logs, events, recovery, diagnostics, and cleanup: every stateful command with explicit paths, redaction, and confirmation gates."
+description: Inspect local workload state, events, and interrupted operations with Hostwright's current CLI.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Use the current command help and
+[CLI reference](/reference/cli/) for the exact build-specific options.
+State-backed commands use Hostwright's secure Application Support database by
+default. `--state-db <path>` or `HOSTWRIGHT_STATE_DB` selects a different
+database.
 
-This task covers day-two operations. Labels per step: `status` and `logs` are
-**state-writing observations**; `events`, `recovery`, and `diagnostics` are
-**read-only**; `cleanup --confirm-cleanup` is **mutating**.
-
-Every command here takes an explicit `--state-db <path>`. Hostwright never
-discovers a database implicitly; see [State store](/concepts/state-store/).
-
-## Status: observe and record
+## Inspect
 
 ```bash
-hostwright status --state-db /tmp/hostwright.sqlite
+hostwright status hostwright.yaml
+hostwright logs web
+hostwright events --output json
+hostwright recovery --output json
+hostwright doctor --output json
 ```
 
-Observes Apple container through the RuntimeAdapter, persists a status event
-and observed snapshot, and renders desired services against observed
-lifecycle, health, and port facts. It never mutates.
+Status and logs may record observations. Events and recovery inspect retained
+local evidence. Output is bounded and redacted; it is not an upload.
 
-## Logs: bounded and redacted
+## Recover safely
 
-```bash
-hostwright logs web --state-db /tmp/hostwright.sqlite --tail 200
-```
+If a command reports interrupted or ambiguous state, preserve the database and
+owned resources. Read the recovery report and follow the command's specific
+recovery path. Do not delete state files, retry with a stale plan, or clean up
+resources based on names.
 
-Reads the last log lines for an observed Hostwright-managed service. Default
-tail is 100 lines, clamped at 1000. Output is redacted before display. There
-is no `--follow`, attach, or exec.
+## Support bundles
 
-## Events: the ledger, filtered
+Use `hostwright diagnostics support preview` to inspect the sections and size
+before creating a bundle. Creation requires the current preview hash and an
+explicit output path. Review the resulting local file before sharing it.
+Hostwright does not upload support bundles automatically.
 
-```bash
-hostwright events --state-db /tmp/hostwright.sqlite \
-  --severity error --type cleanup.failed --limit 20 --sort desc
-```
-
-Reads the persisted event ledger in deterministic order, with `--project`,
-`--type`, `--service`, `--severity`, `--limit`, and `--sort` filters. `events`
-reads an **already-migrated** database; it fails rather than creating or
-migrating one as a side effect.
-
-## Recovery: diagnose interrupted operations
-
-```bash
-hostwright recovery --state-db /tmp/hostwright.sqlite
-```
-
-Reads operation recovery groups and steps and reports whether each apply
-completed, failed, or was interrupted, including redacted lock owners and
-lease expiry for active groups. Recovery output distinguishes: no recovery
-required, manual inspection required, and rollback unsupported (no safe
-inverse operation is proven).
-
-<Aside type="note" title="Diagnostic output">
-`recovery` does not observe Apple container, retry mutations, stop or start
-anything, or roll back changes. An interrupted operation's plan can be reused
-only when its checkpoint proves runtime execution never began; anything
-ambiguous stays blocked for manual inspection.
-</Aside>
-
-## Diagnostics: a local, redacted bundle
-
-```bash
-hostwright diagnostics --state-db /tmp/hostwright.sqlite \
-  --bundle /tmp/hostwright-diagnostics.json --project app-suite
-```
-
-Writes a redacted JSON bundle: telemetry policy (local-only, no upload),
-schema metadata, and redacted events, operations, health results, restart
-state, ownership records, and snapshots. It refuses to overwrite an existing
-bundle file and never uploads anything. The bundle can still contain local
-context (project names, paths, hostnames). Review before sharing.
-
-## Cleanup: dry-run, then exact token
-
-```bash
-# 1. Classify candidates and get the exact confirmation token.
-hostwright cleanup --state-db /tmp/hostwright.sqlite --dry-run
-
-# 2. Delete only what the token covers.
-hostwright cleanup --state-db /tmp/hostwright.sqlite --confirm-cleanup <token>
-```
-
-The dry run classifies every candidate: `eligible`, `ambiguous`, `stale`,
-`running` (never deleted), `unknown`, `blocked`, `never-delete`. Confirmed
-cleanup deletes **only `eligible`** containers: exact Hostwright-owned
-created/stopped/exited containers covered by the current token. It never
-deletes images, volumes, networks, or unmanaged containers, and never uses
-`--all` or `--force`. A partial failure exits with code 72 and preserves the
-successful deletions in the report.
-
-## Next
-
-- [Events and diagnostics](/operations/events-and-diagnostics/): the same surfaces in reference depth.
-- [Error and exit codes](/reference/error-codes/): what each failure means.
+Read [Security and safety](/operations/security-and-safety/) and the
+[core operations guide](https://github.com/hostwright/hostwright/blob/main/docs/reference/installed-lifecycle.md)
+before install or recovery mutations.

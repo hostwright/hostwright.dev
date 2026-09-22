@@ -1,56 +1,60 @@
 ---
 title: What Hostwright is
-description: Hostwright is a Mac-native desired-state container platform for Apple silicon. Start here.
+description: Hostwright is a local control plane for Apple container workloads on one Apple silicon Mac.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright is a **Mac-native desired-state container platform** for [Apple container](/concepts/apple-container-boundary/) workloads.
+Hostwright manages local Apple container workloads through a command-line
+interface and a native macOS app. It validates strict Manifest v3 YAML,
+plans lifecycle changes, and records state in SQLite schema v24. Confirmed
+runtime actions use the authenticated Control API 2.2 daemon and a declared
+runtime provider.
 
-You declare services in a versioned [`hostwright.yaml`](/reference/manifest/) manifest. Hostwright validates intent, computes a deterministic plan, persists exact desired/observed/operation identity, and crosses a typed runtime-provider boundary for every runtime action.
-
-<Aside type="caution" title="In active development">
-Hostwright is in active development and not production ready. `brew install
-hostwright` does not exist today. Build from source and read
-[Limitations](/reference/limitations/) before relying on behavior.
+<Aside type="caution" title="Development release">
+Hostwright `0.0.2-dev` is not GA-qualified or production-ready. The vendor tap
+offers an unsupported qualification build; `brew install hostwright` is not
+available. Read [Compatibility](/reference/compatibility/) and
+[Limitations](/reference/limitations/) before use.
 </Aside>
 
-## What works today
+## Current implementation
 
-- `hostwright --version` and `hostwright capabilities --json` report the build version and the exact capability set.
-- `hostwright init`, `validate`, and `plan` provide explicit Manifest v2, restricted fail-closed parsing, and deterministic planning.
-- `hostwright migrate preview` produces a deterministic non-writing preview for legacy v1/versionless manifests.
-- `status`, bounded `logs`, `events`, `recovery`, and local redacted `diagnostics` use explicit state paths.
-- Confirmation-gated `apply` supports only the currently declared narrow create/start/restart surface.
-- `cleanup` classifies first and deletes only exact cleanup-eligible Hostwright-owned non-running containers after token confirmation.
-- `hostwrightd --foreground` observes, plans, checks bounded loopback health, and records events. It runs in the foreground and performs no unattended mutation.
-- SQLite schema v7 establishes UUID identity, provider binding, fencing, saga intent, compensation, and verification records.
-- Secret references, local policy/team profiles, a one-shot Control API v2 process, advisory scheduler models, and unsigned developer distribution evidence exist within their documented narrow boundaries.
+- Manifest v3 requires explicit CPU and memory requests and limits. Legacy
+  manifests can be reviewed through a deterministic migration preview.
+- Scheduler admission and local lifecycle actions use durable reservations,
+  exact plan confirmation, and fail-closed authority checks.
+- The narrow Compose importer converts supported input for review. Unsupported
+  fields are rejected; Docker API and full Compose compatibility are outside
+  the release scope.
+- The native app supports authenticated local up, down, and restart with
+  confirmation. Signed-app, VoiceOver, and package qualification remains
+  pending.
+- The local daemon, state recovery, support bundles, and installed distribution
+  lifecycle have development implementations. Release qualification is still
+  in progress.
 
-Capabilities outside this set are documented in [Limitations](/reference/limitations/).
+Implementation does not mean release qualification. Current-source physical
+runtime, desktop, VM, security, and signed-artifact evidence is still required
+before `v0.0.2` can be called GA.
 
-## Locked contracts
+## Contract versions
 
 | Contract | Version |
 | --- | ---: |
-| Manifest | 2 |
-| Control API | 2 |
+| Manifest | 3 |
+| Control API | 2.2 |
 | Runtime Provider API | 2 |
 | Plugin ABI | 1 |
-| State schema | 7 |
+| State schema | 24 |
 
-## How these docs are organized
+## Start here
 
-| Section | Answers |
-| --- | --- |
-| **Getting started** | Source setup and the runnable safe loop. |
-| **Concepts** | Desired state, providers, reconciliation, state, policy, safety, and secrets. |
-| **Tasks** | Walkthroughs labeled non-mutating, state-writing, or runtime-mutating. |
-| **Reference** | CLI, manifest, compatibility, limitations, error codes, and policy. |
-| **Operations** | Security, team workflow, the daemon, events, and diagnostics. |
-
-## Where to start
-
-- Read [Why Hostwright](/overview/why-hostwright/) and [Desired state](/concepts/desired-state/).
-- Read [Non-goals](/overview/non-goals/) and [Limitations](/reference/limitations/) for the scope and current support boundary.
-- Follow [Install from source](/getting-started/install-from-source/) and the [Quick start](/getting-started/quick-start/).
+- Read [Install from source](/getting-started/install-from-source/) for the
+  source build and qualification tap.
+- Follow the [Quick start](/getting-started/quick-start/) with a reviewed
+  manifest and explicit confirmation before runtime changes.
+- Use [Compatibility](/reference/compatibility/) and
+  [Limitations](/reference/limitations/) to check the current support boundary.
+- Read the [Security and safety](/operations/security-and-safety/) page before
+  running manifests from other people.

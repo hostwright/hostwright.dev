@@ -1,90 +1,27 @@
 ---
-title: Review an app suite
-description: "Validate and plan a multi-service manifest, and understand health, restart policy, and the one-action-per-apply rule."
+title: Review a local app suite
+description: Plan a multi-service Manifest v3 project and confirm only supported local behavior.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Hostwright describes a local application as one project with multiple services.
+Use Manifest v3, provide CPU and memory requests and limits for every service,
+and declare dependencies and probes only when they are supported by the
+selected runtime.
 
-**This task is read-only**: it validates and plans; it does not apply.
+## Review the project
 
-## The example manifest
+1. Validate the manifest with `hostwright validate <manifest>`.
+2. Inspect the full non-mutating plan with `hostwright plan <manifest>
+   --output json`.
+3. Check images, resource bounds, ports, volumes, commands, health behavior,
+   and provider constraints.
+4. Reject or remove unsupported Compose/orchestrator fields. Do not assume
+   Hostwright will translate unsupported behavior.
+5. If you choose to run the project, use the corresponding dry-run lifecycle
+   command and review the plan before confirming it.
 
-`examples/app-suite/hostwright.yaml` declares a web service and a worker:
-
-```yaml
-version: 2
-project: app-suite
-
-services:
-  web:
-    image: ghcr.io/example/web:latest
-    command: ["serve"]
-    ports:
-      - "8080:8080"
-    env:
-      APP_ENV: development
-      API_BASE_URL: http://localhost:8081
-    health:
-      command: ["curl", "-f", "http://localhost:8080/health"]
-      interval: 15s
-    restart:
-      policy: on-failure
-
-  worker:
-    image: ghcr.io/example/worker:latest
-    env:
-      QUEUE_NAME: default
-    restart:
-      policy: no
-```
-
-## 1. Validate and plan
-
-```bash
-hostwright validate examples/app-suite/hostwright.yaml
-hostwright plan examples/app-suite/hostwright.yaml --output json
-```
-
-The plan covers both services: typed issues from the
-[policy checks](/concepts/policy-engine/) (duplicate host ports, broad bind
-addresses, unsafe mounts, secret-like env values), drift records per service if
-observed state is available, and one deterministic hash for the whole plan.
-
-## 2. What health and restart declarations do
-
-- `health.command` is executed by the [daemon](/operations/daemon/) as an
-  in-process loopback probe for allowlisted command shapes. Results are
-  persisted and feed drift detection ("unhealthy where policy requires
-  health"). Container-exec health checks are not implemented.
-- `restart.policy` gates the *managed start* and *managed restart* actions.
-  `policy: no` (as on `worker`) is a manual hold: Hostwright will never mark a
-  start or restart of that service executable. Restart state also tracks max
-  attempts, backoff, and crash-loop blocking.
-
-## 3. One action per apply
-
-<Aside type="caution" title="Not Compose parity">
-If both services are missing, the plan contains two create actions, and
-`apply` refuses, because more than one executable action exists. Converging a
-multi-service suite means multiple explicit plan-confirm-apply rounds, one
-action each. Hostwright has a narrow mutation gate; it is not a Compose-style
-up command.
-</Aside>
-
-Bring the suite up one gated step at a time:
-
-```bash
-hostwright plan examples/app-suite/hostwright.yaml --output json   # note the hash
-hostwright apply examples/app-suite/hostwright.yaml \
-  --state-db /tmp/hostwright.sqlite --confirm-plan <hash>          # one action
-hostwright plan examples/app-suite/hostwright.yaml --output json   # re-plan: new hash
-```
-
-Each apply changes observed reality, so each subsequent apply needs a freshly
-observed hash. A stale hash is refused with a confirmation-mismatch error
-(exit code 70).
-
-## Next
-
-- [Operations and recovery](/tasks/operations-and-recovery/): watching the suite after it runs.
-- [hostwright.yaml reference](/reference/manifest/): every supported field.
+The importer supports only a documented Compose subset. Conversion produces
+Manifest v3 text for review; it is not full Compose execution or Docker API
+compatibility. See [Import a stack file](/tasks/stack-import/),
+[Limitations](/reference/limitations/), and the
+[core app-suite example](https://github.com/hostwright/hostwright/tree/main/examples/app-suite).

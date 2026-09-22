@@ -56,11 +56,10 @@ The production URL is set in `astro.config.mjs` (`site: "https://hostwright.dev"
 and is used for canonical links and the social card URL. Update it if the domain
 changes.
 
-## Before publishing
+## Product truth
 
-The project name is selected but its public namespaces are **not yet reserved**.
-Confirm and update these placeholders in `src/data/site.ts` first:
-
-- `links.github` — the real GitHub repository URL.
-- `links.x`, `links.reddit` — real social handles (or remove them).
-- The `hostwright.dev` domain.
+The source of truth for support, compatibility, release status, and limitations
+is [`hostwright/hostwright`](https://github.com/hostwright/hostwright). Keep
+public website copy aligned with its current docs and capability contracts.
+The `v0.0.2` release remains in qualification until the core release gate
+passes.

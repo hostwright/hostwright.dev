@@ -9,7 +9,7 @@ export default defineConfig({
     starlight({
       title: "Hostwright",
       description:
-        "Desired-state container control for Apple silicon Macs. Source-only alpha documentation.",
+        "Local control plane for Apple container workloads on one Apple silicon Mac. v0.0.2 is not GA-qualified.",
       logo: { src: "./src/assets/hostwright-mark.png", alt: "Hostwright" },
       favicon: "/favicon.ico",
       customCss: ["./src/styles/theme.css"],

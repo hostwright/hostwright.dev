@@ -1,96 +1,36 @@
 ---
-title: Runtime adapter
-description: Every runtime operation crosses a single typed boundary, so Apple container assumptions never leak across the codebase.
+title: Runtime providers
+description: Hostwright uses capability-declared providers behind one typed boundary for Apple container workloads.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Hostwright routes runtime observation and lifecycle effects through the
+Runtime Provider API. The provider declares its identity, version, and
+capabilities; planning and admission reject unsupported requests before
+runtime effects.
 
-The **RuntimeAdapter** is the one place in Hostwright that talks to the runtime.
-Every other module, including the reconciler, the CLI, and the state store,
-reaches the runtime through this boundary. This single boundary is the most important
-architectural decision in the project.
+## Supported development providers
 
-![Hostwright core talks only through the RuntimeAdapter interface to a CLI adapter today and a planned native adapter later.](/diagrams/06-runtime-adapter-boundary.svg)
+- Apple `container` CLI integration, with conformance coverage for versions
+  1.0.0 and 1.1.0.
+- Apple Containerization 0.35.0 through an authenticated out-of-process
+  helper. Only the helper's declared capability subset is available.
 
-## Why a single boundary
+One project uses one provider for its current generation. Provider migration
+is explicit and fenced. The persistent local daemon and CLI use the same
+provider and state authority.
 
-Apple container is young and evolving. Its command surface, structured output,
-and native APIs will change. If assumptions about it were scattered across the
-reconciler, the state store, and the CLI, every runtime change would ripple
-through the whole codebase.
+## Provider contract
 
-By forcing every runtime operation through one typed protocol, Hostwright keeps
-those assumptions contained. The reconciler works against an abstract contract;
-it does not know or care whether the call is served by shelling out to the
-Apple container CLI or by a future Swift-native client.
+The interface covers provider metadata, capabilities, observation, and
+confirmed lifecycle execution. Execution uses current authenticated Control
+API 2.2 authority, durable intent, and ownership checks. Provider acceptance
+alone is not proof that an effect completed; Hostwright verifies observed
+postconditions before releasing reservations or ownership.
 
-## The contract
+## Boundaries
 
-The adapter exposes:
-
-- `metadata()`: adapter and runtime identity;
-- `capabilities()`: supported capability discovery;
-- `observe(desiredState:)`: read-only runtime snapshots;
-- `plan(desiredState:observedState:)`: adapter-aware planning hooks;
-- `logs(for:tail:)`: bounded read-only log output;
-- `execute(_:confirmation:)`: the mutation hook. It may perform exactly one
-  supported mutation action, and only after confirmation, plan hash, policy
-  validation, and state persistence gates have all passed.
-
-Typed inputs, typed outputs, typed errors. The reconciler never parses a
-human-readable table.
-
-## Command classification
-
-Every process the adapter might run is represented as a typed command spec and
-classified as `readOnly`, `mutating`, `forbidden`, or `unknown`. The process
-runner is not a general shell-out path:
-
-- the executable must resolve through a controlled resolver;
-- read-only commands must pass read-only policy;
-- mutating commands must carry one of exactly four supported kinds:
-  `createMissingService`, `startManagedService`, `restartManagedService`,
-  `deleteManagedContainer`;
-- forbidden, unknown, and unsupported specs are rejected before execution;
-- every command has a timeout (default 30 s, maximum 300 s) and captured,
-  **redacted** output.
-
-Redaction applies to command arguments, environment values, stdout, stderr,
-parser errors, and runtime error messages. Sensitive key fragments such as
-`token`, `password`, `secret`, `credential`, `auth`, and `key` are masked.
-
-## Identity and ownership
-
-Hostwright-created resources carry collision-resistant versioned runtime
-identifiers and exact ownership labels. Observation binds current-project
-labels to the exact identifier, keeps owned orphans visible, ignores unrelated
-labeled projects, and fails closed on malformed current-project ownership.
-Managed start, managed restart, and cleanup operate on **exact identifiers
-only**. Exact-identifier targeting lets two projects with identical legacy
-names remain distinct and safely cleanable.
-
-## Fail-closed parsing
-
-The observation parser accepts only reviewed shapes: the fixture-defined
-observation schema, the verified real empty `container list --all --format
-json` output, Apple builder output (ignored as non-Hostwright state), and exact
-labeled Apple container 1.0.0 rows with network metadata (hostname, IPv4/IPv6,
-gateway, MAC, network name, MTU). Anything else is reported as a parse
-failure; unverified CLI output is never converted into observed state.
-
-<Aside type="note" title="Adapter scope">
-Apple container owns its internals: helpers, VM lifecycle, and the networking
-stack. The adapter rejects command specs outside its reviewed surface,
-including mounts, DNS, custom networks, Rosetta, `run`, pull, build, exec,
-attach, `--all`, `--force`, image deletes, and volume deletes. See the
-[Apple container boundary](/concepts/apple-container-boundary/).
-</Aside>
-
-## CLI adapter first, native adapter later
-
-The concrete implementations today drive the **Apple container CLI**:
-`AppleContainerReadOnlyAdapter` for observation and `AppleContainerApplyAdapter`
-for the four narrow mutations. A Swift-native adapter built on Apple's
-Containerization APIs is a later option, adopted when that surface is stable
-enough to depend on. Both would implement the same protocol, so the rest of
-the system is unaffected by the switch.
+Provider capability does not imply release qualification. Each provider and
+version must pass the declared live, recovery, and cleanup evidence before it
+is included in the final compatibility matrix. See the
+[core runtime-provider architecture](https://github.com/hostwright/hostwright/blob/main/docs/architecture/runtime-adapter.md)
+and [Compatibility](/reference/compatibility/).

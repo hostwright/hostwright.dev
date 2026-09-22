@@ -1,14 +1,13 @@
 // Site-wide constants. Edit URLs here only.
 //
-// NOTE: the name is "pre-screened", not yet reserved. The GitHub org, domain,
-// and social handles below are the project's confirmed accounts.
+// The links below point to the project's current public accounts.
 export const site = {
   name: "Hostwright",
   domain: "hostwright.dev",
   url: "https://hostwright.dev",
   tagline: "Desired-state container control for Apple silicon Macs.",
   description:
-    "Hostwright is a Mac-native, desired-state control plane for Apple's container runtime. Declare a local stack in one manifest and plan changes safely. Open source and in active development.",
+    "Hostwright is a local control plane for Apple container workloads on one Apple silicon Mac. It uses Manifest v3, Control API 2.2, and SQLite schema v24. The v0.0.2 release is not GA-qualified.",
   cli: "hostwright",
   daemon: "hostwrightd",
   manifest: "hostwright.yaml",

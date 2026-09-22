@@ -1,33 +1,40 @@
 ---
 title: Compatibility
-description: The environment Hostwright runs in and the interface versions it currently supports.
+description: The current development support boundary and v0.0.2 qualification targets.
 ---
 
-## Host
+## Current development environment
 
-| Requirement | Supported |
+| Area | Current boundary |
 | --- | --- |
-| CPU | Apple silicon (arm64). |
-| macOS | macOS 26 or newer. |
-| Swift | Tools version 6.2. The exact compiler is recorded per run. |
-| Apple `container` | Verified against 1.0.0 observation shapes and the narrow mutation surface. |
+| Hardware | Apple silicon only; the v0.0.2 qualification target is one physical M4 Mac and one macOS VM. |
+| macOS | macOS 26 or later. |
+| Source toolchain | Swift tools 6.2; the exact compiler is recorded for qualification evidence. |
+| Apple `container` | Versions 1.0.0 and 1.1.0 have provider conformance coverage for their declared capabilities. |
+| Containerization | Version 0.35.0 is pinned behind the out-of-process helper; only its declared local capability subset is supported. |
+| Manifest | Strict Manifest v3; CPU and memory requests and limits are required. Unsupported fields fail closed. |
+| Control API | Version 2.2, authenticated over the local daemon socket. |
+| State | SQLite schema v24 for standalone, node-local state. |
+| Image platform | Linux ARM64 images on Apple silicon. |
 
-## Interface versions
+These are development implementation boundaries. They do not establish a GA
+support claim. Phase 15 must repeat the declared provider/version lanes against
+the accepted source and signed artifacts before the final compatibility matrix
+is published.
 
-| Interface | Version |
-| --- | ---: |
-| Manifest | 2 |
-| Control API | 2 |
-| Runtime Provider API | 2 |
-| Plugin ABI | 1 |
-| State schema | 7 |
+## Release boundaries
 
-The manifest parser accepts `version: 2` and provides a deterministic preview
-for legacy v1 and versionless input.
+- Hostwright supports one Mac per installation. Multi-Mac operation is outside
+  the v0.0.2 scope.
+- The stack importer accepts a reviewed Compose subset. It does not provide a
+  Docker API, Docker client compatibility, or full Compose behavior.
+- Kubernetes, CRI, and Podman compatibility are outside the release scope.
+- The desktop app's signed packaging, accessibility, and VM lifecycle remain
+  qualification items.
+- Run `hostwright capabilities --json` to see the exact capabilities of a
+  specific build. Capability output does not replace current-source release
+  evidence.
 
-Unsupported versions, fields, endpoints, and clients fail with an explicit
-error rather than partial behavior. Container images must provide a
-`linux/arm64` variant.
-
-For the full set of supported and unsupported capabilities, see
-[Limitations](/reference/limitations/).
+See [Limitations](/reference/limitations/) and the
+[core compatibility matrix](https://github.com/hostwright/hostwright/blob/main/docs/reference/compatibility.md)
+for the source of truth.
