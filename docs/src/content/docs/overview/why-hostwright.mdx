@@ -29,31 +29,25 @@ that model instead:
 - Drift between declared and observed state is detected and reported.
 - Cleanup is ownership-checked.
 
-This is the layer Hostwright provides. It borrows the *idea* of a control loop
-from systems like Kubernetes without borrowing their scope.
+This is the layer Hostwright provides. It uses a local control loop without
+claiming Kubernetes behavior or compatibility.
 
 ## Why single-host first
 
-A single Mac is the environment most developers run. Building a cluster
-orchestrator first would spread the implementation across distributed-systems
-problems before the local model is complete. Single-host first bounds the
-scope of the first release; the identity, fencing, and recovery model is
-designed to extend to multiple Macs later.
+A single Mac is the environment the v0.0.2 release targets. Multi-Mac
+membership, remote control, and cross-host scheduling are outside that release
+scope.
 
 ## Why Swift
 
 The runtime substrate is Apple-native, so the control plane is too. Swift gives
-Hostwright direct access to macOS facilities such as the Keychain, process
-control, and system SQLite, plus a native path to Apple's Containerization
-APIs. A Swift daemon, CLI, and core library keep the whole
-system in one idiomatic, testable codebase, with no external package
-dependencies.
+Hostwright access to macOS facilities such as the Keychain, process control,
+and SQLite. The runtime provider boundary supports both the Apple `container`
+CLI and a separate Containerization helper.
 
 ## Why the RuntimeAdapter is the core boundary
 
-Apple container is young and will change. The single most important design
-decision is to route every runtime operation through one typed boundary, the
-[RuntimeAdapter](/concepts/runtime-adapter/), so that runtime change is
-contained to one place. Hostwright can start on the Apple container CLI today
-and move to a native API later without rewriting the reconciler, because both
-implement the same provider contract.
+The single most important design decision is to route runtime observation and
+effects through one typed provider boundary, the
+[Runtime Provider API](/concepts/runtime-adapter/). Providers expose only
+their declared capabilities; unsupported effects fail before mutation.

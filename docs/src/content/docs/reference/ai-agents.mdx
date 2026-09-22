@@ -1,87 +1,50 @@
 ---
 title: Using an AI assistant
-description: The exact prompt to give an AI assistant so it sets up Hostwright with the real install path and the real command surface.
+description: Give an assistant the current Hostwright release boundaries and confirmation rules before asking it to operate a workload.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright installs from source today; packaged distribution (a Homebrew
-formula, `.pkg`, and signed, notarized binaries) is planned. Assistants tend to
-paper over that gap: they may suggest `brew install hostwright` or invent a
-`hostwright down` command, and neither exists today. This page is one prompt
-that fixes both.
+Hostwright `0.0.2-dev` is not GA-qualified. Its current contract is Manifest
+v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24. Use the
+core [CLI reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/cli.md)
+and [Manifest reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/manifest.md)
+for exact flags and fields.
 
-<Aside type="caution" title="No installer today">
-Hostwright runs from Swift Package Manager source. A trusted vendor
-tap/archive/`.pkg` and Homebrew-core submission are planned, and are not
-current installation commands.
+<Aside type="caution" title="Review before runtime changes">
+Validation and planning are non-mutating. Lifecycle and cleanup commands can
+change local resources. Never confirm or execute them without the operator's
+explicit approval of the current plan.
 </Aside>
 
-## The prompt
-
-Paste this into your assistant before asking it to help with Hostwright:
+## Give the assistant these rules
 
 ```text
-I want to try Hostwright, a Mac-native desired-state container platform for
-Apple silicon, in active development. It has no trusted packaged release
-yet. Do not suggest brew, npm, curl-to-shell, or any
-installer. The only way to run it is from source:
+Hostwright is a development release for one Apple silicon Mac. It is not
+GA-qualified. Do not claim Kubernetes, Docker API, full Compose, multi-Mac,
+accelerator passthrough, or production support.
 
-git clone https://github.com/hostwright/hostwright
-cd hostwright
-swift build
-swift test
+Use Manifest v3 and require explicit CPU and memory requests and limits. Do
+not invent fields or silently drop unsupported input. Use `hostwright help`
+and the current CLI and Manifest references for exact commands.
 
-Run commands with `swift run hostwright ...`, not a bare binary.
+Safe inspection includes `hostwright --version`, `capabilities --json`,
+`runtime providers --json`, `validate`, `plan`, and `doctor`. Ask before any
+runtime mutation, install lifecycle change, or cleanup. For a lifecycle
+operation, run the documented dry-run first and present its complete plan.
+Proceed only after I approve that exact plan, then use its current hash with
+the matching confirmed command. Never reuse a stale hash.
 
-Safe commands (no runtime mutation): --version, capabilities, migrate preview,
-init, import-stack, validate, plan, status, logs, events, recovery, diagnostics,
-cleanup --dry-run, doctor. Stateful commands require an explicit
---state-db <path>; there is no default database path.
+Cleanup has a separate dry-run and confirmation token. It may remove only
+exact Hostwright-owned resources proven eligible by the current plan. Never
+delete resources based on names or inferred ownership.
 
-Mutation happens ONLY through two gates, and I want to run those myself:
-  apply --state-db <path> --confirm-plan <hash>   (exactly one action)
-  cleanup --state-db <path> --confirm-cleanup <token>
-Never suggest running apply or confirmed cleanup automatically, never
-invent flags, and never suggest stop/restart/down/rm commands; they do
-not exist.
-
-The currently executable manifest (hostwright.yaml) requires: version: 2, project,
-imagePolicy (allow-tags|require-digest), and per service: image, command,
-ports, env, secretEnv (keychain://<service>/<account> references only),
-volumes, health.command, health.interval, restart.policy
-(no|on-failure|unless-stopped). Do not add networks, depends_on, build,
-replicas, or secrets: blocks; the parser fails closed on them.
-
-Help me: clone and build it, run doctor, generate a starter manifest with
-init, then validate and plan it.
+Do not put credentials in manifests, command arguments, logs, issue reports,
+or support bundles. Support bundles require preview and confirmation; review
+their contents before sharing. Do not upload diagnostics automatically.
 ```
 
-## Why this exists
-
-An assistant's default instincts (assume a mature project has a package
-manager entry, assume "plan" implies it should also "apply") are wrong for a
-tool with this safety posture. The prompt is the same ground truth documented
-on this site, handed to the assistant before it guesses. The authoritative
-surfaces are the [CLI reference](/reference/cli/) and the
-[manifest reference](/reference/manifest/).
-
-## If an agent works inside your repository
-
-Drop the same constraints into a rules file the agent reads automatically:
-`AGENTS.md` or `CLAUDE.md` at your repo root:
-
-```md
-# Hostwright agent ground rules
-
-Source workflow; run via `swift run hostwright ...`. Safe commands:
---version, capabilities, migrate preview, init, import-stack, validate, plan, status, logs, events,
-recovery, diagnostics, cleanup --dry-run, doctor. Stateful commands need
-an explicit --state-db path. Mutation only via apply --confirm-plan <hash>
-(one action) or cleanup --confirm-cleanup <token>. Never run these
-without asking me. stop/restart/down/rm do not exist.
-
-hostwright.yaml supports only: version, project, imagePolicy, and per
-service image, command, ports, env, secretEnv (keychain:// refs), volumes,
-health.command, health.interval, restart.policy.
-```
+For a source build, use the commands in
+[Install and upgrade](/getting-started/install-from-source/). The vendor tap
+offers an unsupported qualification build; `brew install hostwright` is not
+available.

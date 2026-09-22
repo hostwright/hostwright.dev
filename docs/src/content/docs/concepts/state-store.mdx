@@ -1,90 +1,46 @@
 ---
 title: State store
-description: An explicit-path SQLite ledger for desired state, observed snapshots, events, operations, ownership, health, and recovery records.
+description: Hostwright stores local workload, ownership, reservation, audit, and recovery evidence in SQLite schema v24.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Hostwright uses local SQLite schema v24 for desired and observed state,
+operations, reservations, identity, ownership, events, and recovery records.
+It does not use a hosted database or synchronize state to a service.
 
-Hostwright's local state store is SQLite, using the system `SQLite3` library
-with zero external dependencies. It persists desired-state snapshots, observed runtime
-snapshots, the event ledger, operation records, ownership records, health
-results, restart policy state, restart recovery records, and operation recovery
-groups with step-level checkpoints.
+## Database path
 
-![An explicit SQLite state database feeding a ledger of desired, observed, events, operations, ownership, health, and recovery records, read back by the read-only events, recovery, and diagnostics commands.](/diagrams/15-state-ledger.png)
-
-## Explicit paths only
-
-Hostwright **never chooses a database path for you**. There is no default under
-the repository, `~/Library/Application Support`, XDG paths, or any global
-location. Every stateful command takes `--state-db <path>`:
+State-backed commands use the secure per-user Application Support database by
+default. An explicit `--state-db <path>` overrides `HOSTWRIGHT_STATE_DB`, which
+overrides the default. Hostwright validates the selected path, ownership, and
+file permissions before opening the database.
 
 ```bash
-hostwright status --state-db /tmp/hostwright.sqlite
-hostwright events --state-db /tmp/hostwright.sqlite
+hostwright paths --output json
+hostwright doctor --output json
+hostwright state integrity --output json
 ```
 
-Write-path commands (`status`, `logs --state-db`, `apply`, `cleanup`,
-`hostwrightd --foreground`) can run explicit migrations before writing.
-Read-only commands (`events`, `recovery`, `diagnostics`) validate the
-already-applied schema and **fail rather than creating or migrating a database
-as a side effect**.
+See the core [local paths and migration guide](https://github.com/hostwright/hostwright/blob/main/docs/reference/local-paths.md)
+for precedence, permissions, and recovery details.
 
-## Migration continuity
+## Migrations and recovery
 
-Migrations are explicit and checksummed:
+Schema migrations are checksummed and move forward only. Newer, corrupt,
+foreign, or ambiguous databases fail closed. Lifecycle intent is persisted
+before provider effects; interrupted operations retain exact checkpoints and
+ownership evidence for recovery.
 
-- Schema version 6 is the latest supported version. A database migrated by a
-  newer Hostwright release fails closed with an incompatible-schema error;
-  Hostwright does not downgrade or convert.
-- Each migration records a checksum in `schema_migrations`. A known version
-  with an unexpected checksum fails before any application reads or writes.
-- Applied migration history must be a **contiguous prefix starting at
-  version 1**. A database recording a later migration while omitting an earlier
-  one fails closed. A valid older contiguous prefix remains eligible for
-  explicit forward migration.
+## Backups
 
-Schema version 6 added exact observed resource identifiers, observed network
-metadata, and ownership identity versions; legacy rows are backfilled as
-identity version 1, new labeled resources are written as version 2. See
-[Runtime adapter: identity and ownership](/concepts/runtime-adapter/).
+Hostwright implements online state backup, verification, catalog inspection,
+and confirmation-bound restore. State repair is limited to documented
+reconstructible projections. These commands preserve the authoritative ledger
+and refuse to invent ownership or discard ambiguous records. See the core
+[state backup and recovery reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/local-paths.md).
 
-## What is (and is not) stored
+## Concurrency and secrets
 
-Normalized columns hold identifiers, project and service names, timestamps,
-lifecycle states, operation status, event severity, restart status, recovery
-checkpoints, lock leases, and hashes. JSON blobs hold ports, networks, mounts,
-environment snapshots, event and operation payloads, and recovery metadata,
-all **redacted before persistence**.
-
-<Aside type="caution" title="Secrets never touch state">
-Desired environment snapshots never store resolved secret values. `secretEnv`
-entries persist only redacted markers; raw `keychain://` labels and resolved
-values are not stored in desired-state rows. See
-[Secrets and Keychain](/concepts/secrets-and-keychain/).
-</Aside>
-
-## Concurrency
-
-The contract is single-writer: one CLI command or daemon may write a state
-database at a time. Hostwright uses SQLite full-mutex mode, a bounded busy
-timeout, and `BEGIN IMMEDIATE` transactions. If another process holds a write
-lock beyond the timeout, Hostwright reports a locked database instead of
-waiting indefinitely. Operation-group acquisition is atomic across concurrent
-stores, with exactly one winner.
-
-No transaction performs runtime mutation. Apply and cleanup write intent first,
-leave the transaction, call the RuntimeAdapter, then record success or failure.
-
-## Backup and restore are cold operations
-
-1. Stop any Hostwright command or daemon using the database.
-2. Copy the explicit SQLite file plus sidecars (`*-wal`, `*-shm`) if present.
-3. To restore: move the existing database aside (never overwrite), copy the
-   backup into place, and verify with a safe read such as
-   `hostwright events --state-db <path>`.
-
-There are no online backup, restore, or repair commands, and no production
-durability guarantee. Corruption recovery is manual: keep the file, restore
-from a cold backup, or start a new explicit path. Hostwright never invents
-ownership records or erases state automatically.
+Hostwright fences its own writers and validates state before use. This is not
+a same-user sandbox: stop external processes that write the SQLite file before
+restore or repair. Resolved secret values are not persisted in state or
+diagnostics.

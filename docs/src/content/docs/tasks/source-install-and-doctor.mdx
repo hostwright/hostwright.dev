@@ -1,57 +1,36 @@
 ---
 title: Source install and doctor
-description: "Read-only walkthrough: build from source, run the test suite, and check your host with doctor."
+description: Build the current development CLI and run its safe local host checks.
 ---
 
-**This task is read-only.** Nothing here touches the container runtime or
-writes state.
+This workflow builds from source and runs local checks. It does not qualify a
+signed `v0.0.2` release.
 
-## 1. Build from source
+## Build from source
 
 ```bash
 git clone https://github.com/hostwright/hostwright.git
 cd hostwright
 swift build
-```
-
-Hostwright is a dependency-free Swift package: no external SPM packages, SQLite
-via the system library.
-
-## 2. Run the tests
-
-```bash
-swift test
-```
-
-You can list what exists first with `swift test list`, or use the repository's
-`scripts/test.sh` helper. Passing tests on your machine confirm the build.
-
-## 3. Confirm the binary answers
-
-```bash
 swift run hostwright --version
+swift run hostwright capabilities --json
 ```
 
-This prints the current development version.
+The package targets Apple silicon and macOS 26 or later and uses Swift tools
+6.2. For the unsupported qualification build, the vendor tap command is
+`brew install hostwright/tap/hostwright`; `brew install hostwright` is not an
+available install path.
 
-## 4. Check the host
+## Check the host
 
 ```bash
-swift run hostwright doctor
 swift run hostwright doctor --output json
+swift run hostwright runtime providers --json
 ```
 
-`doctor` runs safe local checks only: OS version, Apple silicon and macOS 26+
-gate, Swift toolchain version, `container` executable lookup (presence check only), `hostwright.yaml` presence, state-path
-policy, telemetry policy, and a local resource-intelligence report.
+Doctor performs safe local checks. It does not run a workload or prove that
+every advertised provider capability is qualified for release. Runtime-backed
+commands need Apple `container` and the exact provider prerequisites.
 
-A missing `container` executable is reported as a warning, not a crash. In the
-JSON report, benchmark dimensions that were not measured are reported
-explicitly as `unmeasured`; doctor reports only measured values. The full
-check list is in [Doctor checks](/reference/doctor-checks/).
-
-## Where this leaves you
-
-You have a built CLI and a verdict on current host compatibility. Hostwright
-installs from source today; `brew install hostwright` does not exist yet.
-Continue with [Plan a single service](/tasks/single-service-plan/).
+Continue with the [Quick start](/getting-started/quick-start/) after reading
+the [current compatibility boundary](/reference/compatibility/).

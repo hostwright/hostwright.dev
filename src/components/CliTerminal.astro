@@ -1,8 +1,5 @@
 ---
-// Animated terminal: a non-mutating `hostwright plan` run. Output reveals line
-// by line when the terminal scrolls into view. Progressive enhancement — with
-// no JS the full transcript is shown; reduced-motion freezes it fully visible.
-// The transcript is honest: plan computes a diff but applies nothing.
+// Animated illustration of a local, non-mutating plan command.
 ---
 
 <div class="term-live" aria-label="Example output of hostwright plan">
@@ -19,15 +16,11 @@
       { c: "muted", t: "∙ validating manifest … ok" },
       { c: "muted", t: "∙ computing plan (non-mutating)" },
       { c: "blank", t: " " },
-      { c: "head",  t: "  project: api-local" },
+      { c: "head",  t: "  reads and validates hostwright.yaml" },
+      { c: "muted", t: "  computes a deterministic local plan" },
+      { c: "muted", t: "  does not inspect or change the runtime by default" },
       { c: "blank", t: " " },
-      { c: "add",   t: "  + create   service/api      ghcr.io/example/api:latest" },
-      { c: "add",   t: "  + create   service/redis    redis:7" },
-      { c: "chg",   t: "  ~ map      ports            8080→8080, 6379→6379" },
-      { c: "blank", t: " " },
-      { c: "muted", t: "  plan: 2 to create, 1 to configure, 0 to destroy" },
-      { c: "blank", t: " " },
-      { c: "ok",    t: "✓ no changes applied. review, then apply" },
+      { c: "ok",    t: "✓ no changes applied. Review before any confirmed action." },
     ].map((l, i) => (
       <span class:list={["ln", l.c]} style={`--i:${i}`}>{l.t}<span class="cur" aria-hidden="true"></span></span>
     ))

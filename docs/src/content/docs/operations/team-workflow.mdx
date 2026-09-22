@@ -24,7 +24,7 @@ unsupported versions, invalid identifiers, and `optIn: false` fail closed with
   "displayName": "Local Maintainers",
   "optIn": true,
   "requiredGates": [
-    "runtimeAdapter", "explicitStatePath", "localPolicy", "redaction",
+    "runtimeAdapter", "secureState", "localPolicy", "redaction",
     "auditTrail", "planConfirmation", "cleanupConfirmation",
     "ownershipChecks", "localOnlyNoCloud", "noTelemetryUpload"
   ],
@@ -87,16 +87,15 @@ hostwright validate hostwright.yaml --team-profile team-profile.json
 hostwright plan hostwright.yaml --team-profile team-profile.json --output json
 
 # Confirmed apply:
-hostwright apply hostwright.yaml \
-  --state-db /absolute/path/state.sqlite \
+hostwright up hostwright.yaml \
   --confirm-plan <plan-hash> \
   --team-profile team-profile.json \
   --approval-record approval.json
 
 # Cleanup: profile-aware dry run first, then token-bound approval:
-hostwright cleanup hostwright.yaml --state-db /absolute/path/state.sqlite \
+hostwright cleanup hostwright.yaml \
   --dry-run --team-profile team-profile.json
-hostwright cleanup hostwright.yaml --state-db /absolute/path/state.sqlite \
+hostwright cleanup hostwright.yaml \
   --confirm-cleanup <token> --team-profile team-profile.json \
   --approval-record cleanup-approval.json
 ```

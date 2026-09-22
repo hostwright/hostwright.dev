@@ -15,93 +15,27 @@ export interface RoadmapItem {
 
 export const roadmap: RoadmapItem[] = [
   {
-    title: "01 · Truth and contracts",
+    title: "10 · Local scheduling",
     status: "in-progress",
     detail:
-      "Manifest/API/provider/plugin/state versions, UUID identity, saga state, migration, capability truth, and governance.",
+      "Single-host admission, reservations, placement stability, pressure deferral, and recovery qualification.",
   },
   {
-    title: "02 · Trusted foundation",
-    status: "planned",
+    title: "13 · Narrow Compose import",
+    status: "in-progress",
     detail:
-      "Vendor tap, signed/notarized packages, secure state/defaults, doctor, upgrade, rollback, uninstall, SBOM/provenance.",
+      "Convert the documented Compose subset to Manifest v3, review the output, and run it through confirmed local lifecycle commands.",
   },
   {
-    title: "03 · Apple providers",
-    status: "planned",
+    title: "14 · Native desktop",
+    status: "in-progress",
     detail:
-      "Conformant Apple CLI and pinned Containerization providers with capability negotiation and safe migration.",
+      "Qualify the signed local console, confirmed lifecycle actions, accessibility, and packaged upgrade and recovery.",
   },
   {
-    title: "04 · Complete local lifecycle",
-    status: "planned",
+    title: "15 · v0.0.2 qualification",
+    status: "in-progress",
     detail:
-      "Maintained YAML, full Manifest v2, durable operation DAG, dependencies, probes, updates, rollback, and lifecycle commands.",
-  },
-  {
-    title: "05 · Images and trust",
-    status: "planned",
-    detail:
-      "OCI lifecycle, registries, Keychain/providers, signatures, SBOM, vulnerability policy, provenance, and cache GC.",
-  },
-  {
-    title: "06 · Persistent storage",
-    status: "planned",
-    detail:
-      "Volumes, snapshots, online backup/restore, quotas, fencing, reclaim, and orphan garbage collection.",
-  },
-  {
-    title: "07 · Networking",
-    status: "planned",
-    detail:
-      "Networks, DNS, dual stack, ingress, TLS/mTLS, policy, secure tunnels, and provider SPI.",
-  },
-  {
-    title: "08 · Autonomous operations",
-    status: "planned",
-    detail:
-      "LaunchAgent, reconciliation, rollout/recovery, finalizers/GC, OSLog, events, metrics, traces, and support bundles.",
-  },
-  {
-    title: "09 · Secure control and plugins",
-    status: "planned",
-    detail:
-      "Persistent API, identity, RBAC, admission, tamper-evident audit, workload profiles, WASI, and signed XPC.",
-  },
-  {
-    title: "10 · Scheduling and accelerators",
-    status: "planned",
-    detail:
-      "Fair deterministic placement, topology/disruption/hysteresis, pressure/energy, and host-native Metal/Core ML/MLX.",
-  },
-  {
-    title: "11 · Multi-Mac HA",
-    status: "planned",
-    detail:
-      "Cluster CA, managed etcd, node agents, fencing, remote placement/storage/discovery, failover, upgrades, and DR.",
-  },
-  {
-    title: "12 · Kubernetes",
-    status: "planned",
-    detail:
-      "Real pod-sandbox VM, CRI/CNI/CSI, kubelet, resource/Helm translation, scheduler/device integration, and conformance.",
-  },
-  {
-    title: "13 · Docker ecosystem",
-    status: "planned",
-    detail:
-      "Docker API/context, Compose, Podman, Testcontainers, GitHub Actions, Xcode, VS Code, and JetBrains.",
-  },
-  {
-    title: "14 · Native and team control",
-    status: "planned",
-    detail:
-      "Accessible SwiftUI app, parity, team/MDM, optional offline-safe cloud, OIDC, outbound agents, and remote audit.",
-  },
-  {
-    title: "15 · GA qualification",
-    status: "planned",
-    detail:
-      "Security, fuzzing, sanitizers, soaks, conformance, performance, DR, docs, support, signed release, and Homebrew core.",
+      "Complete the bounded single-Mac security, performance, recovery, documentation, and signed-artifact evidence before GA.",
   },
 ];

@@ -1,73 +1,42 @@
 ---
 title: Desired state
-description: Hostwright separates declared state from observed runtime state and computes the difference deterministically.
+description: Hostwright compares Manifest v3 intent with local runtime state and requires explicit confirmation before lifecycle changes.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
-
-Hostwright is a **desired-state** system. You declare what should run; Hostwright
-observes what is running, computes the difference, and reports it as drift with
-a deterministic plan.
-
-![Desired state and observed runtime state compared by a comparator to produce a drift report.](/diagrams/05-desired-observed-drift.svg)
+Hostwright reads a strict Manifest v3 declaration and compares it with local
+runtime observations. It reports typed issues and produces a plan for review.
+It does not silently change a workload when the manifest changes.
 
 ## Two kinds of state
 
-- **Desired state**: what you declared in [`hostwright.yaml`](/reference/manifest/).
-  Persisted as a snapshot to the explicit SQLite database you pass with
-  `--state-db`.
-- **Observed state**: what is running, read back from the runtime
-  through the [RuntimeAdapter](/concepts/runtime-adapter/) at a point in time.
-  `hostwright status --state-db <path>` records it as an observed snapshot.
+- **Desired state** is the project and service configuration in
+  [`hostwright.yaml`](/reference/manifest/).
+- **Observed state** is a point-in-time view read through the selected runtime
+  provider. Stateful operations record it in SQLite schema v24.
 
-The [reconciler](/concepts/reconciliation/) compares the two, emits typed drift
-records and issues, and produces a plan with a deterministic hash. Convergence
-is never automatic: mutation happens only through the confirmed
-[apply gate](/concepts/safety-model/), one action at a time.
+The reconciler compares these records, applies admission and provider policy,
+and computes lifecycle actions. A dry-run shows the changes and a plan hash;
+the confirmed command revalidates that plan through authenticated local
+Control API 2.2 authority.
 
-## Why declarative
+## Why declaration helps
 
-Imperative commands describe *how*; a manifest describes *what*. A declarative
-model provides properties that imperative commands do not:
-
-- **Idempotency**: apply recomputes the plan and refuses to run when the
-  confirmed hash no longer matches reality, so a stale intent cannot re-execute.
-- **Drift detection**: with desired and observed snapshots both recorded,
-  Hostwright reports when observed state diverges from desired state.
-- **Reviewable change**: the difference is shown as a plan, with a hash, before
-  anything mutates.
-- **Recovery**: operation intent, checkpoints, and recovery records are
-  persisted before mutation, so an interrupted operation is diagnosable with
-  [`hostwright recovery`](/operations/events-and-diagnostics/).
+- **Reviewable change:** examine the complete proposed plan before mutation.
+- **Idempotency:** execution is bound to current project identity, provider
+  capability, reservation, and operation authority.
+- **Recovery:** durable checkpoints make interrupted operations inspectable
+  and keep uncertain resources fenced until recovery is safe.
+- **Explicit limits:** each service declares CPU and memory requests and
+  limits; unsupported fields or provider behavior fail before effects.
 
 ## The unit of declaration
 
-A manifest declares a **project** that contains one or more **services**. A
-service references an image and the runtime details needed to run it: ports,
-environment, secret references, health checks, and restart policy.
+A project contains one or more services. The Manifest v3 contract describes
+images, resources, scheduling constraints, commands, ports, volumes,
+environment, secret references, probes, and restart behavior. Each field is
+documented in the [Manifest reference](/reference/manifest/).
 
-```yaml
-version: 2
-project: api-local
-
-services:
-  api:
-    image: ghcr.io/example/api:latest
-    ports:
-      - "8080:8080"
-```
-
-<Aside type="note" title="Single-host authority">
-Desired state is scoped to one Mac. The same UUID, fencing, recovery, and
-policy model is designed to extend to multiple Macs. See
-[Why Hostwright](/overview/why-hostwright/) and
-[Non-goals](/overview/non-goals/).
-</Aside>
-
-## What convergence is not
-
-Hostwright does not run an aggressive convergence loop. The foreground
-[daemon](/operations/daemon/) observes, plans, and records events. Mutation
-remains reserved for the confirmed apply gate. `apply` executes exactly one confirmed action per invocation. Automatic
-rollback and multi-action apply are not implemented; see
+Hostwright's v0.0.2 scope is one Apple silicon Mac. Multi-Mac scheduling is
+outside this release. The implementation remains under development
+qualification; see [Compatibility](/reference/compatibility/) and
 [Limitations](/reference/limitations/).

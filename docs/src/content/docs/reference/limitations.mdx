@@ -1,53 +1,51 @@
 ---
 title: Limitations
-description: The current support boundary. What Hostwright implements today, and what is outside the current surface.
+description: Current development limits and qualification gaps for the v0.0.2 single-Mac release.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-Hostwright is in active development and not production ready. This page states
-the current support boundary.
+Hostwright `0.0.2-dev` is not production-ready. The v0.0.2 target is a single
+Apple silicon Mac with the CLI, local scheduler, narrow Compose conversion,
+and native desktop console. All claims below are bounded by the exact build
+and evidence available for it.
 
-## Implemented
+## Implemented development surfaces
 
-- Manifest v2 with a restricted, fail-closed parser, deterministic legacy
-  migration preview, validation, planning, and capability reporting.
-- Apple `container` observation and confirmation-gated create, start, restart,
-  and delete paths through the runtime adapter.
-- SQLite state with desired, observed, event, operation, ownership, health,
-  restart, and recovery records, Hostwright UUIDs, provider binding, and
-  fencing.
-- Bounded logs, local events, recovery, and diagnostics; safe doctor checks;
-  local policy and team profiles; secret references with a read-only Keychain
-  reader; a one-shot Control API; and a reviewed-local extension handshake.
-- A foreground reconciliation loop, advisory scheduler and resource models,
-  narrow stack-file import, and local benchmark evidence.
+- Manifest v3 validation, explicit resource requests and limits, deterministic
+  planning, and confirmed local lifecycle operations through authenticated
+  Control API 2.2.
+- Apple `container` and Containerization 0.35.0 provider adapters, each limited
+  to the capabilities it declares.
+- SQLite schema v24, durable ownership and reservation records, recovery, and
+  local privacy-safe support bundles.
+- A narrow Compose importer that converts supported fields for operator
+  review; unsupported input is rejected.
+- A native app for authenticated up, down, and restart with confirmation.
 
-## Outside the current surface
+Implementation status does not mean release qualification is complete. Current
+source must still pass physical-host lifecycle and soak work, desktop and
+accessibility checks, VM install/upgrade/recovery, security review, and signed
+artifact verification.
 
-The following are outside the current command surface. Each states present
-behavior.
+## Outside the v0.0.2 scope
 
-| Area | Current behavior |
+| Area | Boundary |
 | --- | --- |
-| Install | Source build only. No packaged, signed, or notarized distribution, and no upgrade, rollback, or uninstall command. |
-| Runtime providers | Narrow Apple `container` surface. The Containerization framework path is absent. |
-| Lifecycle | One confirmed action per apply. Stop, restart, down, and rm are absent, and rollback is manual. |
-| Images | Local reference policy only. Hostwright uses a pre-pulled local image and performs no registry resolution, signing, or scanning. |
-| Storage | Guarded mounts only. Volumes, snapshots, quotas, and online backup or restore are absent. |
-| Networking | Loopback publishing only. Networks, DNS, ingress, TLS, and tunnels are absent. |
-| Daemon | Foreground loop only. Autonomous background operation, a launch agent, and unattended mutation are absent. |
-| Control and plugins | One-shot API and a declaration handshake. A persistent API, RBAC, audit, and plugin execution are absent. |
-| Scheduling | Advisory models only. Placement, capacity reservation, and accelerator exposure are absent. |
-| Multi-host | Single host only. Clustering, consensus, and remote operations are absent. |
-| Kubernetes and Docker | No CRI, kubelet, pod sandbox, Docker API, or Compose runtime. Stack import is a narrow conversion. |
-
-## Non-goals
-
-Some capabilities are held as permanent boundaries by design. See
-[Non-goals](/overview/non-goals/).
+| Multi-Mac | No cluster membership, quorum, remote placement, or cross-host recovery. |
+| Kubernetes | No Kubernetes, CRI, CNI, CSI, kubelet, or Helm compatibility. |
+| Docker ecosystem | No Docker API or client compatibility; no full Compose compatibility. |
+| Scheduling | No topology optimization, automatic preemption, or cross-host placement. |
+| Accelerators | No direct guest GPU/ANE passthrough or host-native accelerator service. |
+| Desktop | No team, MDM, cloud, or automatic update service. |
+| Support | No production support SLA, hosted diagnostics, telemetry upload, or cloud control plane. |
+| Release | `v0.0.2` is not GA until protected release and artifact evidence gates pass. |
 
 <Aside type="note">
 `hostwright capabilities --json` reports the exact implemented surface for a
-given build.
+build. It does not establish compatibility outside the tested host, OS,
+runtime, and artifact versions.
 </Aside>
+
+See the [core limitations reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/limitations.md)
+for the current source-of-truth details.

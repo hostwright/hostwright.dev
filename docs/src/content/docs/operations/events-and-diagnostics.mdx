@@ -1,87 +1,47 @@
 ---
 title: Events and diagnostics
-description: "The event ledger, operation recovery groups, and local redacted diagnostics bundles: reference depth for the observability surfaces."
+description: Inspect local events, recovery state, and privacy-safe support evidence.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Hostwright stores local operation and recovery evidence in SQLite schema v24.
+State-backed commands use the documented Application Support database by
+default; `--state-db` or `HOSTWRIGHT_STATE_DB` can select another path. See the
+[state and paths reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/local-paths.md).
 
-Every meaningful step (observations, applies, cleanups, daemon iterations,
-health checks) lands in the event ledger of the explicit state database, so
-failures are explainable after the fact. Three read-only commands expose it.
-All three read an **already-migrated** database and fail rather than creating
-or migrating one as a side effect.
-
-## Events
+## Events and traces
 
 ```bash
-hostwright events --state-db /tmp/hostwright.sqlite \
-  [--project <name>] [--type <event>] [--service <name>] \
-  [--severity info|warning|error] [--limit <n>] [--sort asc|desc] \
-  [--output text|json]
+hostwright events --output json
+hostwright traces status --output json
 ```
 
-Events render in deterministic timestamp/id order. Types include status
-observations, `logs.read`, apply start/success/failure,
-`cleanup.*`, `team.profile.selected`, `team.approval.recorded`,
-`daemon.started`, `daemon.reconcile.succeeded`, `daemon.reconcile.failed`,
-`daemon.backoff`, `daemon.sleep_wake_resumed`, `daemon.stopped`,
-`health.check.*`, and `restart.policy.state`. Payloads are redacted before
-persistence, so the ledger is safe to read but still local-context-rich.
+The event ledger is the durable local record; OSLog mirrors selected records
+for troubleshooting. Event and trace views are bounded and redacted. They do
+not upload data.
 
-## Recovery
+## Inspect and recover operations
 
 ```bash
-hostwright recovery --state-db /tmp/hostwright.sqlite [--project <name>]
+hostwright recovery --output json
+hostwright state integrity --output json
+hostwright state backups --output json
 ```
 
-Apply persists an operation recovery **group** with step records (intent,
-checkpoints, forward runtime steps, rollback-unavailable markers, and redacted
-manual recovery hints) before and during mutation. `recovery` reads those
-groups and reports, per operation:
+Recovery inspection reports durable checkpoints and any required action. It
+does not authorize broad cleanup or bypass ownership. Preserve reported
+state and follow the exact recovery command before retrying a lifecycle
+operation.
 
-- **no automatic recovery required**: it completed;
-- **manual inspection required**: it failed or was interrupted;
-- **rollback unsupported**: no safe inverse operation is proven.
-
-Active groups show their redacted lock owner and lease expiry. A group with no
-persisted mutation intent can be reacquired after lease expiry (the old group
-is marked interrupted). A recorded intent stays blocked unless its checkpoint
-proves runtime execution never began (`pre-runtime-state-incomplete`);
-ambiguous or post-runtime interruptions require manual inspection. Older
-databases with legacy restart recovery records render those as legacy entries.
-
-<Aside type="note" title="Diagnostic output">
-Recovery never observes Apple container, retries mutation, stops/starts/
-deletes resources, or rolls anything back. Hostwright has no automatic
-rollback because no safe inverse operation is proven; the output is a
-diagnosis, not a repair.
-</Aside>
-
-## Diagnostics bundles
+## Support bundles
 
 ```bash
-hostwright diagnostics --state-db /tmp/hostwright.sqlite \
-  --bundle /tmp/hostwright-diagnostics.json [--project <name>] [--manifest <path>]
+hostwright diagnostics support preview --output json
+hostwright diagnostics support create \
+  --output-path /absolute/private/support.json \
+  --confirm-preview <preview-hash> --output json
 ```
 
-Writes a local redacted JSON bundle containing:
-
-- the telemetry policy statement (local-only, no upload);
-- state schema and version metadata;
-- an optional manifest summary (omitting `--manifest` makes the bundle
-  state-only; only paths you pass are read);
-- redacted events, operations, operation groups and steps, health results,
-  restart policy state, restart recovery records, ownership records, and
-  observed snapshots.
-
-It refuses to overwrite an existing bundle path (`HW-CLI-002`) and never
-inspects or mutates the runtime, creates or migrates a database, or uploads
-anything. Bundles can still contain sensitive local context (project names,
-service names, paths, hostnames, identifiers). **Review before sharing**.
-
-## Telemetry policy
-
-Hostwright's telemetry policy is local-only and is itself reported in doctor,
-status, and diagnostics output. There is no external telemetry, hosted
-diagnostics, automatic upload, or OSLog integration. See
-[Limitations](/reference/limitations/).
+Support creation requires an explicit preview and confirmation. Bundles are
+bounded and privacy-safe, but may still contain local context. Inspect the
+bundle before sharing. Hostwright does not upload it automatically; see the
+[core support-bundle guide](https://github.com/hostwright/hostwright/blob/main/docs/reference/support-bundles.md).

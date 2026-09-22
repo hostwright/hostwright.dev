@@ -1,30 +1,29 @@
 ---
 import { Code } from "astro:components";
-import StatusChip from "./StatusChip.astro";
-import { cliCore, cliPlanned } from "../data/homepage.ts";
+import { cliCore, cliLocalOps } from "../data/homepage.ts";
 ---
 
 <div class="cli">
   <div class="term">
     <div class="term-bar">
-      <span class="term-label">hostwright · core</span>
-      <span class="term-note">in design</span>
+      <span class="term-label">hostwright · inspect</span>
+      <span class="term-note">current development CLI</span>
     </div>
     <Code code={cliCore} lang="bash" theme="github-light" />
   </div>
 
   <div class="term">
     <div class="term-bar">
-      <span class="term-label">hostwright · later</span>
-      <StatusChip status="planned" />
+      <span class="term-label">hostwright · operate</span>
+      <span class="term-note">review each plan</span>
     </div>
-    <Code code={cliPlanned} lang="bash" theme="github-light" />
+    <Code code={cliLocalOps} lang="bash" theme="github-light" />
   </div>
 </div>
 
 <p class="cli-caption">
-  The command surface is still in design. These are the intended shapes.
-  Commands marked <em>Planned</em> are scheduled on the roadmap.
+  Hostwright is a development release. Runtime actions require a current plan
+  hash and authenticated local daemon authority.
 </p>
 
 <style>
