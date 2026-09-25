@@ -13,6 +13,8 @@ Control API 2.2 Unix socket. Install a coherent Hostwright payload before settin
 the daemon; building an unsigned source checkout alone does not establish installed
 trust or a supported distribution. Use the [installation guide](/getting-started/install-from-source/).
 
+These commands require the current signed candidate; the public dev.12 package predates this setup.
+
 Create a private Manifest v3 file with explicit CPU/memory requests and limits.
 Choose its project, image, ports, and mounts deliberately: installing and starting
 the daemon can reconcile that configuration. Then invoke the bootstrap installation
@@ -38,10 +40,11 @@ confirmation. A manifest-level `planHash` is distinct from the observed lifecycl
 
 ## Current Behavior
 
-The foreground loop remains available:
+For foreground operation, bootstrap identities once, then start the daemon in a separate terminal under the same account. Change to the manifest directory in that terminal before running:
 
 ```bash
-hostwrightd --foreground --config <hostwright.yaml>
+hostwright daemon bootstrap-identities --json
+hostwrightd --foreground --config "$PWD/hostwright.yaml"
 ```
 
 The managed process is launched only from the exact owned plist as:

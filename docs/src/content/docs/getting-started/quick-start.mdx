@@ -1,28 +1,13 @@
 ---
 title: Quick start
-description: "The safe core loop: init, validate, plan, doctor, and how confirmed apply fits in after it."
+description: "Validate a manifest, review a lifecycle plan, and run a local service."
 ---
 
-Hostwright is an unsupported development prerelease. The accepted release scope
-is one Apple silicon Mac running macOS 26, local capacity admission, narrow Compose
-import, and confirmed native desktop lifecycle. Current-source release qualification
-is pending; see [compatibility](/reference/compatibility/).
-
-This page describes the current command contract. Its CPU/memory lifecycle example
-has not yet passed the current-source live qualification transcript; it is not a
-tested quickstart or a supported release claim.
+This quickstart requires a signed current-source candidate on one Apple silicon Mac running macOS 26. The public tap still installs dev.12, which uses older commands and contracts. Current-candidate live qualification is pending; see [installation](/getting-started/install-from-source/) and [compatibility](/reference/compatibility/).
 
 ## Prepare
 
-The authenticated CLI requires an explicitly bootstrapped signed daemon, including
-read-only validation and planning. Follow the [daemon setup](/operations/daemon/)
-before running these commands. Read-only means no runtime changes, not anonymous access.
-
-Install from [source or the vendor tap](/getting-started/install-from-source/).
-Runtime commands require a declared supported provider and Linux ARM64 image.
-`hostwright doctor --output json` performs safe local checks, including provider
-version probes. `hostwright paths --json` reports the secure selected state layout.
-The default database is under Application Support; `--state-db` explicitly overrides it.
+Start Apple `container`, then follow [daemon setup](/operations/daemon/) to bootstrap the signed CLI and daemon. CLI validation, planning, and runtime requests use the authenticated Control API.
 
 `hostwright init` creates a starter manifest without overwriting an existing file.
 Alternatively save the canonical single-service example below to a new file;
@@ -30,7 +15,7 @@ first check that its project and host port do not conflict with an existing work
 
 ```yaml
 version: 3
-project: phase04-single
+project: quickstart
 imagePolicy: require-digest
 
 services:
@@ -65,6 +50,7 @@ services:
 
 ```bash
 hostwright validate hostwright.yaml
+hostwright image pull docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92 --platform linux/arm64 --runtime-provider apple-cli
 hostwright plan hostwright.yaml --output json
 hostwright runtime providers --json
 hostwright up hostwright.yaml --dry-run --runtime-provider apple-cli --output json

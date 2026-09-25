@@ -135,7 +135,6 @@ export default defineConfig({
             { label: "Doctor checks", slug: "reference/doctor-checks" },
             { label: "Limitations", slug: "reference/limitations" },
             { label: "Compatibility", slug: "reference/compatibility" },
-            { label: "Using an AI assistant", slug: "reference/ai-agents" },
           ],
         },
         {

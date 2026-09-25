@@ -1,6 +1,6 @@
 ---
 title: Review an app suite
-description: "Validate and plan a multi-service manifest, and understand health, restart policy, and the one-action-per-apply rule."
+description: "Plan and run a multi-service manifest with dependencies, probes, and rolling updates."
 ---
 
 This canonical Manifest v3 example declares a completed preparation job, two
@@ -74,8 +74,14 @@ services:
 
 ## Review and execute
 
+Use a signed current-source candidate and start Apple `container`. Follow
+[installation](/getting-started/install-from-source/) and [daemon setup](/operations/daemon/)
+before running these commands: validation, planning, and lifecycle requests use the
+authenticated Control API. The public dev.12 package uses older contracts.
+
 ```bash
 hostwright validate hostwright.yaml
+hostwright image pull docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92 --platform linux/arm64 --runtime-provider apple-cli
 hostwright plan hostwright.yaml --output json
 hostwright runtime providers --json
 hostwright up hostwright.yaml --dry-run --runtime-provider apple-cli --output json
@@ -84,10 +90,6 @@ hostwright up hostwright.yaml --dry-run --runtime-provider apple-cli --output js
 `validate` and `plan` do not change the runtime. `plan` is a manifest-level plan;
 the lifecycle confirmation hash comes from the observed-runtime `up --dry-run`.
 Review its exact image, resource requests/limits, ownership, provider, and actions.
-
-Confirmed execution requires the signed payload and an authenticated local daemon
-identity. Follow the [installation guide](/getting-started/install-from-source/) and
-[daemon reference](/operations/daemon/). An absent or stale authority fails closed.
 
 ```bash
 hostwright up hostwright.yaml --confirm-plan <planSHA256> --runtime-provider apple-cli
