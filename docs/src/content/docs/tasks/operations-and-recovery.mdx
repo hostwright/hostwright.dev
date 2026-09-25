@@ -9,8 +9,10 @@ This task covers day-two operations. Labels per step: `status` and `logs` are
 **state-writing observations**; `events`, `recovery`, and `diagnostics` are
 **read-only**; `cleanup --confirm-cleanup` is **mutating**.
 
-Every command here takes an explicit `--state-db <path>`. Hostwright never
-discovers a database implicitly; see [State store](/concepts/state-store/).
+The examples explicitly select `--state-db /tmp/hostwright.sqlite`. Use that
+same path only if it is your daemon's selected database. Without an override,
+Hostwright uses `~/Library/Application Support/Hostwright/state/state.sqlite`;
+see [State store](/concepts/state-store/) and [daemon setup](/operations/daemon/).
 
 ## Status: observe and record
 
@@ -30,7 +32,9 @@ hostwright logs web --state-db /tmp/hostwright.sqlite --tail 200
 
 Reads the last log lines for an observed Hostwright-managed service. Default
 tail is 100 lines, clamped at 1000. Output is redacted before display. There
-is no `--follow`, attach, or exec.
+is no `--follow` mode for this bounded snapshot. Separate authenticated
+`logs --stream`, `attach`, and `exec` commands have their own interactive contracts;
+see [CLI reference](/reference/cli/).
 
 ## Events: the ledger, filtered
 

@@ -9,7 +9,7 @@ export default defineConfig({
     starlight({
       title: "Hostwright",
       description:
-        "Desired-state container control for Apple silicon Macs. Source-only alpha documentation.",
+        "Single-Mac container control for Apple silicon. Unsupported development prerelease documentation.",
       logo: { src: "./src/assets/hostwright-mark.png", alt: "Hostwright" },
       favicon: "/favicon.ico",
       customCss: ["./src/styles/theme.css"],
@@ -135,7 +135,6 @@ export default defineConfig({
             { label: "Doctor checks", slug: "reference/doctor-checks" },
             { label: "Limitations", slug: "reference/limitations" },
             { label: "Compatibility", slug: "reference/compatibility" },
-            { label: "Using an AI assistant", slug: "reference/ai-agents" },
           ],
         },
         {

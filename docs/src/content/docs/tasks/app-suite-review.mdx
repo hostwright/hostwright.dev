@@ -1,90 +1,111 @@
 ---
 title: Review an app suite
-description: "Validate and plan a multi-service manifest, and understand health, restart policy, and the one-action-per-apply rule."
+description: "Plan and run a multi-service manifest with dependencies, probes, and rolling updates."
 ---
 
-import { Aside } from "@astrojs/starlight/components";
-
-**This task is read-only**: it validates and plans; it does not apply.
-
-## The example manifest
-
-`examples/app-suite/hostwright.yaml` declares a web service and a worker:
+This canonical Manifest v3 example declares a completed preparation job, two
+workers, and a web service. Review total CPU/memory requests, limits, dependency
+and probe gates, and the host port before planning. Local admission must reserve
+the complete executable service set; it never silently discards unsupported fields.
 
 ```yaml
-version: 2
-project: app-suite
+version: 3
+project: phase04-three-service
+imagePolicy: require-digest
 
 services:
-  web:
-    image: ghcr.io/example/web:latest
-    command: ["serve"]
-    ports:
-      - "8080:8080"
-    env:
-      APP_ENV: development
-      API_BASE_URL: http://localhost:8081
-    health:
-      command: ["curl", "-f", "http://localhost:8080/health"]
-      interval: 15s
+  prepare:
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    resources:
+      requests: {cpus: 1, memory: 256MiB}
+      limits: {cpus: 1, memory: 256MiB}
+    command: ["python3", "-c", "print('prepared')"]
     restart:
-      policy: on-failure
+      policy: "no"
 
   worker:
-    image: ghcr.io/example/worker:latest
-    env:
-      QUEUE_NAME: default
-    restart:
-      policy: no
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    resources:
+      requests: {cpus: 1, memory: 512MiB}
+      limits: {cpus: 1, memory: 512MiB}
+    replicas: 2
+    command: ["python3", "-c", "import time; time.sleep(3600)"]
+    dependsOn:
+      prepare: completed
+    probes:
+      startup:
+        exec: ["python3", "-c", "raise SystemExit(0)"]
+      readiness:
+        exec: ["python3", "-c", "raise SystemExit(0)"]
+      liveness:
+        exec: ["python3", "-c", "raise SystemExit(0)"]
+    update:
+      strategy: rolling
+      maxSurge: 1
+      maxUnavailable: 1
+      progressDeadline: 60s
+
+  web:
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    resources:
+      requests: {cpus: 1, memory: 512MiB}
+      limits: {cpus: 1, memory: 512MiB}
+    command: ["python3", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
+    dependsOn:
+      worker: ready
+    ports:
+      - "18081:8080"
+    probes:
+      startup:
+        exec: ["python3", "-c", "raise SystemExit(0)"]
+      readiness:
+        tcp:
+          port: 8080
+      liveness:
+        http:
+          port: 8080
+          path: /
+    update:
+      strategy: recreate
+      maxSurge: 0
+      maxUnavailable: 1
+      progressDeadline: 60s
 ```
 
-## 1. Validate and plan
+## Review and execute
+
+Use a signed current-source candidate and start Apple `container`. Follow
+[installation](/getting-started/install-from-source/) and [daemon setup](/operations/daemon/)
+before running these commands: validation, planning, and lifecycle requests use the
+authenticated Control API. The public dev.12 package uses older contracts.
 
 ```bash
-hostwright validate examples/app-suite/hostwright.yaml
-hostwright plan examples/app-suite/hostwright.yaml --output json
+hostwright validate hostwright.yaml
+hostwright image pull docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92 --platform linux/arm64 --runtime-provider apple-cli
+hostwright plan hostwright.yaml --output json
+hostwright runtime providers --json
+hostwright up hostwright.yaml --dry-run --runtime-provider apple-cli --output json
 ```
 
-The plan covers both services: typed issues from the
-[policy checks](/concepts/policy-engine/) (duplicate host ports, broad bind
-addresses, unsafe mounts, secret-like env values), drift records per service if
-observed state is available, and one deterministic hash for the whole plan.
-
-## 2. What health and restart declarations do
-
-- `health.command` is executed by the [daemon](/operations/daemon/) as an
-  in-process loopback probe for allowlisted command shapes. Results are
-  persisted and feed drift detection ("unhealthy where policy requires
-  health"). Container-exec health checks are not implemented.
-- `restart.policy` gates the *managed start* and *managed restart* actions.
-  `policy: no` (as on `worker`) is a manual hold: Hostwright will never mark a
-  start or restart of that service executable. Restart state also tracks max
-  attempts, backoff, and crash-loop blocking.
-
-## 3. One action per apply
-
-<Aside type="caution" title="Not Compose parity">
-If both services are missing, the plan contains two create actions, and
-`apply` refuses, because more than one executable action exists. Converging a
-multi-service suite means multiple explicit plan-confirm-apply rounds, one
-action each. Hostwright has a narrow mutation gate; it is not a Compose-style
-up command.
-</Aside>
-
-Bring the suite up one gated step at a time:
+`validate` and `plan` do not change the runtime. `plan` is a manifest-level plan;
+the lifecycle confirmation hash comes from the observed-runtime `up --dry-run`.
+Review its exact image, resource requests/limits, ownership, provider, and actions.
 
 ```bash
-hostwright plan examples/app-suite/hostwright.yaml --output json   # note the hash
-hostwright apply examples/app-suite/hostwright.yaml \
-  --state-db /tmp/hostwright.sqlite --confirm-plan <hash>          # one action
-hostwright plan examples/app-suite/hostwright.yaml --output json   # re-plan: new hash
+hostwright up hostwright.yaml --confirm-plan <planSHA256> --runtime-provider apple-cli
+hostwright status hostwright.yaml --runtime-provider apple-cli --output json
 ```
 
-Each apply changes observed reality, so each subsequent apply needs a freshly
-observed hash. A stale hash is refused with a confirmation-mismatch error
-(exit code 70).
+Use the exact hash from the fresh dry run, with the same manifest, provider, and
+selected state path. If anything changes, review another dry run. Stopping and
+removing resources each require their own fresh dry-run hash:
 
-## Next
+```bash
+hostwright down hostwright.yaml --dry-run --runtime-provider apple-cli
+hostwright down hostwright.yaml --confirm-plan <down-planSHA256> --runtime-provider apple-cli
+hostwright rm hostwright.yaml --dry-run --runtime-provider apple-cli
+hostwright rm hostwright.yaml --confirm-plan <rm-planSHA256> --runtime-provider apple-cli
+```
 
-- [Operations and recovery](/tasks/operations-and-recovery/): watching the suite after it runs.
-- [hostwright.yaml reference](/reference/manifest/): every supported field.
+Only proven Hostwright-owned resources are eligible for removal. Preserve unmanaged
+workloads and inspect [recovery](/reference/cli/) after interruption.

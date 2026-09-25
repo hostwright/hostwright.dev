@@ -3,8 +3,9 @@ title: Source install and doctor
 description: "Read-only walkthrough: build from source, run the test suite, and check your host with doctor."
 ---
 
-**This task is read-only.** Nothing here touches the container runtime or
-writes state.
+This task builds source and runs local checks. It does not apply a workload.
+Authenticated CLI checks require [daemon setup](/operations/daemon/); bootstrap
+creates local identity and state, and the daemon can reconcile its configured workload.
 
 ## 1. Build from source
 
@@ -14,8 +15,8 @@ cd hostwright
 swift build
 ```
 
-Hostwright is a dependency-free Swift package: no external SPM packages, SQLite
-via the system library.
+The package uses pinned SwiftPM dependencies, including Yams for bounded YAML
+decoding and Containerization behind its helper. SQLite uses the system library.
 
 ## 2. Run the tests
 
@@ -42,7 +43,7 @@ swift run hostwright doctor --output json
 ```
 
 `doctor` runs safe local checks only: OS version, Apple silicon and macOS 26+
-gate, Swift toolchain version, `container` executable lookup (presence check only), `hostwright.yaml` presence, state-path
+gate, Swift toolchain version, `container` executable lookup and supported version probes, `hostwright.yaml` presence, state-path
 policy, telemetry policy, and a local resource-intelligence report.
 
 A missing `container` executable is reported as a warning, not a crash. In the
@@ -53,5 +54,6 @@ check list is in [Doctor checks](/reference/doctor-checks/).
 ## Where this leaves you
 
 You have a built CLI and a verdict on current host compatibility. Hostwright
-installs from source today; `brew install hostwright` does not exist yet.
+installs from source or the unsupported [vendor tap](/getting-started/install-from-source/).
+Literal `brew install hostwright` is unavailable; Homebrew-core submission is deferred.
 Continue with [Plan a single service](/tasks/single-service-plan/).

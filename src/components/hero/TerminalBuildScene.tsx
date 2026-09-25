@@ -22,84 +22,84 @@ type LineKind = "cmd" | "muted" | "add" | "ok" | "blank";
 // section's scroll range for the pack-frame reveal + a real hold on it,
 // rather than squeezing that payoff into a sliver at the very end.
 const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
-  { text: "$ hostwright plan", kind: "cmd", start: 0.0, dur: 0.035 },
+  { text: "# Authenticated local lifecycle", kind: "cmd", start: 0.0, dur: 0.035 },
   {
-    text: "∙ reading hostwright.yaml",
+    text: "$ hostwright validate hostwright.yaml",
     kind: "muted",
     start: 0.042,
     dur: 0.014,
   },
   {
-    text: "∙ validating manifest … ok",
+    text: "$ hostwright up hostwright.yaml --dry-run",
     kind: "muted",
     start: 0.063,
     dur: 0.014,
   },
   {
-    text: "  + create   service/postgres  postgres:16",
+    text: "# Review image digests",
     kind: "add",
     start: 0.091,
     dur: 0.014,
   },
   {
-    text: "  + create   service/redis     redis:7",
+    text: "# Review CPU and memory requests",
     kind: "add",
     start: 0.112,
     dur: 0.014,
   },
   {
-    text: "  + create   service/api       ghcr.io/example/api",
+    text: "# Review provider limits",
     kind: "add",
     start: 0.133,
     dur: 0.014,
   },
   {
-    text: "  + create   service/worker    ghcr.io/example/worker",
+    text: "# Review exact owned resources",
     kind: "add",
     start: 0.154,
     dur: 0.014,
   },
   {
-    text: "  + create   service/nginx     nginx:1.27",
+    text: "# Review planned actions",
     kind: "add",
     start: 0.175,
     dur: 0.014,
   },
   {
-    text: "  plan: 5 to create, 0 to change, 0 to destroy",
+    text: "# Copy reviewed planSHA256",
     kind: "muted",
     start: 0.203,
     dur: 0.014,
   },
   { text: "", kind: "blank", start: 0.238, dur: 0 },
-  { text: "$ hostwright apply", kind: "cmd", start: 0.259, dur: 0.035 },
+  { text: "$ hostwright up hostwright.yaml", kind: "cmd", start: 0.259, dur: 0.035 },
   {
-    text: "∙ starting postgres … healthy",
+    text: "  --confirm-plan <planSHA256>",
     kind: "muted",
     start: 0.308,
     dur: 0.014,
   },
   {
-    text: "∙ starting redis … healthy",
+    text: "$ hostwright status hostwright.yaml",
     kind: "muted",
     start: 0.357,
     dur: 0.014,
   },
-  { text: "∙ starting api … healthy", kind: "muted", start: 0.406, dur: 0.014 },
+  { text: "$ hostwright down hostwright.yaml --dry-run", kind: "muted", start: 0.406, dur: 0.014 },
   {
-    text: "∙ starting worker … healthy",
+    text: "# Review a fresh shutdown hash",
     kind: "muted",
     start: 0.455,
     dur: 0.014,
   },
   {
-    text: "∙ starting nginx … healthy",
+    text: "$ hostwright down hostwright.yaml",
     kind: "muted",
     start: 0.504,
     dur: 0.014,
   },
   {
-    text: "✓ applied — 5 running, 0 pending",
+    text: "  --confirm-plan <down-planSHA256>",
     kind: "ok",
     start: 0.553,
     dur: 0.021,
@@ -109,11 +109,11 @@ const LINE: { text: string; kind: LineKind; start: number; dur: number }[] = [
 // index into LINE whose completion triggers each layer stacking in, bottom
 // to top: data layer first, gateway last — a real dependency order.
 const LAYERS = [
-  { label: "postgres", lineIndex: 11 },
-  { label: "redis", lineIndex: 12 },
-  { label: "api", lineIndex: 13 },
-  { label: "worker", lineIndex: 14 },
-  { label: "nginx", lineIndex: 15 },
+  { label: "intent", lineIndex: 11 },
+  { label: "admission", lineIndex: 12 },
+  { label: "identity", lineIndex: 13 },
+  { label: "runtime", lineIndex: 14 },
+  { label: "ledger", lineIndex: 15 },
 ];
 
 const KIND_COLOR: Record<LineKind, string> = {

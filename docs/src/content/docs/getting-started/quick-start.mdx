@@ -1,108 +1,84 @@
 ---
 title: Quick start
-description: "The safe core loop: init, validate, plan, doctor, and how confirmed apply fits in after it."
+description: "Validate a manifest, review a lifecycle plan, and run a local service."
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+This quickstart requires a signed current-source candidate on one Apple silicon Mac running macOS 26. The public tap still installs dev.12, which uses older commands and contracts. Current-candidate live qualification is pending; see [installation](/getting-started/install-from-source/) and [compatibility](/reference/compatibility/).
 
-This page covers the safe core loop. Every command here is **read-only or
-local-file-only**. The container runtime stays untouched until you opt into
-the confirmed apply gate at the end.
+## Prepare
 
-## Requirements
+Start Apple `container`, then follow [daemon setup](/operations/daemon/) to bootstrap the signed CLI and daemon. CLI validation, planning, and runtime requests use the authenticated Control API.
 
-Hostwright targets one environment:
-
-- An **Apple silicon** Mac (arm64).
-- **macOS 26 or later.**
-- **Apple container** installed and working, for runtime-backed commands.
-- Container images that provide a **`linux/arm64`** variant.
-
-Check your host first:
-
-```bash
-hostwright doctor
-```
-
-`doctor` runs safe local checks only: OS version, architecture gate, Swift
-toolchain, whether a `container` executable is on `PATH`, manifest presence, and
-local resource facts. It never runs Apple container commands. See
-[Doctor checks](/reference/doctor-checks/).
-
-## The core loop
-
-```bash
-# 1. Create a starter manifest in the current directory.
-#    Never overwrites an existing file; there is no --force.
-hostwright init
-
-# 2. Validate the restricted manifest shape. No registry or runtime contact.
-hostwright validate
-
-# 3. Compute the deterministic, non-mutating plan.
-#    Prints a plan hash, typed issues, and planned actions.
-hostwright plan
-
-# 4. Machine-readable output for scripts, if you want it.
-hostwright plan --output json
-```
-
-`plan` does not inspect Apple container by default and does not claim any
-resource is running or healthy. It is a manifest-level dry run with a
-deterministic hash. See [Reconciliation](/concepts/reconciliation/).
-
-## A minimal manifest
-
-The checked-in example at `examples/single-service/hostwright.yaml`:
+`hostwright init` creates a starter manifest without overwriting an existing file.
+Alternatively save the canonical single-service example below to a new file;
+first check that its project and host port do not conflict with an existing workload.
 
 ```yaml
-version: 2
-project: single-service
+version: 3
+project: quickstart
+imagePolicy: require-digest
 
 services:
   web:
-    image: docker.io/library/nginx:1.27
+    image: docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+    resources:
+      requests: {cpus: 1, memory: 512MiB}
+      limits: {cpus: 1, memory: 512MiB}
+    command: ["python3", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
     ports:
-      - "8080:80"
-    health:
-      command: ["curl", "-f", "http://localhost:8080/"]
-      interval: 30s
+      - "18080:8080"
+    probes:
+      startup:
+        exec: ["python3", "-c", "raise SystemExit(0)"]
+      readiness:
+        tcp:
+          port: 8080
+      liveness:
+        http:
+          port: 8080
+          path: /
     restart:
-      policy: on-failure
+      policy: unless-stopped
+    update:
+      strategy: recreate
+      maxSurge: 0
+      maxUnavailable: 1
+      progressDeadline: 60s
 ```
 
-Every field is described in the [`hostwright.yaml` reference](/reference/manifest/).
-
-## Observing the runtime
-
-Runtime observation and state persistence require an **explicit** state
-database path that you choose:
+## Review and execute
 
 ```bash
-hostwright status --state-db /tmp/hostwright.sqlite
-hostwright logs web --state-db /tmp/hostwright.sqlite
+hostwright validate hostwright.yaml
+hostwright image pull docker.io/library/python@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92 --platform linux/arm64 --runtime-provider apple-cli
+hostwright plan hostwright.yaml --output json
+hostwright runtime providers --json
+hostwright up hostwright.yaml --dry-run --runtime-provider apple-cli --output json
 ```
 
-`status` observes Apple container through the RuntimeAdapter, persists a status
-event and snapshot, and renders desired services against observed facts. It
-does not mutate anything.
+`validate` and `plan` do not change the runtime. `plan` is a manifest-level plan;
+the lifecycle confirmation hash comes from the observed-runtime `up --dry-run`.
+Review its exact image, resource requests/limits, ownership, provider, and actions.
 
-## Mutation is a separate, gated step
+Confirmed execution requires the signed payload and an authenticated local daemon
+identity. Follow the [installation guide](/getting-started/install-from-source/) and
+[daemon reference](/operations/daemon/). An absent or stale authority fails closed.
 
-<Aside type="caution" title="The only mutating paths">
-Runtime mutation happens only through `hostwright apply --state-db <path>
---confirm-plan <hash>` and `hostwright cleanup --state-db <path>
---confirm-cleanup <token>`. Apply executes exactly **one** confirmed action per
-invocation and refuses to run if the plan hash does not match the currently
-observed plan. There is no multi-action apply.
-</Aside>
+```bash
+hostwright up hostwright.yaml --confirm-plan <planSHA256> --runtime-provider apple-cli
+hostwright status hostwright.yaml --runtime-provider apple-cli --output json
+```
 
-The apply flow is covered step by step in
-[Plan a single service](/tasks/single-service-plan/), and the safety reasoning
-in the [Safety model](/concepts/safety-model/).
+Use the exact hash from the fresh dry run, with the same manifest, provider, and
+selected state path. If anything changes, review another dry run. Stopping and
+removing resources each require their own fresh dry-run hash:
 
-## Next
+```bash
+hostwright down hostwright.yaml --dry-run --runtime-provider apple-cli
+hostwright down hostwright.yaml --confirm-plan <down-planSHA256> --runtime-provider apple-cli
+hostwright rm hostwright.yaml --dry-run --runtime-provider apple-cli
+hostwright rm hostwright.yaml --confirm-plan <rm-planSHA256> --runtime-provider apple-cli
+```
 
-- [Desired state](/concepts/desired-state/): the model behind the manifest.
-- [Operations and recovery](/tasks/operations-and-recovery/): status, logs, events, diagnostics, cleanup.
-- [Limitations](/reference/limitations/): what to expect, stated plainly.
+Only proven Hostwright-owned resources are eligible for removal. Preserve unmanaged
+workloads and inspect [recovery](/reference/cli/) after interruption.

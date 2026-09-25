@@ -1,60 +1,54 @@
 ---
 title: Install from source
-description: Build Hostwright from source. No packages are published while it is in development.
+description: Build Hostwright locally or install the signed development package.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+Hostwright is on the `0.0.2-dev` development line. The v0.0.2 release is still undergoing qualification.
 
-Hostwright is in active development and not production ready.
+## Signed development package
 
-<Aside type="caution" title="No package-manager install">
-`brew install hostwright` does not exist today. A vendor tap, signed and
-notarized archives, and a `.pkg` are planned. The current install path is a
-source build.
-</Aside>
+```bash
+brew install hostwright/tap/hostwright
+hostwright --version
+```
 
-## Requirements
+The vendor tap installs the immutable **dev.12** qualification prerelease. It uses Manifest v2 and SQLite schema v7, and cannot run the current-source quickstart. Homebrew-core submission is deferred; `brew install hostwright` is unavailable.
 
-- Apple silicon Mac.
-- macOS 26 or newer for the current package target.
-- Swift 6.2-compatible toolchain.
-- Apple `container` only for live runtime commands.
-- Git.
+The preserved upgrade baselines are:
 
-## Build and verify
+| Release | Source commit |
+| --- | --- |
+| dev.11 | `7d97d6c9ff878ec567c88e6993d4543ab8f0ad95` |
+| dev.12 | `71414005104933d8ee3591e8c91bc831bce2e2a2` |
+
+A current signed candidate must pass the [release process](https://github.com/hostwright/hostwright/blob/main/docs/release/RELEASE_PROCESS.md) before publication. Qualification covers the actual CLI, daemon, desktop app, helpers, archive, and package.
+
+## Build current source
+
+Use Apple silicon, macOS 26 or later, and a Swift 6.2-compatible toolchain. Network access is needed for source and dependencies. Apple `container` is required for live operations through the CLI provider.
 
 ```bash
 git clone https://github.com/hostwright/hostwright.git
 cd hostwright
-swift build
-swift test
-scripts/integration.sh
+swift build --jobs 1
+scripts/test.sh pr
 swift run hostwright --version
-swift run hostwright capabilities --json
 ```
 
-This prints the current development version. There is no release tag to check
-out yet; build from the default branch.
+Locate the executables with `swift build --show-bin-path`. Source builds do not establish installed trust. Authenticated operations require a coherent signed CLI, daemon, and companion payload; follow [daemon setup](/operations/daemon/).
 
-## Try the current safe surface
+Current source uses Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24. See [compatibility](/reference/compatibility/) for the provider matrix.
 
-```bash
-swift run hostwright init
-swift run hostwright validate
-swift run hostwright plan --output json
-swift run hostwright doctor --output json
-```
+## State and package maintenance
 
-Runtime-backed/state-writing commands require Apple `container` as applicable
-and an explicit database path:
+The default state database is `~/Library/Application Support/Hostwright/state/state.sqlite`. Inspect selected paths with `hostwright paths --json`; use the same state selection for the CLI and daemon.
 
-```bash
-swift run hostwright status --state-db /tmp/hostwright.sqlite
-swift run hostwright logs api --state-db /tmp/hostwright.sqlite
-swift run hostwright events --state-db /tmp/hostwright.sqlite
-swift run hostwright cleanup --state-db /tmp/hostwright.sqlite --dry-run
-```
+Before an upgrade, create a verified state backup. State backups do not include workload data or Keychain items. Package upgrades also require a prepared, exact state binding. Follow the [installed lifecycle reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/installed-lifecycle.md) for upgrade, rollback, repair, and uninstall, and the [recovery runbook](https://github.com/hostwright/hostwright/blob/main/docs/reference/local-recovery.md) after interruption.
 
-The current checkout is a source tree, not an installed package. Managed
-install, upgrade, rollback, repair, and uninstall are planned. Until then,
-preserve or clean runtime and state resources explicitly.
+Installers act only on verified owned payloads. They preserve unrelated or modified files and do not install or start a LaunchAgent automatically. `hostwright daemon install` separately manages the current-user service. Deleting a source checkout does not uninstall the application or remove state or workloads.
+
+## Release verification
+
+`hostwright-dist verify-release` checks the signed release inventory. Checksums establish byte identity; signatures, notarization, and retained source evidence establish separate parts of distribution trust. Local unsigned `build` and `assemble` output cannot satisfy the signed release gate.
+
+The [release verification reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/release-promotion.md) describes staging, candidate acceptance, and immutable publication. Historical dev.11/dev.12 qualification does not qualify current-source artifacts.

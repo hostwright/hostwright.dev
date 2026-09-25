@@ -1,7 +1,6 @@
 // Site-wide constants. Edit URLs here only.
 //
-// NOTE: the name is "pre-screened", not yet reserved. The GitHub org, domain,
-// and social handles below are the project's confirmed accounts.
+// The GitHub org, domain, and social handles below are the project's accounts.
 export const site = {
   name: "Hostwright",
   domain: "hostwright.dev",

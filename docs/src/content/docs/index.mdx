@@ -11,33 +11,24 @@ You declare services in a versioned [`hostwright.yaml`](/reference/manifest/) ma
 
 <Aside type="caution" title="In active development">
 Hostwright is in active development and not production ready. `brew install
-hostwright` does not exist today. Build from source and read
+hostwright` does not exist today. Use the [documented source or vendor-tap installation](/getting-started/install-from-source/) and read
 [Limitations](/reference/limitations/) before relying on behavior.
 </Aside>
 
-## What works today
+## Current development boundary
 
-- `hostwright --version` and `hostwright capabilities --json` report the build version and the exact capability set.
-- `hostwright init`, `validate`, and `plan` provide explicit Manifest v2, restricted fail-closed parsing, and deterministic planning.
-- `hostwright migrate preview` produces a deterministic non-writing preview for legacy v1/versionless manifests.
-- `status`, bounded `logs`, `events`, `recovery`, and local redacted `diagnostics` use explicit state paths.
-- Confirmation-gated `apply` supports only the currently declared narrow create/start/restart surface.
-- `cleanup` classifies first and deletes only exact cleanup-eligible Hostwright-owned non-running containers after token confirmation.
-- `hostwrightd --foreground` observes, plans, checks bounded loopback health, and records events. It runs in the foreground and performs no unattended mutation.
-- SQLite schema v7 establishes UUID identity, provider binding, fencing, saga intent, compensation, and verification records.
-- Secret references, local policy/team profiles, a one-shot Control API v2 process, advisory scheduler models, and unsigned developer distribution evidence exist within their documented narrow boundaries.
+- Manifest v3, Runtime Provider API v2, Control API 2.2, and SQLite schema v24.
+- Authenticated local daemon lifecycle with plan confirmation, durable reservations,
+  recovery, ownership fencing, and exact cleanup.
+- Narrow Compose import with explicit CPU/memory mapping, followed by separately
+  confirmed local execution.
+- Native desktop up/down/restart with confirmation, cancellation, and disconnect handling.
+- Signed development archives and packages plus the vendor tap; current-source
+  release qualification remains pending.
 
-Capabilities outside this set are documented in [Limitations](/reference/limitations/).
-
-## Locked contracts
-
-| Contract | Version |
-| --- | ---: |
-| Manifest | 2 |
-| Control API | 2 |
-| Runtime Provider API | 2 |
-| Plugin ABI | 1 |
-| State schema | 7 |
+Multi-Mac, Kubernetes, Docker API/client parity, accelerators, scheduler optimization,
+team/MDM/cloud features, automatic updates, and Homebrew-core publication are deferred.
+Read [limitations](/reference/limitations/) and the exact [compatibility matrix](/reference/compatibility/).
 
 ## How these docs are organized
 

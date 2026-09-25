@@ -1,6 +1,6 @@
 ---
 title: State store
-description: An explicit-path SQLite ledger for desired state, observed snapshots, events, operations, ownership, health, and recovery records.
+description: A secure local SQLite ledger for desired state, observed snapshots, events, operations, ownership, health, and recovery records.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -13,28 +13,22 @@ groups with step-level checkpoints.
 
 ![An explicit SQLite state database feeding a ledger of desired, observed, events, operations, ownership, health, and recovery records, read back by the read-only events, recovery, and diagnostics commands.](/diagrams/15-state-ledger.png)
 
-## Explicit paths only
+## Secure selected paths
 
-Hostwright **never chooses a database path for you**. There is no default under
-the repository, `~/Library/Application Support`, XDG paths, or any global
-location. Every stateful command takes `--state-db <path>`:
+The default database is `~/Library/Application Support/Hostwright/state/state.sqlite`.
+`--state-db` takes precedence over `HOSTWRIGHT_STATE_DB`, then the documented default.
+Use `hostwright paths --json` to inspect the selected layout. Private managed directories
+require mode `0700`; sensitive files require `0600`. Unsafe ownership, ACLs, links,
+or writable parents fail closed.
 
-```bash
-hostwright status --state-db /tmp/hostwright.sqlite
-hostwright events --state-db /tmp/hostwright.sqlite
-```
-
-Write-path commands (`status`, `logs --state-db`, `apply`, `cleanup`,
-`hostwrightd --foreground`) can run explicit migrations before writing.
-Read-only commands (`events`, `recovery`, `diagnostics`) validate the
-already-applied schema and **fail rather than creating or migrating a database
-as a side effect**.
+State-writing commands can apply compatible migrations. Read-only state queries
+validate an existing schema without creating or migrating it.
 
 ## Migration continuity
 
 Migrations are explicit and checksummed:
 
-- Schema version 6 is the latest supported version. A database migrated by a
+- Schema version 24 is the latest supported version. A database migrated by a
   newer Hostwright release fails closed with an incompatible-schema error;
   Hostwright does not downgrade or convert.
 - Each migration records a checksum in `schema_migrations`. A known version
@@ -44,10 +38,9 @@ Migrations are explicit and checksummed:
   one fails closed. A valid older contiguous prefix remains eligible for
   explicit forward migration.
 
-Schema version 6 added exact observed resource identifiers, observed network
-metadata, and ownership identity versions; legacy rows are backfilled as
-identity version 1, new labeled resources are written as version 2. See
-[Runtime adapter: identity and ownership](/concepts/runtime-adapter/).
+Schema v24 retains lifecycle, storage, network, restart, and ownership authority and
+adds authenticated local control, audit/RBAC, admission, durable scheduler reservations,
+and installed-identity rotation fencing. This is single-Mac state; cluster authority is deferred.
 
 ## What is (and is not) stored
 
@@ -76,15 +69,14 @@ stores, with exactly one winner.
 No transaction performs runtime mutation. Apply and cleanup write intent first,
 leave the transaction, call the RuntimeAdapter, then record success or failure.
 
-## Backup and restore are cold operations
+## Verified backup, restore, and repair
 
-1. Stop any Hostwright command or daemon using the database.
-2. Copy the explicit SQLite file plus sidecars (`*-wal`, `*-shm`) if present.
-3. To restore: move the existing database aside (never overwrite), copy the
-   backup into place, and verify with a safe read such as
-   `hostwright events --state-db <path>`.
+Use `hostwright state integrity --json`, `hostwright state backups --json`, and
+`hostwright state recover --json` to inspect health and retained recovery evidence.
+Online backup publishes a verified private catalog. Restore requires confirmation
+and preserves a pre-restore backup or quarantined corrupt source. Repair rebuilds
+only supported projections; it never invents ownership authority.
 
-There are no online backup, restore, or repair commands, and no production
-durability guarantee. Corruption recovery is manual: keep the file, restore
-from a cold backup, or start a new explicit path. Hostwright never invents
-ownership records or erases state automatically.
+Read the [state command reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/cli.md)
+for the exact backup/restore/repair arguments and confirmation tokens. Current-release
+installation and recovery qualification remains pending; this prerelease has no GA durability claim.
