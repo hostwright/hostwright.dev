@@ -3,7 +3,7 @@ title: Install from source
 description: Build Hostwright locally or install the signed development package.
 ---
 
-Hostwright is preparing the `0.0.2-rc.4` candidate. No supported RC or GA channel has been published; the final v0.0.2 release remains under qualification.
+Hostwright is preparing the `0.0.2-rc.5` candidate. No supported RC or GA channel has been published; the final v0.0.2 release remains under qualification.
 
 ## Signed development package
 
@@ -41,7 +41,7 @@ Current source uses Manifest v3, Control API 2.2, Runtime Provider API v2, and S
 
 ## State and package maintenance
 
-The default state database is `~/Library/Application Support/Hostwright/state/state.sqlite`. Inspect selected paths with `hostwright paths --json`; use the same state selection for the CLI and daemon.
+The default state database is `~/Library/Application Support/Hostwright/state/state.sqlite`. After identity bootstrap and daemon startup, inspect selected paths with `hostwright paths --json` from that signed installation. Use the same state selection for the CLI and daemon.
 
 Before an upgrade, create a verified state backup. State backups do not include workload data or Keychain items. Package upgrades also require a prepared, exact state binding. Follow the [installed lifecycle reference](https://github.com/hostwright/hostwright/blob/main/docs/reference/installed-lifecycle.md) for upgrade, rollback, repair, and uninstall, and the [recovery runbook](https://github.com/hostwright/hostwright/blob/main/docs/reference/local-recovery.md) after interruption.
 
