@@ -31,8 +31,8 @@ export const nonGoals: NonGoal[] = [
 // External constraints receive product fallbacks instead of becoming excuses.
 export const underResearch: NonGoal[] = [
   {
-    title: "Vendor tap installation",
-    detail: "The maintained vendor tap supplies unsupported qualification packages. Homebrew-core submission is deferred from v0.0.2.",
+    title: "Official Homebrew acceptance",
+    detail: "The vendor tap supplies unsupported qualification packages. The intended GA launch also requires an accepted official cask and verified installation without adding a tap.",
   },
   {
     title: "Accelerators deferred",
