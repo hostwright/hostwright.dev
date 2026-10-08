@@ -41,6 +41,14 @@ Docs use the existing Cloudflare Pages project. Account/project access is pendin
 
 ## Release truth
 
-The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24. Signed vendor-tap dev.11/dev.12 artifacts are unsupported qualification prereleases; current-source/final-version release qualification remains pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported.
+The core repository is preparing `0.0.2-rc.7`; no supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
+
+| Installation path | What the site may claim |
+| --- | --- |
+| `brew install hostwright/tap/hostwright` | Installs signed dev.12, an unsupported qualification prerelease with older contracts. |
+| Current source | Development builds; authenticated commands require a matching signed installation, identity bootstrap, and a running daemon. |
+| `brew install hostwright` | Unavailable until official Homebrew cask acceptance. This is a required launch goal, not a completed installation path. |
+
+Current-source and final-version release qualification remain pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported. Keep installation, compatibility, and roadmap copy aligned with the [GA readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-08.md); the combined GA and official Homebrew launch date is unconfirmed.
 
 Canonical scope: [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). Installation and compatibility truth belong in the docs content and current core repository contracts.
