@@ -3,10 +3,9 @@ title: Security and safety
 description: "The operational security posture: mutation boundaries, redaction, image trust, network exposure, and untrusted input."
 ---
 
+Hostwright `0.0.2-rc.7` is in candidate preparation. RC and final `v0.0.2` acceptance remain pending; earlier development evidence does not qualify these bytes.
 
-Hostwright `0.0.2-dev` is not production ready. The active release target is `v0.0.2`; security-sensitive features remain unsupported until their owning roadmap issue has clean security and runtime evidence.
-
-The v0.0.2 program turns earlier unsupported security-sensitive scope into explicit implementation work for trusted install, secrets, supply chain, storage, networking, tunnels, autonomous mutation, identity/RBAC/admission/audit, plugins, clusters, interoperability, GUI/MDM, and optional cloud control. The exact current state is emitted by `hostwright capabilities --json`; only the qualified networking, storage, lifecycle, and distribution subsets described there are supported on this development line.
+The accepted release scope is one Apple silicon Mac, explicit local workload lifecycle, CPU/memory admission, narrow Compose import, and the desktop console. Multi-Mac, Kubernetes, Docker-client compatibility, Homebrew-core, and team/MDM/cloud claims are deferred under [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). The exact implemented capabilities are emitted by `hostwright capabilities --json`; support requires passing conformance and release evidence for the declared provider/version cell.
 
 ## Runtime Boundary
 
@@ -100,7 +99,7 @@ Event cursors bind only a validated non-secret event identifier and SHA-256 of t
 
 Metrics use only fixed catalog-owned names, label keys, and label values. No project, service, resource, operation, provider, path, endpoint, host, error text, secret, credential, or PII becomes a label or raw-row export. Snapshot is a shared-fenced read of existing schema-v17 authority and creates no sample store or listener. Export requires an exact recomputed confirmation hash and a canonical current-user private parent; an `openat`-bound exclusive/no-follow mode-`0600` file is revalidated by descriptor and path identity before success. Cancellation or failure removes only the exact created incomplete file. There is no automatic upload. See [Bounded Local Metrics and SLOs](https://github.com/hostwright/hostwright/blob/main/docs/reference/metrics.md).
 
-Trace records use only fixed span names and closed attribute keys/values, canonical UUID context, bounded depth/count/size, and post-commit event/operation identifiers. Raw output, errors, paths, manifests, project/service/resource names, credentials, PII, and secret references are not accepted as attributes. Trace failure never changes control status. Export requires a complete retained trace plus its exact recomputed hash and uses the same exclusive descriptor-bound private-file contract as metrics. Trace rows retain independently under the Manifest-v2 `traces` class; no listener, external exporter, or automatic upload exists. See [Correlated Local Traces](https://github.com/hostwright/hostwright/blob/main/docs/reference/traces.md).
+Trace records use only fixed span names and closed attribute keys/values, canonical UUID context, bounded depth/count/size, and post-commit event/operation identifiers. Raw output, errors, paths, manifests, project/service/resource names, credentials, PII, and secret references are not accepted as attributes. Trace failure never changes control status. Export requires a complete retained trace plus its exact recomputed hash and uses the same exclusive descriptor-bound private-file contract as metrics. Trace rows retain independently under the Manifest v3 `traces` class; no listener, external exporter, or automatic upload exists. See [Correlated Local Traces](https://github.com/hostwright/hostwright/blob/main/docs/reference/traces.md).
 
 ## Policy Boundary
 
@@ -150,21 +149,16 @@ The trusted path requires exact non-ambiguous Developer ID Application and Insta
 
 The protected release workflow separates build/sign, attestation, and publication. Repository code runs with read-only contents permission and no OIDC or publication authority. A GitHub-hosted no-checkout job receives only OIDC/attestation authority for the retained signed files. Only the final no-checkout publication job receives contents write permission. Actions are commit-pinned, tags are immutable, published bytes are downloaded and compared, GitHub attestations are verified, and a failure after tag creation removes the release/tag.
 
-Immutable dev.11/dev.12 qualification releases passed Developer ID signing,
-notarization, Gatekeeper, signed `.pkg`, vendor-tap installation, and clean-Mac
-evidence. The vendor tap publishes the qualified dev.12 formula. These remain
-unsupported prereleases; current-source and final-version qualification are pending.
-Local unsigned artifacts are non-publishable. See the
-[installation guide](/getting-started/install-from-source/) for the recorded boundary.
+Immutable dev.11/dev.12 releases provide signed/notarized archives and packages; the vendor tap installs dev.12 as an unsupported qualification prerelease. Current RC and final-version bytes require their own signing, Gatekeeper, full lifecycle, and protected acceptance evidence. Local unsigned artifacts cannot satisfy those gates.
 
 ## Control Surface Boundary
 
 Daemon-ready local control uses the authenticated, user-private Unix-socket
-Control API 2.2. It has no TCP listener. Kernel peer credentials, audit token,
+Control API v2.2. It has no TCP listener. Kernel peer credentials, audit token,
 live code identity, the persisted subject, RBAC, admission, effective-intent
 reauthorization, durable idempotency, and tamper-evident audit all run before a
 mutation handler. The one-shot `hostwright-control` companion remains only the
-bounded bootstrap path for daemon installation, repair, and uninstall. Neither surface
+bounded bootstrap path for identity setup and the exact current-user daemon service lifecycle, including offline start, repair and status. Neither surface
 permits request-selected state paths or direct calls around the shared
 validation, ownership, provider, migration, and audit boundaries.
 
@@ -183,6 +177,8 @@ CDHash as a separate non-owner identity. Later ad-hoc replacement remains
 fail-closed until explicitly declared; this first-install trust-on-first-use
 boundary does not protect against an attacker already controlling the invoking
 user account or its build directory.
+
+Docker execution is deferred. Docker envelopes are rejected by the bootstrap API and production CLI executor before input reads or command execution. The persistent daemon lifecycle transport remains reserved for authenticated workload commands; service control uses the trusted companion and retains its exact ownership checks.
 
 Admission policies are bounded declarative documents, not arbitrary native
 code. Conflicting writes, malformed policy state, stale plan hashes, expired or
@@ -304,7 +300,7 @@ Fetch verifies descriptor size, digest, media type, graph edges, and root subjec
 
 Narrow retention leases use exact UUID fencing tokens. Remote cleanup requires a confirmed plan hash, an inactive lease set, immutable Hostwright publication evidence, exact remote content and subject revalidation, and post-delete absence. Fallback cleanup conditionally removes only the matching descriptor and restores it if the exact manifest delete fails. It never deletes blobs, unrelated manifests, indexes belonging to another subject, or invokes a registry-wide prune. This remote artifact-retention boundary is separate from schema-v14 local content-cache accounting and does not authorize runtime-image or OCI-cache pressure deletion.
 
-Phase 08 state compaction is another separate local boundary. It accepts only a fully validated Manifest-v2 policy and an exact dry-run token, creates a verified rollback backup, and deletes only allowlisted schema-v17 rows whose age/count eligibility, recovery horizon, hold status, terminal state, finalizers, references, UUID generation/fence identity, and complete logical snapshot still match. Security, trust, provenance, vulnerability, secret, approval, operator, maintenance, and retention events are isolated in the audit class. Backup pruning uses only a verified private catalog identity and same-parent atomic staging. Journal, torn-commit, terminal-effect, or integrity ambiguity blocks ordinary state access and preserves evidence. Database pressure never authorizes global/native prune, runtime mutation, current authority deletion, recovery-horizon reduction, hold bypass, or unmanaged filesystem cleanup.
+Phase 08 state compaction is another separate local boundary. It accepts only a fully validated Manifest v3 policy and an exact dry-run token, creates a verified rollback backup, and deletes only allowlisted schema-v17 rows whose age/count eligibility, recovery horizon, hold status, terminal state, finalizers, references, UUID generation/fence identity, and complete logical snapshot still match. Security, trust, provenance, vulnerability, secret, approval, operator, maintenance, and retention events are isolated in the audit class. Backup pruning uses only a verified private catalog identity and same-parent atomic staging. Journal, torn-commit, terminal-effect, or integrity ambiguity blocks ordinary state access and preserves evidence. Database pressure never authorizes global/native prune, runtime mutation, current authority deletion, recovery-horizon reduction, hold bypass, or unmanaged filesystem cleanup.
 
 Phase 08 support bundles are an explicit local disclosure boundary, not an automatic crash collector. Preview and create project only fixed bounded version, capability, configuration-shape, integrity, OSLog, event, metrics, trace, operation, and evidence fields. Record IDs are hashed; raw manifest values, event/operation payloads, paths, environment values, secret stores, Keychain contents, credentials, and private keys are excluded. A fresh preview hash is required before one new private file. Optional macOS CMS encryption receives plaintext only on bounded subprocess standard input and persists only encrypted output plus a recipient-reference hash. A private durable journal records file intent and exact identity; recovery safe-holds on ambiguity. Deletion requires both retained Hostwright creation evidence and an unchanged single-link device/inode/hash/size identity. No bundle is uploaded, retained externally, overwritten, broadly discovered, or deleted by compaction, daemon cleanup, distribution uninstall, or another file's receipt. See [Privacy-Safe Support Bundles](https://github.com/hostwright/hostwright/blob/main/docs/reference/support-bundles.md).
 

@@ -33,13 +33,18 @@ You can list what exists first with `swift test list`, or use the repository's
 swift run hostwright --version
 ```
 
-This prints the current development version.
+This prints the current source version.
 
-## 4. Check the host
+## 4. Check a signed installation
+
+Use the CLI and daemon from the same signed installation. Complete
+[identity bootstrap and daemon startup](/operations/daemon/) under the same
+macOS account and local paths first. Version and help work on a source build;
+`doctor` uses the authenticated Control API.
 
 ```bash
-swift run hostwright doctor
-swift run hostwright doctor --output json
+hostwright doctor
+hostwright doctor --output json
 ```
 
 `doctor` runs safe local checks only: OS version, Apple silicon and macOS 26+
@@ -53,7 +58,8 @@ check list is in [Doctor checks](/reference/doctor-checks/).
 
 ## Where this leaves you
 
-You have a built CLI and a verdict on current host compatibility. Hostwright
+You have a built CLI. After completing the signed-installation step, you also
+have a verdict on current host compatibility. Hostwright
 installs from source or the unsupported [vendor tap](/getting-started/install-from-source/).
-Literal `brew install hostwright` is unavailable; Homebrew-core submission is deferred.
+`brew install hostwright` remains unavailable. Official cask acceptance and a verified no-tap installation are required for the intended GA launch.
 Continue with [Plan a single service](/tasks/single-service-plan/).
