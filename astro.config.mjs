@@ -5,7 +5,7 @@ import sitemap from "@astrojs/sitemap";
 
 import react from "@astrojs/react";
 
-// Canonical production URL for the GitHub Pages root site.
+// Canonical production URL for the root site.
 export default defineConfig({
   site: "https://hostwright.dev",
   integrations: [mdx(), sitemap(), react()],

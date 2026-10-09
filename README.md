@@ -35,9 +35,11 @@ Use `npm run dev` or `npm run preview` inside either project to serve it locally
 
 ## Hosting and CI
 
-The root is hosted on GitHub Pages. `.github/workflows/deploy.yml` checks, builds, and publishes only the root `dist/` on authorized main-branch updates. `.github/workflows/check.yml` independently installs, typechecks, builds, checks links, and audits both projects on pull requests and main updates; it does not publish docs.
+The production root site uses the existing Cloudflare Worker `hostwrightdev`, with custom domains `hostwright.dev` and `www.hostwright.dev`. Workers Builds runs `npm run build` from the repository root, then `npx wrangler deploy` for `main` or `npx wrangler versions upload` for other branches. `wrangler.jsonc` points to the generated `dist/` assets and records the existing domains, compatibility settings and preview URLs. `_headers` and `_redirects` apply to those static assets. A successful version upload creates a preview; it does not publish the branch to production.
 
-Docs use the existing Cloudflare Pages project. Account/project access is pending; dashboard access is signed out. Do not infer a configured deployment or migrate hosting. The docs project must use `docs` as its build root, `npm run build` as its build command, and `dist` as its output directory. Verify the existing project settings once access is available.
+The existing GitHub Pages workflow also checks, builds and publishes root `dist/` on authorized main-branch updates. `.github/workflows/check.yml` independently installs, typechecks, builds, checks links, and audits both projects on pull requests and main updates; it does not publish docs.
+
+Docs use the existing Cloudflare Pages project `hostwright-docs`, configured with `docs` as the build root, `npm run build` as the build command, and `dist` as the output directory. Root Workers configuration does not deploy the docs project.
 
 ## Release truth
 
