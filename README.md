@@ -43,7 +43,7 @@ Docs use the existing Cloudflare Pages project `hostwright-docs`, configured wit
 
 ## Release truth
 
-The core repository is preparing `0.0.2-rc.7`; no supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
+The core repository is preparing `0.0.2-rc.9` with an explicit native SwiftPM release build after RC.8 failed its macOS 27 distribution check. No supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
 
 | Installation path | What the site may claim |
 | --- | --- |
