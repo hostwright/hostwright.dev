@@ -43,7 +43,7 @@ Docs use the existing Cloudflare Pages project `hostwright-docs`, configured wit
 
 ## Release truth
 
-The core repository is preparing `0.0.2-rc.10` with a rebuilt Linux 6.18.55 kernel and reviewed security backports after RC.9 was held by its kernel security review. No supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
+The core repository is preparing `0.0.2-rc.11` with the rebuilt Linux 6.18.55 kernel and reviewed security backports. RC.10 qualification found a host-dependent test assertion and a clean release-build timeout; complete qualification of the corrected candidate is still required. No supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
 
 | Installation path | What the site may claim |
 | --- | --- |
