@@ -7,11 +7,10 @@ This quickstart requires a signed current-source candidate on one Apple silicon 
 
 ## Prepare
 
-Start Apple `container`, then follow [daemon setup](/operations/daemon/) to bootstrap the signed CLI and daemon. CLI validation, planning, and runtime requests use the authenticated Control API.
-
-`hostwright init` creates a starter manifest without overwriting an existing file.
-Alternatively save the canonical single-service example below to a new file;
-first check that its project and host port do not conflict with an existing workload.
+Start Apple `container`, then save the canonical single-service example below to
+a new `hostwright.yaml`. First check that its project and host port do not
+conflict with an existing workload. Create this file before starting the daemon;
+CLI validation, planning, and runtime requests use the authenticated Control API.
 
 ```yaml
 version: 3
@@ -46,6 +45,18 @@ services:
       progressDeadline: 60s
 ```
 
+In a separate terminal under the same macOS account, change to the directory
+containing `hostwright.yaml`, bootstrap the installed identities and start the
+foreground daemon:
+
+```bash
+hostwright daemon bootstrap-identities --json
+hostwrightd --foreground --config "$PWD/hostwright.yaml"
+```
+
+Keep that terminal running while using the CLI. See [daemon setup](/operations/daemon/)
+for managed service installation and local path requirements.
+
 ## Review and execute
 
 ```bash
@@ -67,6 +78,7 @@ identity. Follow the [installation guide](/getting-started/install-from-source/)
 ```bash
 hostwright up hostwright.yaml --confirm-plan <planSHA256> --runtime-provider apple-cli
 hostwright status hostwright.yaml --runtime-provider apple-cli --output json
+curl --fail http://127.0.0.1:18080/
 ```
 
 Use the exact hash from the fresh dry run, with the same manifest, provider, and
@@ -82,3 +94,9 @@ hostwright rm hostwright.yaml --confirm-plan <rm-planSHA256> --runtime-provider 
 
 Only proven Hostwright-owned resources are eligible for removal. Preserve unmanaged
 workloads and inspect [recovery](/reference/cli/) after interruption.
+Press Control-C in the foreground daemon terminal after cleanup if you started
+it for this walkthrough.
+
+The [desktop quickstart](https://github.com/hostwright/hostwright/blob/main/docs/guides/desktop-quickstart.md)
+covers manifest selection, confirmed Start/Stop actions, logs and CLI removal
+using the same signed installation.
