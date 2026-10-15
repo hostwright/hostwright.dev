@@ -43,7 +43,7 @@ Docs use the existing Cloudflare Pages project `hostwright-docs`, configured wit
 
 ## Release truth
 
-The core repository is preparing `0.0.2-rc.11` with the rebuilt Linux 6.18.55 kernel and reviewed security backports. RC.10 qualification found a host-dependent test assertion and a clean release-build timeout. The corrected RC.11 source matrix, ASan and TSan each passed 3,544 unique cases with no failures or skips; six critical fuzz targets completed five-minute runs. Signed staging and installed-artifact qualification remain pending. No supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
+Current source prepares `0.0.2-rc.12` and requires fresh qualification. The frozen `0.0.2-rc.11` candidate completed signed staging and its first dev.11 VM upgrade. The subsequent rollback and compensation failed; the [raw failure is retained](https://github.com/hostwright/hostwright/issues/278#issuecomment-6185484144), and the candidate is not accepted. Its source matrix, ASan and TSan each passed 3,544 unique cases with no failures or skips; six critical fuzz targets completed five-minute runs. No supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
 
 | Installation path | What the site may claim |
 | --- | --- |
@@ -51,6 +51,6 @@ The core repository is preparing `0.0.2-rc.11` with the rebuilt Linux 6.18.55 ke
 | Current source | Development builds; authenticated commands require a matching signed installation, identity bootstrap, and a running daemon. |
 | `brew install hostwright` | Unavailable until official Homebrew cask acceptance. This is a required launch goal, not a completed installation path. |
 
-Installed RC.11 artifacts and final-version release qualification remain pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported. Keep installation, compatibility, and roadmap copy aligned with the [GA readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-14.md); the combined GA and official Homebrew launch date is unconfirmed.
+Complete installed-candidate and final-version release qualification remain pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported. Keep installation, compatibility, and roadmap copy aligned with the [GA readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-15.md); the combined GA and official Homebrew launch date is unconfirmed.
 
 Canonical scope: [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). Installation and compatibility truth belong in the docs content and current core repository contracts.
