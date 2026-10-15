@@ -3,7 +3,9 @@ title: Install from source
 description: Build Hostwright locally or install the signed development package.
 ---
 
-Current source prepares `0.0.2-rc.12`, which requires fresh candidate qualification. The frozen `0.0.2-rc.11` candidate completed signed staging and its first dev.11 VM upgrade. Its subsequent rollback failed, so installed-artifact qualification remains blocked; see the [retained failure](https://github.com/hostwright/hostwright/issues/278#issuecomment-6185484144). The RC.11 source matrix, ASan and TSan each passed 3,544 unique cases with no failures or skips, and six critical fuzz targets completed five-minute runs. No supported RC or GA channel has been published. See the [October 15 readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-15.md) and [independently reviewed sanitizer evidence](https://github.com/hostwright/hostwright/issues/271#issuecomment-6148896686).
+The frozen candidate is `0.0.2-rc.12`. Its supported source matrix passed **3,554 unique tests**, its exact runtime archive is authenticated, and all six fresh fuzz targets passed five minutes plus corpus replay. See the [source evidence summary](https://github.com/hostwright/hostwright/blob/main/docs/evidence/phase15-rc12-aa8586a1/README.md).
+
+Release qualification remains open: macOS 26 payload reproducibility failed, and complete sanitizer coverage and signed installation/recovery checks remain required. The earlier RC.11 signed package installed over dev.11 but failed rollback; its [failure record](https://github.com/hostwright/hostwright/issues/278#issuecomment-6185484144) remains retained. No supported RC or GA channel has been published. Follow the [October 15 readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-15.md).
 
 ## Signed development package
 
