@@ -5,7 +5,7 @@ description: Build Hostwright locally or install the signed development package.
 
 The frozen candidate is `0.0.2-rc.12`. Its supported source matrix passed **3,554 unique tests**, its exact runtime archive is authenticated, and all six fresh fuzz targets passed five minutes plus corpus replay. See the [source evidence summary](https://github.com/hostwright/hostwright/blob/main/docs/evidence/phase15-rc12-aa8586a1/README.md).
 
-Release qualification remains open: the first macOS 26 payload comparison failed, and the ASan base failed one lifecycle test. A later [production-builder comparison](https://github.com/hostwright/hostwright/actions/runs/38779685934) matched all nine executable payloads in two builds; the original failed distribution job is being retried. Complete sanitizer coverage and signed installation/recovery checks remain required.
+Release qualification remains open: the ASan base failed one lifecycle test. The [macOS 26 distribution retry](https://github.com/hostwright/hostwright/actions/runs/38697524899/attempts/2) passed all 54 tests, and the [production-builder comparison](https://github.com/hostwright/hostwright/actions/runs/38779685934) matched all nine executable payloads in two builds. The original failed comparison remains retained. Complete sanitizer coverage and signed installation/recovery checks remain required.
 
 The earlier RC.11 signed package installed over dev.11 but failed rollback; its [failure record](https://github.com/hostwright/hostwright/issues/278#issuecomment-6185484144) remains retained. No supported RC or GA channel has been published. Follow the [October 15 readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-15.md).
 
