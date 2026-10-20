@@ -3,11 +3,11 @@ title: Install from source
 description: Build Hostwright locally or install the signed development package.
 ---
 
-RC.13 preparation is underway. The reviewed [kernel security fixes](https://github.com/hostwright/hostwright/pull/401), [patched-source guest inventory correction](https://github.com/hostwright/hostwright/pull/402) and [guest SwiftNIO update](https://github.com/hostwright/hostwright/pull/403) are merged. The [ingredient producer](https://github.com/hostwright/hostwright/actions/runs/38944254249) passed; a fresh freeze, final runtime archive, signed artifacts and installed lifecycle qualification remain required.
+RC.14 preparation follows the merged [managed-daemon startup fix](https://github.com/hostwright/hostwright/pull/414). A signed development build passed supported repair, managed startup, two authenticated integrity checks and service cleanup in the qualification VM. A fresh source freeze, exact-source runtime producer, signed staging and installed lifecycle qualification remain required.
 
-Frozen RC.12 and its [source, sanitizer and runtime results](https://github.com/hostwright/hostwright/blob/main/docs/evidence/phase15-rc12-aa8586a1/README.md) remain retained under their original bindings. Its signed inventory and runtime security findings require a new candidate. Earlier RC.11 rollback failures and the original RC.12 build and sanitizer failures remain retained; earlier results do not qualify RC.13.
+Frozen RC.13 passed [source, sanitizer, fuzz and supply-chain checks](https://github.com/hostwright/hostwright/blob/main/docs/evidence/phase15-rc13-c0f63020/README.md), and [issue #275](https://github.com/hostwright/hostwright/issues/275) is closed with reviewed public evidence. Its installed-service startup defect prevents full acceptance. RC.13 and earlier results remain bound to their original source and artifacts; they do not qualify RC.14.
 
-No supported RC or GA channel has been published. Official `brew install hostwright` is not available yet. See the [current GA readiness record](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-18.md) for the exact progress and remaining issue gates. A GA date is not confirmed, and official Homebrew acceptance remains a launch requirement.
+No supported RC or GA channel has been published. Official `brew install hostwright` is not available yet. See the [current GA readiness record](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-20-rc14.md) for the exact progress and remaining issue gates. A GA date is not confirmed, and official Homebrew acceptance remains a launch requirement.
 
 ## Signed development package
 
