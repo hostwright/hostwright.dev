@@ -3,11 +3,11 @@ title: Install from source
 description: Build Hostwright locally or install the signed development package.
 ---
 
-RC.18 preparation retains the [same-port reservation repair](https://github.com/hostwright/hostwright/pull/418) and adds the [SQLite qualification fixture repair](https://github.com/hostwright/hostwright/pull/419). It retains the managed-daemon correction, verified guest-kernel security backports and runtime source-patch ledger. The replacement requires its own clean source freeze, authenticated runtime producer, signed artifacts and complete qualification.
+RC.19 prepares the [TLS qualification fixture repair](https://github.com/hostwright/hostwright/pull/421) and optional preferences-only Homebrew cleanup. It retains the same-port reservation and SQLite fixture repairs, managed-daemon correction, verified guest-kernel security backports and runtime source-patch ledger. The macOS 26 final-payload reproducibility failure remains under investigation. A clean source freeze, authenticated runtime producer, signed artifacts and complete qualification remain required.
 
-Earlier source, sanitizer, fuzz and supply-chain results remain bound to their original source and artifacts. The RC.17 full ThreadSanitizer run failed its symlink fixture. Focused repair tests passed, but those checks and the interrupted RC.14 base do not qualify RC.18 or a full sanitizer suite.
+Earlier source, sanitizer, fuzz and supply-chain results remain bound to their original source and artifacts. RC.18 failed one ingress source test and its macOS 26 final-executable reproducibility comparison. Focused repair checks and passing earlier lanes do not qualify RC.19 or either full sanitizer suite.
 
-No supported RC or GA channel has been published. Official `brew install hostwright` is not available yet. See the [current GA readiness record](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-25-rc18.md) for the exact progress and remaining issue gates. A GA date is not confirmed, and official Homebrew acceptance remains a launch requirement.
+No supported RC or GA channel has been published. Official `brew install hostwright` is not available yet. See the [current GA readiness record](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-25-rc19.md) for the exact progress and remaining issue gates. A GA date is not confirmed, and official Homebrew acceptance remains a launch requirement.
 
 ## Signed development package
 
