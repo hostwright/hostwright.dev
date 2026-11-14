@@ -103,6 +103,6 @@ export const roadmap: RoadmapItem[] = [
     title: "15 · GA qualification",
     status: "in-progress",
     detail:
-      "Current-source security, fuzzing, sanitizers, live cycles, a 30-minute soak, VM recovery, documentation, signed release, vendor tap, and official Homebrew cask acceptance.",
+      "Focused source checks, signed artifact integrity, clean installation, one lifecycle per declared provider, recovery, desktop/Compose workflows, documentation and vendor-tap publication.",
   },
 ];
