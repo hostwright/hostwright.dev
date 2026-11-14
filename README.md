@@ -49,8 +49,8 @@ Current source prepares `0.0.2-rc.12` and requires fresh qualification. The froz
 | --- | --- |
 | `brew install hostwright/tap/hostwright` | Installs signed dev.12, an unsupported qualification prerelease with older contracts. |
 | Current source | Development builds; authenticated commands require a matching signed installation, identity bootstrap, and a running daemon. |
-| `brew install hostwright` | Unavailable until official Homebrew cask acceptance. This is a required launch goal, not a completed installation path. |
+| `brew install hostwright` | Unavailable on a fresh installation. Official Homebrew inclusion is deferred; v0.0.2 uses signed downloads and the vendor tap. |
 
-Complete installed-candidate and final-version release qualification remain pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported. Keep installation, compatibility, and roadmap copy aligned with the [GA readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-15.md); the combined GA and official Homebrew launch date is unconfirmed.
+Complete installed-candidate and final-version release qualification remain pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported. Keep installation, compatibility, and roadmap copy aligned with the [GA readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-15.md); final publication remains pending; official Homebrew inclusion does not block v0.0.2.
 
 Canonical scope: [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). Installation and compatibility truth belong in the docs content and current core repository contracts.
