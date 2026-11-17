@@ -1,26 +1,26 @@
 ---
-title: Install from source
-description: Build Hostwright locally or install the signed development package.
+title: Install Hostwright
+description: Install signed Hostwright v0.0.2 downloads or build current source.
 ---
 
-The current final-version candidate has been signed and notarized, with clean VM
-installation/upgrade/rollback evidence. A demonstrated delegated CLI output defect
-is being repaired before a new candidate is qualified. No stable v0.0.2 release has
-been published.
+Install Hostwright **v0.0.2** on Apple silicon with macOS 26 or later. Download the
+signed and notarized archive or package from the [v0.0.2 release](https://github.com/hostwright/hostwright/releases/tag/v0.0.2),
+or use the vendor Homebrew tap below. Review the release checksums and provenance
+alongside the download.
 
 The release uses five focused groups: source, artifact integrity, installation,
 working product and documentation. One lifecycle per declared provider is required;
 repeated timed campaigns and official Homebrew acceptance are outside this release.
 See the [release process](https://github.com/hostwright/hostwright/blob/main/docs/release/RELEASE_PROCESS.md).
 
-## Signed development package
+## Signed release
 
 ```bash
 brew install hostwright/tap/hostwright
 hostwright --version
 ```
 
-The vendor tap installs the immutable **dev.12** qualification prerelease. It uses Manifest v2 and SQLite schema v7, and cannot run the current-source quickstart. The v0.0.2 launch uses signed downloads and the vendor tap. Official Homebrew inclusion is deferred; fresh-machine `brew install hostwright` remains unavailable. See the [Homebrew distribution plan](https://github.com/hostwright/hostwright/blob/main/docs/reference/homebrew-distribution.md).
+The vendor tap installs **v0.0.2**. It uses Manifest v3 and SQLite schema v24 and includes the signed desktop app. Official Homebrew inclusion is deferred; use the full `hostwright/tap/hostwright` name on a fresh machine. See the [Homebrew distribution plan](https://github.com/hostwright/hostwright/blob/main/docs/reference/homebrew-distribution.md).
 
 The preserved upgrade baselines are:
 
@@ -29,7 +29,7 @@ The preserved upgrade baselines are:
 | dev.11 | `7d97d6c9ff878ec567c88e6993d4543ab8f0ad95` |
 | dev.12 | `71414005104933d8ee3591e8c91bc831bce2e2a2` |
 
-A current signed candidate must pass the [release process](https://github.com/hostwright/hostwright/blob/main/docs/release/RELEASE_PROCESS.md) before publication. Qualification covers the actual CLI, daemon, desktop app, helpers, archive, and package.
+The [release process](https://github.com/hostwright/hostwright/blob/main/docs/release/RELEASE_PROCESS.md) covers the CLI, daemon, desktop app, helpers, archive and package. The preserved prereleases above establish upgrade baselines and retain their original contracts.
 
 ## Build current source
 

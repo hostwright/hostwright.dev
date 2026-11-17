@@ -9,13 +9,13 @@ Hostwright is a **Mac-native desired-state container platform** for [Apple conta
 
 You declare services in a versioned [`hostwright.yaml`](/reference/manifest/) manifest. Hostwright validates intent, computes a deterministic plan, persists exact desired/observed/operation identity, and crosses a typed runtime-provider boundary for every runtime action.
 
-<Aside type="caution" title="In active development">
-Hostwright is in active development and not production ready. `brew install
-hostwright` does not exist today. Use the [documented source or vendor-tap installation](/getting-started/install-from-source/) and read
-[Limitations](/reference/limitations/) before relying on behavior.
+<Aside type="note" title="Hostwright v0.0.2">
+Install the [signed release or vendor tap](/getting-started/install-from-source/)
+and read [Limitations](/reference/limitations/) for the single-Mac scope. Official
+Homebrew inclusion is deferred; use `brew install hostwright/tap/hostwright`.
 </Aside>
 
-## Current development boundary
+## v0.0.2 boundary
 
 - Manifest v3, Runtime Provider API v2, Control API 2.2, and SQLite schema v24.
 - Authenticated local daemon lifecycle with plan confirmation, durable reservations,
@@ -23,8 +23,7 @@ hostwright` does not exist today. Use the [documented source or vendor-tap insta
 - Narrow Compose import with explicit CPU/memory mapping, followed by separately
   confirmed local execution.
 - Native desktop up/down/restart with confirmation, cancellation, and disconnect handling.
-- Signed development archives and packages plus the vendor tap; current-source
-  release qualification remains pending.
+- Signed and notarized release archives and packages plus the vendor tap.
 
 Multi-Mac, Kubernetes, Docker API/client parity, accelerators, scheduler optimization,
 team/MDM/cloud features, automatic updates, and Homebrew-core publication are deferred.
@@ -44,4 +43,4 @@ Read [limitations](/reference/limitations/) and the exact [compatibility matrix]
 
 - Read [Why Hostwright](/overview/why-hostwright/) and [Desired state](/concepts/desired-state/).
 - Read [Non-goals](/overview/non-goals/) and [Limitations](/reference/limitations/) for the scope and current support boundary.
-- Follow [Install from source](/getting-started/install-from-source/) and the [Quick start](/getting-started/quick-start/).
+- Follow [Install Hostwright](/getting-started/install-from-source/) and the [Quick start](/getting-started/quick-start/).

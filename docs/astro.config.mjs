@@ -81,7 +81,7 @@ export default defineConfig({
           label: "Getting started",
           items: [
             {
-              label: "Install from source",
+              label: "Install Hostwright",
               slug: "getting-started/install-from-source",
             },
             { label: "Quick start", slug: "getting-started/quick-start" },
