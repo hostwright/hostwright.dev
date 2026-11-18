@@ -43,7 +43,7 @@ Docs use the existing Cloudflare Pages project `hostwright-docs`, configured wit
 
 ## Release truth
 
-Hostwright v0.0.2 is the single-Mac release for Apple silicon on macOS 26 or later. Install the signed archive or package from the [immutable release](https://github.com/hostwright/hostwright/releases/tag/v0.0.2), or use `brew install hostwright/tap/hostwright`. Official Homebrew inclusion is deferred.
+Hostwright v0.0.2 is the single-Mac release for Apple silicon on macOS 26 or later. Install the signed archive or package from the [v0.0.2 release](https://github.com/hostwright/hostwright/releases/tag/v0.0.2), or use `brew install hostwright/tap/hostwright`. Official Homebrew inclusion is deferred.
 
 The release covers local CLI workflows, CPU/memory admission, narrow Compose import, and confirmed desktop up/down/restart. Interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24. The [compatibility matrix](https://docs.hostwright.dev/reference/compatibility/) records the provider boundary. One physical host and a macOS VM establish no independent-hardware or high-availability claim.
 
