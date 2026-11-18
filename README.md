@@ -43,14 +43,10 @@ Docs use the existing Cloudflare Pages project `hostwright-docs`, configured wit
 
 ## Release truth
 
-Current source prepares `0.0.2-rc.12` and requires fresh qualification. The frozen `0.0.2-rc.11` candidate completed signed staging and its first dev.11 VM upgrade. The subsequent rollback and compensation failed; the [raw failure is retained](https://github.com/hostwright/hostwright/issues/278#issuecomment-6185484144), and the candidate is not accepted. Its source matrix, ASan and TSan each passed 3,544 unique cases with no failures or skips; six critical fuzz targets completed five-minute runs. No supported RC or GA channel has been published. The accepted scope is single-Mac CLI, local CPU/memory admission, narrow Compose import, and confirmed native desktop up/down/restart. Current interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24.
+Hostwright v0.0.2 is the single-Mac release for Apple silicon on macOS 26 or later. Install the signed archive or package from the [v0.0.2 release](https://github.com/hostwright/hostwright/releases/tag/v0.0.2), or use `brew install hostwright/tap/hostwright`. Official Homebrew inclusion is deferred.
 
-| Installation path | What the site may claim |
-| --- | --- |
-| `brew install hostwright/tap/hostwright` | Installs signed dev.12, an unsupported qualification prerelease with older contracts. |
-| Current source | Development builds; authenticated commands require a matching signed installation, identity bootstrap, and a running daemon. |
-| `brew install hostwright` | Unavailable on a fresh installation. Official Homebrew inclusion is deferred; v0.0.2 uses signed downloads and the vendor tap. |
+The release covers local CLI workflows, CPU/memory admission, narrow Compose import, and confirmed desktop up/down/restart. Interfaces are Manifest v3, Control API 2.2, Runtime Provider API v2, and SQLite schema v24. The [compatibility matrix](https://docs.hostwright.dev/reference/compatibility/) records the provider boundary. One physical host and a macOS VM establish no independent-hardware or high-availability claim.
 
-Complete installed-candidate and final-version release qualification remain pending. Do not call the CPU/memory quickstart tested before its real live transcript passes, or present deferred products as supported. Keep installation, compatibility, and roadmap copy aligned with the [GA readiness snapshot](https://github.com/hostwright/hostwright/blob/main/docs/release/ga-readiness-2026-10-15.md); final publication remains pending; official Homebrew inclusion does not block v0.0.2.
+The [release process](https://github.com/hostwright/hostwright/blob/main/docs/release/RELEASE_PROCESS.md) uses five focused groups: source, artifact integrity, installation, working product and documentation. Historical development evidence remains bound to its original source and artifacts.
 
-Canonical scope: [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). Installation and compatibility truth belong in the docs content and current core repository contracts.
+The immutable dev.11/dev.12 builds remain historical qualification prereleases. Multi-Mac, Kubernetes, Docker-client compatibility, accelerators, cloud/team features and automatic updates are outside v0.0.2. See [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md).

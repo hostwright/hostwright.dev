@@ -32,7 +32,7 @@ export const nonGoals: NonGoal[] = [
 export const underResearch: NonGoal[] = [
   {
     title: "Official Homebrew acceptance",
-    detail: "Official Homebrew inclusion is deferred. The v0.0.2 release uses signed downloads and the vendor tap; current public tap packages remain unsupported qualification builds until final publication.",
+    detail: "Official Homebrew inclusion is deferred. The v0.0.2 release uses signed downloads and the vendor tap.",
   },
   {
     title: "Accelerators deferred",

@@ -3,9 +3,9 @@ title: Security and safety
 description: "The operational security posture: mutation boundaries, redaction, image trust, network exposure, and untrusted input."
 ---
 
-Hostwright `0.0.2` is in candidate preparation. Final `v0.0.2` acceptance remains pending; earlier development evidence does not qualify these bytes.
+Hostwright `v0.0.2` uses signed downloads and the vendor tap. Its release evidence binds the source, staged artifacts and public downloads; historical development evidence keeps its original bindings.
 
-The accepted release scope is one Apple silicon Mac, explicit local workload lifecycle, CPU/memory admission, narrow Compose import, and the desktop console. Multi-Mac, Kubernetes, Docker-client compatibility, Homebrew-core, and team/MDM/cloud claims are deferred under [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). The exact implemented capabilities are emitted by `hostwright capabilities --json`; support requires passing conformance and release evidence for the declared provider/version cell.
+The accepted release scope is one Apple silicon Mac, explicit local workload lifecycle, CPU/memory admission, narrow Compose import, and the desktop console. Multi-Mac, Kubernetes, Docker-client compatibility, Homebrew-core, and team/MDM/cloud claims are deferred under [ADR 0015](https://github.com/hostwright/hostwright/blob/main/docs/design/adr-0015-reduced-local-release.md). The exact implemented capabilities are emitted by `hostwright capabilities --json`; support is limited to the declared provider/version cells covered by the focused release evidence.
 
 ## Runtime Boundary
 
@@ -147,9 +147,9 @@ The distribution lifecycle does not create, register, or autostart a LaunchAgent
 
 The trusted path requires exact non-ambiguous Developer ID Application and Installer fingerprints from one team, a preconfigured `notarytool` Keychain profile, two byte-identical clean payload builds, hardened-runtime signatures, Apple acceptance, online ZIP tickets, a stapled package ticket, Gatekeeper acceptance, exact payload/package inventories, per-artifact SPDX, source/digest-bound provenance, sorted checksums, exact single-signer CMS verification, and final independent extraction/expansion verification. Secrets are not accepted in argv. SIGINT/SIGTERM and explicit cancellation use the same bounded process-tree cleanup path.
 
-The protected release workflow separates build/sign, attestation, and publication. Repository code runs with read-only contents permission and no OIDC or publication authority. A GitHub-hosted no-checkout job receives only OIDC/attestation authority for the retained signed files. Only the final no-checkout publication job receives contents write permission. Actions are commit-pinned, tags are immutable, published bytes are downloaded and compared, GitHub attestations are verified, and a failure after tag creation removes the release/tag.
+The protected release workflow separates build/sign, attestation, and publication. Build code runs with read-only contents permission and no OIDC or publication authority. A GitHub-hosted job uses OIDC to attest the retained signed files. Publication checks out protected workflow tools to verify the accepted source and signed bytes. GitHub denied the v0.0.2 workflow token's publication write after the protected checks passed. An authorized maintainer then published the same signed bytes and verified all public assets against the staged inventory. The repository protects version tags from update and deletion. A failure after tag creation retains the tag and published assets for maintainer review.
 
-Immutable dev.11/dev.12 releases provide signed/notarized archives and packages; the vendor tap installs dev.12 as an unsupported qualification prerelease. Current RC and final-version bytes require their own signing, Gatekeeper, full lifecycle, and protected acceptance evidence. Local unsigned artifacts cannot satisfy those gates.
+The signed v0.0.2 release provides signed/notarized archives and packages, with the same verified archive distributed by the vendor tap. dev.11/dev.12 remain historical qualification prereleases. Local unsigned artifacts cannot satisfy the release gates.
 
 ## Control Surface Boundary
 

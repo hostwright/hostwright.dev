@@ -17,7 +17,7 @@ export interface RoadmapItem {
 export const roadmap: RoadmapItem[] = [
   {
     title: "01 · Truth and contracts",
-    status: "in-progress",
+    status: "implemented",
     detail:
       "Manifest/API/provider/plugin/state versions, UUID identity, saga state, migration, capability truth, and governance.",
   },
@@ -31,7 +31,7 @@ export const roadmap: RoadmapItem[] = [
     title: "03 · Apple providers",
     status: "implemented",
     detail:
-      "Conformant Apple CLI and pinned Containerization providers with capability negotiation and safe migration.",
+      "Apple CLI and pinned Containerization providers with capability negotiation and safe migration.",
   },
   {
     title: "04 · Complete local lifecycle",
@@ -71,7 +71,7 @@ export const roadmap: RoadmapItem[] = [
   },
   {
     title: "10 · Local capacity admission",
-    status: "in-progress",
+    status: "implemented",
     detail:
       "Authenticated local admission, durable CPU/memory reservations, recovery, and fresh pressure observations. Optimization and accelerators are deferred.",
   },
@@ -89,19 +89,19 @@ export const roadmap: RoadmapItem[] = [
   },
   {
     title: "13 · Local Compose import",
-    status: "in-progress",
+    status: "implemented",
     detail:
       "Narrow resource-aware Compose conversion and confirmed local execution. Docker API/client and IDE integrations are deferred.",
   },
   {
     title: "14 · Native local control",
-    status: "in-progress",
+    status: "implemented",
     detail:
       "Authenticated SwiftUI up/down/restart, confirmation, cancellation, disconnect handling, and supported packaging. Team/MDM/cloud controls are deferred.",
   },
   {
-    title: "15 · GA qualification",
-    status: "in-progress",
+    title: "15 · v0.0.2 release",
+    status: "implemented",
     detail:
       "Focused source checks, signed artifact integrity, clean installation, one lifecycle per declared provider, recovery, desktop/Compose workflows, documentation and vendor-tap publication.",
   },
