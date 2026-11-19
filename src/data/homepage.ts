@@ -17,7 +17,7 @@ export const problem = {
   body: [
     "Apple container gives the Mac a native container runtime: lightweight Linux VMs, an OCI image flow, and a command surface built for Apple silicon.",
     "Running a multi-service stack requires more than starting containers: declared state, validation, health checks, restart policy, drift detection between declared and observed state, and ownership-checked cleanup.",
-    "Hostwright is that layer. The accepted v0.0.2 scope is one Mac; multi-Mac orchestration is deferred.",
+    "Hostwright is that layer. v0.0.2 is the signed release for one Mac: CLI, daemon, desktop app, and Compose import. Multi-Mac orchestration is deferred.",
   ],
 };
 
@@ -28,7 +28,7 @@ export interface Capability {
 
 export const whatItIs = {
   heading: "What Hostwright does",
-  intro: "Current capabilities of the CLI and daemon.",
+  intro: "What ships in v0.0.2.",
   capabilities: [
     {
       title: "Declares services in hostwright.yaml",
@@ -58,12 +58,27 @@ export const whatItIs = {
     {
       title: "Runs doctor checks",
       detail:
-        "Runs safe local checks for OS, architecture, Swift, manifest presence, and `container` executable lookup.",
+        "Runs safe local checks for OS, architecture, manifest presence, and required runtime tools. A release install does not need Swift.",
     },
     {
       title: "Treats destruction as explicit",
       detail:
         "Cleanup is dry-run first and token-confirmed, limited to exact owned eligible containers. Broad garbage collection is not implemented.",
+    },
+    {
+      title: "Imports a narrow Compose subset",
+      detail:
+        "hostwright import-stack converts a safe Compose subset into a reviewable manifest, with an explicit loss report. It never mutates anything.",
+    },
+    {
+      title: "Includes a native desktop app",
+      detail:
+        "The signed SwiftUI app selects a local manifest, shows status, logs, and events, and runs confirmed up, down, and restart.",
+    },
+    {
+      title: "Ships as signed downloads",
+      detail:
+        "Signed and notarized archive and package with checksums, provenance, and corresponding source, plus the hostwright/tap Homebrew tap.",
     },
   ] satisfies Capability[],
 };

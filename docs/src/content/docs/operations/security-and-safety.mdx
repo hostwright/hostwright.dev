@@ -354,10 +354,9 @@ Phase 10 implements a host-native accelerator service only with a threat model, 
 
 ## Unsupported Security-Sensitive Scope
 
-The current development build does not yet include the following. Their v0.0.2 implementations are owned by Phases 02–15; this list is a present-tense safety boundary, not a non-goal list:
+Hostwright v0.0.2 does not include the following. This list is a present-tense safety boundary, not a non-goal list:
 
 - privileged helper;
-- supported/qualified installer channel or launch agent;
 - daemon mutation outside the shared local lifecycle saga or without exact ownership and fencing;
 - arbitrary DNS mutation or unmanaged tunnel management;
 - cloud control plane;
@@ -365,7 +364,7 @@ The current development build does not yet include the following. Their v0.0.2 i
 - GPU/ANE scheduling, Metal/Core ML/MLX/PyTorch MPS container support, host-native accelerator helpers, or host accelerator device exposure;
 - generic plugin loader, capability invocation, remote plugin registry, binary plugin distribution, or untrusted extension execution;
 - cloud team service, central remote control, hosted audit log, user tracking, enterprise support workflow, or remote policy distribution;
-- credentialed passing Developer ID/notarization/stapling/Gatekeeper evidence, published signed installer verification, vendor-tap availability, dependency/image SBOM claims, or vulnerability scanning;
+- dependency/image SBOM claims beyond the published release SBOMs, or vulnerability scanning;
 - external telemetry, hosted diagnostics, or automatic diagnostic upload.
 - unredacted OSLog fields, OSLog-derived operation authority, or automatic unified-log export.
 - support SLA, enterprise support workflow, enforced CODEOWNERS, or branch-protection policy.
